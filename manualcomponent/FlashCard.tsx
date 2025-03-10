@@ -43,6 +43,9 @@ const FlashCard = ({ page: page, direction: direction }: PageType) => {
       </div>
       {page === "practising" && direction === "german_to_meaning" && (
         <div className="px-8">
+          <div className="text-center">
+            Please click on flashcard to switch it!
+          </div>
           <Card
             className="mt-6 p-6 cursor-pointer"
             onClick={() => setShowMeaning(!showMeaning)}
@@ -51,7 +54,7 @@ const FlashCard = ({ page: page, direction: direction }: PageType) => {
               <div className="text-xl font-semibold">
                 {showMeaning ? (
                   <div className="py-4 text-3xl font-bold">
-                    {WordList[index].word}
+                    {WordList[index]?.word}
                   </div>
                 ) : (
                   <div className="border flex flex-col gap-1">
@@ -59,28 +62,28 @@ const FlashCard = ({ page: page, direction: direction }: PageType) => {
                       className="p-2
            border border-amber-400"
                     >
-                      {WordList[index].bangla}
+                      {WordList[index]?.bangla}
                     </span>
                     <span
                       className="p-2
            border border-amber-400"
                     >
-                      {WordList[index].english}
+                      {WordList[index]?.english}
                     </span>
                     <span
                       className="p-2
            border border-amber-400"
                     >
-                      {WordList[index].synonym}
+                      {WordList[index]?.synonym}
                     </span>
                     <span
                       className="p-2
            border border-amber-400"
                     >
-                      {WordList[index].example}
+                      {WordList[index]?.example}
                     </span>
-                    {WordList[index].picture && (
-                      <Image src={WordList[index].picture} alt="img" />
+                    {WordList[index]?.picture && (
+                      <Image src={WordList[index]?.picture} alt="img" />
                     )}
                   </div>
                 )}
@@ -91,6 +94,9 @@ const FlashCard = ({ page: page, direction: direction }: PageType) => {
       )}
       {page === "practising" && direction === "meaning_to_german" && (
         <div className="px-8">
+          <div className="text-center">
+            Please click on flashcard to switch it!
+          </div>
           <Card
             className="mt-6 p-6 cursor-pointer"
             onClick={() => setShowMeaning(!showMeaning)}
@@ -103,33 +109,33 @@ const FlashCard = ({ page: page, direction: direction }: PageType) => {
                       className="p-2
            border border-amber-400"
                     >
-                      {WordList[index].bangla}
+                      {WordList[index]?.bangla}
                     </span>
                     <span
                       className="p-2
            border border-amber-400"
                     >
-                      {WordList[index].english}
+                      {WordList[index]?.english}
                     </span>
                     <span
                       className="p-2
            border border-amber-400"
                     >
-                      {WordList[index].synonym}
+                      {WordList[index]?.synonym}
                     </span>
                     <span
                       className="p-2
            border border-amber-400"
                     >
-                      {WordList[index].example}
+                      {WordList[index]?.example}
                     </span>
-                    {WordList[index].picture && (
+                    {WordList[index]?.picture && (
                       <Image src={WordList[index].picture} alt="img" />
                     )}
                   </div>
                 ) : (
                   <div className="py-4 text-3xl font-bold">
-                    {WordList[index].word}
+                    {WordList[index]?.word}
                   </div>
                 )}
               </div>
@@ -139,33 +145,33 @@ const FlashCard = ({ page: page, direction: direction }: PageType) => {
       )}
       {page === "learning" && (
         <div className="px-8">
-          <div className="py-4 text-3xl font-bold">{WordList[index].word}</div>
+          <div className="py-4 text-3xl font-bold">{WordList[index]?.word}</div>
           <div className="border flex flex-col gap-1">
             <span
               className="p-2
            border border-amber-400"
             >
-              {WordList[index].bangla}
+              {WordList[index]?.bangla}
             </span>
             <span
               className="p-2
            border border-amber-400"
             >
-              {WordList[index].english}
+              {WordList[index]?.english}
             </span>
             <span
               className="p-2
            border border-amber-400"
             >
-              {WordList[index].synonym}
+              {WordList[index]?.synonym}
             </span>
             <span
               className="p-2
            border border-amber-400"
             >
-              {WordList[index].example}
+              {WordList[index]?.example}
             </span>
-            {WordList[index].picture && (
+            {WordList[index]?.picture && (
               <Image src={WordList[index].picture} alt="img" />
             )}
           </div>

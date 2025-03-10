@@ -22,11 +22,17 @@ function Navbar() {
                             React.createElement(link_1["default"], { href: "/practising/meaning-to-german", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "Meaning to German"))))),
                 React.createElement("li", { className: "relative", onMouseEnter: function () { return setDropdown("Test"); }, onMouseLeave: function () { return setDropdown(""); } },
                     React.createElement("button", { className: "border text-white px-4 py-2 rounded-lg transition duration-600 " + (active === "Test" ? "bg-blue-500" : "hover:bg-blue-700") }, "Test"),
-                    dropdown === "Test" && (React.createElement("ul", { className: "text-white absolute right-0 w-48 shadow-lg" },
+                    dropdown === "Test" && (React.createElement("ul", { className: "text-sm text-white absolute right-0 w-48 shadow-lg" },
                         React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
-                            React.createElement(link_1["default"], { href: "/exam/mcq-questions", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "MCQ")),
+                            React.createElement(link_1["default"], { href: "/exam/mcq-bangla-to-german", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "MCQ:Bangla to German")),
                         React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
-                            React.createElement(link_1["default"], { href: "/exam/fill-blanks", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "Fill in the Blank")))))),
+                            React.createElement(link_1["default"], { href: "/exam/mcq-german-to-bangla", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "MCQ:German to Bangla")),
+                        React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
+                            React.createElement(link_1["default"], { href: "/exam/mcq-german-to-english", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "MCQ:German to English")),
+                        React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
+                            React.createElement(link_1["default"], { href: "/exam/mcq-meaning-to-german", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "MCQ:Meaning to German")),
+                        React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
+                            React.createElement(link_1["default"], { href: "/exam/fill-in-the-blank", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "Fill in the blank")))))),
             React.createElement(QuestionSelection_1["default"], null))));
 }
 exports["default"] = Navbar;

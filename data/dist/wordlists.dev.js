@@ -36,5 +36,29 @@ var WordList = [{
   synonym: "",
   example: "",
   picture: ""
+}, {
+  id: 5,
+  word: "Beschleunigung",
+  bangla: "ত্বরণ, গতি বৃদ্ধি",
+  english: "acceleration",
+  synonym: "",
+  example: "",
+  picture: ""
+}, {
+  id: 6,
+  word: "fassen",
+  bangla: "ধরা, পড়া, বুঝা, ধারণ করা",
+  english: "to grasp, to catch, to hold",
+  synonym: "fangen",
+  example: "",
+  picture: ""
+}, {
+  id: 7,
+  word: "Rastlosigkeit",
+  bangla: "থামেনা, চলতে থাকে",
+  english: "restless",
+  synonym: "",
+  example: "",
+  picture: ""
 }];
 exports.WordList = WordList;
