@@ -3,6 +3,7 @@
 exports.__esModule = true;
 var link_1 = require("next/link");
 var react_1 = require("react");
+var QuestionSelection_1 = require("./QuestionSelection");
 function Navbar() {
     var _a = react_1.useState(""), active = _a[0], setActive = _a[1];
     var _b = react_1.useState("null"), dropdown = _b[0], setDropdown = _b[1];
@@ -25,6 +26,7 @@ function Navbar() {
                         React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
                             React.createElement(link_1["default"], { href: "/test/mcq", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "MCQ")),
                         React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
-                            React.createElement(link_1["default"], { href: "/test/fill-in-the-blank", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "Fill in the Blank")))))))));
+                            React.createElement(link_1["default"], { href: "/test/fill-in-the-blank", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "Fill in the Blank")))))),
+            React.createElement(QuestionSelection_1["default"], null))));
 }
 exports["default"] = Navbar;

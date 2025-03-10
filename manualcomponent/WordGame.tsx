@@ -122,17 +122,3 @@ export default function WordGame() {
     </div>
   );
 }
-
-const words = [
-  {
-    word: "Haus",
-    germanMeaning: "house",
-    englishMeaning: "house",
-    banglaMeaning: "বাড়ি",
-    synonym: "building",
-    picture: "https://example.com/house.jpg",
-    quizOptions: ["home", "building", "apartment", "car"],
-    correctAnswer: "building",
-  },
-  // Add more words as needed
-];

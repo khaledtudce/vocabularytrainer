@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import QuestionSelection from "./QuestionSelection";
 
 export default function Navbar() {
   const [active, setActive] = useState("");
@@ -90,6 +91,7 @@ export default function Navbar() {
             )}
           </li>
         </ul>
+        <QuestionSelection />
       </div>
     </nav>
   );
