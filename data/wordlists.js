@@ -1,10 +1,11 @@
-export const wordList = [
+export const WordList = [
   {
     id: 1,
     word: "übergegriffen",
     bangla: "ছড়িয়ে পড়েছে (আগুন, অসন্তোষ, সহিংসতা), প্রসারিত হয়েছে",
     english: "to spread (fire, violence, dissatisfaction), to extend",
     synonym: "",
+    example: "",
     picture: "",
   },
   {
@@ -13,6 +14,7 @@ export const wordList = [
     bangla: "বড়, ব্যাপক, সামগ্রিক, সর্বোপরি",
     english: "extensive, comprehensive, wide-ranging",
     synonym: "",
+    example: "",
     picture: "",
   },
   {
@@ -21,6 +23,7 @@ export const wordList = [
     bangla: "বাধা, প্রতিবন্ধকতা, প্রভাবিতকরণ",
     english: "hindrance, hamper, adverse effect",
     synonym: "",
+    example: "",
     picture: "",
   },
   {
@@ -29,6 +32,7 @@ export const wordList = [
     bangla: "অপ্রতিরোধ্য, অবিরাম",
     english: "unstoppable, relentless",
     synonym: "",
+    example: "",
     picture: "",
   },
 ];

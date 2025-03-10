@@ -3,13 +3,14 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.wordList = void 0;
-var wordList = [{
+exports.WordList = void 0;
+var WordList = [{
   id: 1,
   word: "übergegriffen",
   bangla: "ছড়িয়ে পড়েছে (আগুন, অসন্তোষ, সহিংসতা), প্রসারিত হয়েছে",
   english: "to spread (fire, violence, dissatisfaction), to extend",
   synonym: "",
+  example: "",
   picture: ""
 }, {
   id: 2,
@@ -17,6 +18,7 @@ var wordList = [{
   bangla: "বড়, ব্যাপক, সামগ্রিক, সর্বোপরি",
   english: "extensive, comprehensive, wide-ranging",
   synonym: "",
+  example: "",
   picture: ""
 }, {
   id: 3,
@@ -24,6 +26,7 @@ var wordList = [{
   bangla: "বাধা, প্রতিবন্ধকতা, প্রভাবিতকরণ",
   english: "hindrance, hamper, adverse effect",
   synonym: "",
+  example: "",
   picture: ""
 }, {
   id: 4,
@@ -31,6 +34,7 @@ var wordList = [{
   bangla: "অপ্রতিরোধ্য, অবিরাম",
   english: "unstoppable, relentless",
   synonym: "",
+  example: "",
   picture: ""
 }];
-exports.wordList = wordList;
+exports.WordList = WordList;

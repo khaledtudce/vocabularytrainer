@@ -1,11 +1,14 @@
 import FlashCard from "@/manualcomponent/FlashCard";
 import Navbar from "@/manualcomponent/NavBar";
+import React from "react";
 
-export default function Home() {
+const page = () => {
   return (
     <div className="bg-bgcolor h-screen">
       <Navbar />
-      <FlashCard />
+      <FlashCard page={"practising"} direction={"meaning_to_german"} />
     </div>
   );
-}
+};
+
+export default page;

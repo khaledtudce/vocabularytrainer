@@ -73,7 +73,7 @@ export default function Navbar() {
               <ul className="text-white absolute right-0 w-48 shadow-lg">
                 <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
                   <Link
-                    href="/test/mcq"
+                    href="/exam/mcq-questions"
                     className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
                   >
                     MCQ
@@ -81,7 +81,7 @@ export default function Navbar() {
                 </li>
                 <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
                   <Link
-                    href="/test/fill-in-the-blank"
+                    href="/exam/fill-blanks"
                     className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
                   >
                     Fill in the Blank

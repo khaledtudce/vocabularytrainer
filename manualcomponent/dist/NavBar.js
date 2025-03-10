@@ -24,9 +24,9 @@ function Navbar() {
                     React.createElement("button", { className: "border text-white px-4 py-2 rounded-lg transition duration-600 " + (active === "Test" ? "bg-blue-500" : "hover:bg-blue-700") }, "Test"),
                     dropdown === "Test" && (React.createElement("ul", { className: "text-white absolute right-0 w-48 shadow-lg" },
                         React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
-                            React.createElement(link_1["default"], { href: "/test/mcq", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "MCQ")),
+                            React.createElement(link_1["default"], { href: "/exam/mcq-questions", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "MCQ")),
                         React.createElement("li", { className: "mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg" },
-                            React.createElement(link_1["default"], { href: "/test/fill-in-the-blank", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "Fill in the Blank")))))),
+                            React.createElement(link_1["default"], { href: "/exam/fill-blanks", className: "block px-4 py-2 hover:bg-blue-700 rounded-lg" }, "Fill in the Blank")))))),
             React.createElement(QuestionSelection_1["default"], null))));
 }
 exports["default"] = Navbar;
