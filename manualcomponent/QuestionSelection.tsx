@@ -2,9 +2,17 @@
 
 import { useState } from "react";
 
-export default function DifficultySelector() {
+type DifficultySelectorType = {
+  onSelectWordIdFrom: (selectedWordIdFrom: number) => void;
+  onSelectWordIdTo: (selectedWordIdTo: number) => void;
+};
+
+export default function DifficultySelector({
+  onSelectWordIdFrom,
+  onSelectWordIdTo,
+}: DifficultySelectorType) {
   const [difficulty, setDifficulty] = useState("Medium");
-  const [range, setRange] = useState({ from: 1, to: 1600 });
+  const [range, setRange] = useState({ from: 1, to: 30 });
 
   return (
     <div
@@ -29,11 +37,12 @@ export default function DifficultySelector() {
             <select
               className="w-full rounded border"
               value={range.from}
-              onChange={(e) =>
-                setRange({ ...range, from: Number(e.target.value) })
-              }
+              onChange={(e) => {
+                setRange({ ...range, from: Number(e.target.value) });
+                onSelectWordIdFrom(Number(e.target.value));
+              }}
             >
-              {Array.from({ length: 1600 }, (_, i) => i + 1).map((num) => (
+              {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
                 <option key={num} value={num}>
                   {num}
                 </option>
@@ -43,11 +52,12 @@ export default function DifficultySelector() {
             <select
               className="w-full rounded border"
               value={range.to}
-              onChange={(e) =>
-                setRange({ ...range, to: Number(e.target.value) })
-              }
+              onChange={(e) => {
+                setRange({ ...range, to: Number(e.target.value) });
+                onSelectWordIdTo(Number(e.target.value));
+              }}
             >
-              {Array.from({ length: 1599 }, (_, i) => i + 1).map((num) => (
+              {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
                 <option key={num} value={num}>
                   {num}
                 </option>

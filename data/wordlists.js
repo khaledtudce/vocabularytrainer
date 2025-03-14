@@ -7,6 +7,7 @@ export const WordList = [
     synonym: "",
     example: "",
     picture: "",
+    hardlevel: "",
   },
   {
     id: 2,
@@ -16,6 +17,7 @@ export const WordList = [
     synonym: "",
     example: "",
     picture: "",
+    hardlevel: "",
   },
   {
     id: 3,
@@ -25,6 +27,7 @@ export const WordList = [
     synonym: "",
     example: "",
     picture: "",
+    hardlevel: "",
   },
   {
     id: 4,
@@ -34,6 +37,7 @@ export const WordList = [
     synonym: "",
     example: "",
     picture: "",
+    hardlevel: "",
   },
   {
     id: 5,
@@ -43,6 +47,7 @@ export const WordList = [
     synonym: "",
     example: "",
     picture: "",
+    hardlevel: "",
   },
   {
     id: 6,
@@ -52,6 +57,7 @@ export const WordList = [
     synonym: "fangen",
     example: "",
     picture: "",
+    hardlevel: "",
   },
   {
     id: 7,
@@ -61,5 +67,6 @@ export const WordList = [
     synonym: "",
     example: "",
     picture: "",
+    hardlevel: "",
   },
 ];

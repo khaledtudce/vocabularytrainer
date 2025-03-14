@@ -4,7 +4,15 @@ import Link from "next/link";
 import { useState } from "react";
 import QuestionSelection from "./QuestionSelection";
 
-export default function Navbar() {
+type NavbarType = {
+  onSelectWordIdFrom: (selectedWordIdFrom: number) => void;
+  onSelectWordIdTo: (selectedWordIdTo: number) => void;
+};
+
+export default function Navbar({
+  onSelectWordIdFrom,
+  onSelectWordIdTo,
+}: NavbarType) {
   const [active, setActive] = useState("");
   const [dropdown, setDropdown] = useState("null");
 
@@ -115,7 +123,10 @@ export default function Navbar() {
             )}
           </li>
         </ul>
-        <QuestionSelection />
+        <QuestionSelection
+          onSelectWordIdFrom={onSelectWordIdFrom}
+          onSelectWordIdTo={onSelectWordIdTo}
+        />
       </div>
     </nav>
   );
