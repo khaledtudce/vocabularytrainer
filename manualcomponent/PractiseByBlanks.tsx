@@ -112,15 +112,18 @@ export default function PractiseByBlanks({
             Wrong Input: {wrongInput}
           </p>
         )}
-        <input
-          type="text"
-          value={input}
-          onChange={handleInputChange}
-          disabled={completed}
-          className={`mt-4 p-2 border border-blue-500 rounded w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            wrongInput ? "border-red-500" : ""
-          }`}
-        />
+        <div className="flex items-center justify-center gap-1">
+          <h1 className="font-semibold mt-2">Please write here: </h1>
+          <input
+            type="text"
+            value={input}
+            onChange={handleInputChange}
+            disabled={completed}
+            className={`mt-4 p-2 border border-blue-500 rounded w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              wrongInput ? "border-red-500" : ""
+            }`}
+          />
+        </div>
         {completed && (
           <p className="text-green-600 font-bold mt-2">
             🎉 Well done! You completed the word! 🎉
