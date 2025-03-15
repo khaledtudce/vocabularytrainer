@@ -96,6 +96,14 @@ export default function Navbar({
                 </li>
                 <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
                   <Link
+                    href="/practising/mcq-english-to-german"
+                    className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
+                  >
+                    MCQ:English to German
+                  </Link>
+                </li>
+                <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
+                  <Link
                     href="/practising/mcq-meaning-to-german"
                     className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
                   >

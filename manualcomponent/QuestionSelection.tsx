@@ -11,8 +11,9 @@ export default function DifficultySelector({
   onSelectWordIdFrom,
   onSelectWordIdTo,
 }: DifficultySelectorType) {
-  const [difficulty, setDifficulty] = useState("Medium");
+  const [difficulty, setDifficulty] = useState("Custom");
   const [range, setRange] = useState({ from: 1, to: 30 });
+  // in case of custom and hard, we provide another new list
 
   return (
     <div

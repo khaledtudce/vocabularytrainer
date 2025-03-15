@@ -5,7 +5,7 @@ import MCQCard from "@/manualcomponent/MCQCard";
 import Navbar from "@/manualcomponent/NavBar";
 import React, { useState } from "react";
 
-const MCQBanglaToGerman = () => {
+const MCQGermanToBangla = () => {
   const [selectedWordIdFrom, setSelectedWordIdFrom] = useState(1);
   const [selectedWordIdTo, setSelectedWordIdTo] = useState(WordList.length);
 
@@ -18,9 +18,10 @@ const MCQBanglaToGerman = () => {
       <MCQCard
         selectedWordIdFrom={selectedWordIdFrom}
         selectedWordIdTo={selectedWordIdTo}
+        mcqdirection={"germanToBangla"}
       />
     </div>
   );
 };
 
-export default MCQBanglaToGerman;
+export default MCQGermanToBangla;
