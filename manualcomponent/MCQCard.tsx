@@ -41,8 +41,8 @@ const MCQCard = ({ selectedWordIdFrom, selectedWordIdTo }: MCQCardType) => {
   const prevWord = () => {
     setSelectedAnswer("");
     setIndex((prev) => {
-      if (prev === selectedWordIdFrom) {
-        return selectedWordIdFrom;
+      if (prev <= selectedWordIdFrom) {
+        return selectedWordIdFrom - 1;
       } else {
         return (prev - 1) % WordList.length;
       }
@@ -50,11 +50,10 @@ const MCQCard = ({ selectedWordIdFrom, selectedWordIdTo }: MCQCardType) => {
   };
 
   const nextWord = () => {
-    // it goes to minus!!!!
     setSelectedAnswer("");
     setIndex((prev) => {
-      if (prev === selectedWordIdTo) {
-        return selectedWordIdTo;
+      if (prev >= selectedWordIdTo - 1) {
+        return selectedWordIdTo - 1;
       } else {
         return (prev + 1) % WordList.length;
       }

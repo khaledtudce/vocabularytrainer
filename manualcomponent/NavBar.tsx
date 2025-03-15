@@ -45,13 +45,13 @@ export default function Navbar({
               Practising
             </button>
             {dropdown === "Practising" && (
-              <ul className="text-white absolute right-0 w-48 shadow-lg rounded-lg">
+              <ul className="text-sm text-white absolute right-0 w-56 shadow-lg rounded-lg">
                 <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
                   <Link
                     href="/practising/german-to-meaning"
                     className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
                   >
-                    German to Meaning
+                    Flashcard:German to Meaning
                   </Link>
                 </li>
                 <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
@@ -59,7 +59,47 @@ export default function Navbar({
                     href="/practising/meaning-to-german"
                     className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
                   >
-                    Meaning to German
+                    Flashcard:Meaning to German
+                  </Link>
+                </li>
+                <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
+                  <Link
+                    href="/practising/fill-in-the-blanks"
+                    className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
+                  >
+                    Fill in the blanks
+                  </Link>
+                </li>
+                <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
+                  <Link
+                    href="/practising/mcq-bangla-to-german"
+                    className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
+                  >
+                    MCQ:Bangla to German
+                  </Link>
+                </li>
+                <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
+                  <Link
+                    href="/practising/mcq-german-to-bangla"
+                    className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
+                  >
+                    MCQ:German to Bangla
+                  </Link>
+                </li>
+                <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
+                  <Link
+                    href="/practising/mcq-german-to-english"
+                    className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
+                  >
+                    MCQ:German to English
+                  </Link>
+                </li>
+                <li className="mt-0.5 bg-blue-500 hover:bg-blue-700 rounded-lg">
+                  <Link
+                    href="/practising/mcq-meaning-to-german"
+                    className="block px-4 py-2 hover:bg-blue-700 rounded-lg"
+                  >
+                    MCQ:Meaning to German
                   </Link>
                 </li>
               </ul>
