@@ -14,7 +14,10 @@ const PractiseFillInTheBlanks = () => {
         onSelectWordIdFrom={setSelectedWordIdFrom}
         onSelectWordIdTo={setSelectedWordIdTo}
       />
-      <PractiseByBlanks />
+      <PractiseByBlanks
+        selectedWordIdFrom={selectedWordIdFrom}
+        selectedWordIdTo={selectedWordIdTo}
+      />
     </div>
   );
 };
