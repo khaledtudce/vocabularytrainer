@@ -52,7 +52,7 @@ export const WordList = [
   {
     id: 6,
     word: "fassen",
-    bangla: "ধরা, পড়া, বুঝা, ধারণ করা",
+    bangla: "ধরা পড়া, বুঝা, ধারণ করা",
     english: "to grasp, to catch, to hold",
     synonym: "fangen",
     example: "",

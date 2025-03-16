@@ -19,7 +19,9 @@ export default function Navbar({
   return (
     <nav className="w-full bg-blue-600 p-2 shadow-md">
       <div className="container flex justify-between items-center">
-        <h1 className="text-white text-xl font-bold">Vocabulary Learner</h1>
+        <Link href="/learning">
+          <h1 className="text-white text-xl font-bold">Vocabulary Learner</h1>
+        </Link>
         <ul className="flex space-x-6">
           <li className="mt-2">
             <Link
