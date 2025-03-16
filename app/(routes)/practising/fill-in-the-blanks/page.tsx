@@ -17,6 +17,7 @@ const PractiseFillInTheBlanks = () => {
       <PractiseByBlanks
         selectedWordIdFrom={selectedWordIdFrom}
         selectedWordIdTo={selectedWordIdTo}
+        reason="practise"
       />
     </div>
   );

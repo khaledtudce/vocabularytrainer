@@ -271,7 +271,6 @@ const ExamMCQCard = ({
               className="mt-2 bg-gray-500"
               onClick={() => {
                 setExamQuestionInfo([]);
-                setOptions([]);
                 setIndex(selectedWordIdFrom - 1);
                 setExamFinished(false);
               }}
