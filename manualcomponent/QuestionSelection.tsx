@@ -12,7 +12,7 @@ export default function DifficultySelector({
   onSelectWordIdTo,
 }: DifficultySelectorType) {
   const [difficulty, setDifficulty] = useState("Custom");
-  const [range, setRange] = useState({ from: 1, to: 30 });
+  const [range, setRange] = useState({ from: 1, to: 7 });
   // in case of custom and hard, we provide another new list
 
   return (

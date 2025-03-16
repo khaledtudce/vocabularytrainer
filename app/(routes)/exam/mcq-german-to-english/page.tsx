@@ -1,9 +1,26 @@
-import React from 'react'
+"use client";
 
-const page = () => {
+import ExamMCQCard from "@/manualcomponent/ExamMCQCard";
+import Navbar from "@/manualcomponent/NavBar";
+import React, { useState } from "react";
+
+const ExamMCQGermanToEnglish = () => {
+  const [selectedWordIdFrom, setSelectedWordIdFrom] = useState(1);
+  const [selectedWordIdTo, setSelectedWordIdTo] = useState(7);
+
   return (
-    <div>page</div>
-  )
-}
+    <div className="bg-bgcolor h-screen">
+      <Navbar
+        onSelectWordIdFrom={setSelectedWordIdFrom}
+        onSelectWordIdTo={setSelectedWordIdTo}
+      />
+      <ExamMCQCard
+        selectedWordIdFrom={selectedWordIdFrom}
+        selectedWordIdTo={selectedWordIdTo}
+        mcqdirection="germanToEnglish"
+      />
+    </div>
+  );
+};
 
-export default page
+export default ExamMCQGermanToEnglish;

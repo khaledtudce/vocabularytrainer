@@ -7,10 +7,10 @@ type ExamMCQCardType = {
   selectedWordIdTo: number;
   mcqdirection: string;
 };
+
 type ExamQuestionInfo = {
   id: number;
   questions: string;
-  questionOptions: string[];
   seletedAnswer: string;
   correctAnswer: string;
 };
@@ -34,7 +34,10 @@ const ExamMCQCard = ({
   }, [selectedWordIdFrom]);
 
   useEffect(() => {
-    if (mcqdirection === "banglaToGerman") {
+    if (
+      mcqdirection === "banglaToGerman" ||
+      mcqdirection === "meaningToGerman"
+    ) {
       const getRandomGermanOptionsForBangla = () => {
         const correctAnswer = currentWord?.word;
         const wrongAnswers = WordList.filter(
@@ -46,6 +49,30 @@ const ExamMCQCard = ({
         return [...wrongAnswers, correctAnswer].sort(() => 0.5 - Math.random());
       };
       setOptions(getRandomGermanOptionsForBangla());
+    } else if (mcqdirection === "germanToBangla") {
+      const getRandomBanglaOptionsForGerman = () => {
+        const correctAnswer = currentWord?.bangla;
+        const wrongAnswers = WordList.filter(
+          (w) => w?.word !== currentWord?.word
+        )
+          .map((w) => w?.bangla)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3);
+        return [...wrongAnswers, correctAnswer].sort(() => 0.5 - Math.random());
+      };
+      setOptions(getRandomBanglaOptionsForGerman());
+    } else if (mcqdirection === "germanToEnglish") {
+      const getRandomBanglaOptionsForGerman = () => {
+        const correctAnswer = currentWord?.english;
+        const wrongAnswers = WordList.filter(
+          (w) => w?.word !== currentWord?.word
+        )
+          .map((w) => w?.english)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3);
+        return [...wrongAnswers, correctAnswer].sort(() => 0.5 - Math.random());
+      };
+      setOptions(getRandomBanglaOptionsForGerman());
     }
   }, [currentWord, mcqdirection]);
 
@@ -61,19 +88,41 @@ const ExamMCQCard = ({
   };
 
   const saveCurrentQuestionInfo = () => {
-    const newQuestion: ExamQuestionInfo = {
-      id: currentWord?.id,
-      questions: currentWord?.bangla,
-      questionOptions: options,
-      seletedAnswer: selectedAnswer,
-      correctAnswer: currentWord?.word,
-    };
+    let newQuestion: ExamQuestionInfo;
+    if (mcqdirection === "banglaToGerman") {
+      newQuestion = {
+        id: currentWord?.id,
+        questions: currentWord?.bangla,
+        seletedAnswer: selectedAnswer,
+        correctAnswer: currentWord?.word,
+      };
+    } else if (mcqdirection === "germanToBangla") {
+      newQuestion = {
+        id: currentWord?.id,
+        questions: currentWord?.word,
+        seletedAnswer: selectedAnswer,
+        correctAnswer: currentWord?.bangla,
+      };
+    } else if (mcqdirection === "germanToEnglish") {
+      newQuestion = {
+        id: currentWord?.id,
+        questions: currentWord?.word,
+        seletedAnswer: selectedAnswer,
+        correctAnswer: currentWord?.english,
+      };
+    } else if (mcqdirection === "meaningToGerman") {
+      newQuestion = {
+        id: currentWord?.id,
+        questions: currentWord?.bangla + ", " + currentWord?.english,
+        seletedAnswer: selectedAnswer,
+        correctAnswer: currentWord?.word,
+      };
+    }
     setExamQuestionInfo((prev) => [...prev, newQuestion]);
-    console.log(examQuestionInfos);
   };
 
   const nextWord = async () => {
-    if (!examFinished) await saveCurrentQuestionInfo();
+    await saveCurrentQuestionInfo();
     setSelectedAnswer("");
     setIndex((prev) => {
       if (prev >= selectedWordIdTo - 1) {
@@ -124,6 +173,81 @@ const ExamMCQCard = ({
                   </div>
                 </>
               )}
+              {mcqdirection === "germanToBangla" && (
+                <>
+                  <h3 className="text-3xl font-semibold mb-4">
+                    {currentWord?.id}. {currentWord?.word}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {options.map((option, index) => (
+                      <button
+                        key={index}
+                        className={`px-4 py-2 rounded-md border border-amber-400 ${
+                          selectedAnswer === option
+                            ? "bg-green-600"
+                            : "bg-gray-200"
+                        }`}
+                        onClick={() => {
+                          setSelectedAnswer(option);
+                        }}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {mcqdirection === "germanToEnglish" && (
+                <>
+                  <h3 className="text-3xl font-semibold mb-4">
+                    {currentWord?.id}. {currentWord?.word}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {options.map((option, index) => (
+                      <button
+                        key={index}
+                        className={`px-4 py-2 rounded-md border border-amber-400 ${
+                          selectedAnswer === option
+                            ? "bg-green-600"
+                            : "bg-gray-200"
+                        }`}
+                        onClick={() => {
+                          setSelectedAnswer(option);
+                        }}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {mcqdirection === "meaningToGerman" && (
+                <>
+                  <h1 className="text-xl font-semibold mb-1">
+                    {currentWord?.id}. {currentWord?.bangla}
+                  </h1>
+                  <h1 className="text-xl font-semibold mb-4">
+                    English: {currentWord?.english}
+                  </h1>
+                  <div className="grid grid-cols-2 gap-4">
+                    {options.map((option, index) => (
+                      <button
+                        key={index}
+                        className={`px-4 py-2 rounded-md border border-amber-400 ${
+                          selectedAnswer === option
+                            ? "bg-green-600"
+                            : "bg-gray-200"
+                        }`}
+                        onClick={() => {
+                          setSelectedAnswer(option);
+                        }}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <div>
@@ -140,39 +264,9 @@ const ExamMCQCard = ({
               Congratulation! you have finised the test! Here is your result:
             </span>
             <span>
-              Total Questions: {selectedWordIdTo - selectedWordIdFrom}
+              Total Questions: {1 + (selectedWordIdTo - selectedWordIdFrom)}
             </span>
             <span>Correct Answer: {correctAnswerCount}</span>
-            <ul className="mt-2">
-              {examQuestionInfos.map((item) => (
-                <li
-                  key={item.id}
-                  className={`p-2 border rounded mb-2 ${
-                    item.seletedAnswer === item.correctAnswer
-                      ? "bg-green-200"
-                      : "bg-red-200"
-                  }`}
-                >
-                  <strong>
-                    {item.id}. {item.questions}
-                  </strong>{" "}
-                  <br />
-                  Your Answer:{" "}
-                  <span
-                    className={
-                      item.seletedAnswer === item.correctAnswer
-                        ? "text-green-700"
-                        : "text-red-700"
-                    }
-                  >
-                    {item.seletedAnswer}
-                  </span>{" "}
-                  <br />
-                  Correct Answer:{" "}
-                  <span className="font-bold">{item.correctAnswer}</span>
-                </li>
-              ))}
-            </ul>
             <Button
               className="mt-2 bg-gray-500"
               onClick={() => {
@@ -182,8 +276,44 @@ const ExamMCQCard = ({
                 setExamFinished(false);
               }}
             >
-              Back to Question
+              Back to question again
             </Button>
+            <ul className="mt-2">
+              {examQuestionInfos.map((item) => (
+                <li
+                  key={item.id}
+                  className={` p-2 border rounded mb-2 ${
+                    item.seletedAnswer === item.correctAnswer
+                      ? "bg-green-200"
+                      : "bg-red-200"
+                  }`}
+                >
+                  <span className="flex flex-col">
+                    <span className="flex flex-wrap">
+                      <strong>
+                        {item.id}. {item.questions}
+                      </strong>
+                    </span>
+                    <span className="p-1 flex gap-1">
+                      <span>Your Answer:</span>
+                      <span
+                        className={
+                          item.seletedAnswer === item.correctAnswer
+                            ? "text-green-700"
+                            : "text-red-700"
+                        }
+                      >
+                        {item.seletedAnswer}
+                      </span>
+                    </span>
+                    <span className="p-1 flex gap-1">
+                      <span>Correct Answer:</span>
+                      <span className="font-bold">{item.correctAnswer}</span>
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
