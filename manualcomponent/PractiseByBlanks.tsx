@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { WordList } from "@/data/wordlists";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 type PractiseByBlanksType = {
   selectedWordIdFrom: number;
@@ -71,7 +71,7 @@ export default function PractiseByBlanks({
     (item) => item.userAnswer === item.correctAnswer
   ).length;
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value.length > germanWord.length) return; // Prevent extra input
     const correctPart = germanWord.slice(0, value.length);
