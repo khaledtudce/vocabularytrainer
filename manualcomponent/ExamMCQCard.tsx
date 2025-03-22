@@ -139,129 +139,125 @@ const ExamMCQCard = ({
   ).length;
 
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow-md w-full">
+    <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
       {!examFinished && (
         <>
-          <div className="">
-            <Button className="mt-6 bg-lime-700" onClick={prevWord}>
+          <div className="flex py-5 items-center gap-20">
+            <Button className="bg-lime-700" onClick={prevWord}>
               Previous
             </Button>
-          </div>
-          <div className="px-8">
-            <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
-              {mcqdirection === "banglaToGerman" && (
-                <>
-                  <h3 className="text-3xl font-semibold mb-4">
-                    {currentWord?.id}. {currentWord?.bangla}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {options.map((option, index) => (
-                      <button
-                        key={index}
-                        className={`px-4 py-2 rounded-md border border-amber-400 ${
-                          selectedAnswer === option
-                            ? "bg-green-600"
-                            : "bg-gray-200"
-                        }`}
-                        onClick={() => {
-                          setSelectedAnswer(option);
-                        }}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-              {mcqdirection === "germanToBangla" && (
-                <>
-                  <h3 className="text-3xl font-semibold mb-4">
-                    {currentWord?.id}. {currentWord?.word}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {options.map((option, index) => (
-                      <button
-                        key={index}
-                        className={`px-4 py-2 rounded-md border border-amber-400 ${
-                          selectedAnswer === option
-                            ? "bg-green-600"
-                            : "bg-gray-200"
-                        }`}
-                        onClick={() => {
-                          setSelectedAnswer(option);
-                        }}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-              {mcqdirection === "germanToEnglish" && (
-                <>
-                  <h3 className="text-3xl font-semibold mb-4">
-                    {currentWord?.id}. {currentWord?.word}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {options.map((option, index) => (
-                      <button
-                        key={index}
-                        className={`px-4 py-2 rounded-md border border-amber-400 ${
-                          selectedAnswer === option
-                            ? "bg-green-600"
-                            : "bg-gray-200"
-                        }`}
-                        onClick={() => {
-                          setSelectedAnswer(option);
-                        }}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-              {mcqdirection === "meaningToGerman" && (
-                <>
-                  <h1 className="text-xl font-semibold mb-1">
-                    {currentWord?.id}. {currentWord?.bangla}
-                  </h1>
-                  <h1 className="text-xl font-semibold mb-4">
-                    English: {currentWord?.english}
-                  </h1>
-                  <div className="grid grid-cols-2 gap-4">
-                    {options.map((option, index) => (
-                      <button
-                        key={index}
-                        className={`px-4 py-2 rounded-md border border-amber-400 ${
-                          selectedAnswer === option
-                            ? "bg-green-600"
-                            : "bg-gray-200"
-                        }`}
-                        onClick={() => {
-                          setSelectedAnswer(option);
-                        }}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-          <div>
-            <Button className="mt-6 bg-lime-600" onClick={nextWord}>
+            <Button className="bg-lime-700" onClick={nextWord}>
               Next
             </Button>
+          </div>
+          <div className="p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
+            {mcqdirection === "banglaToGerman" && (
+              <>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-5">
+                  {currentWord?.id}. {currentWord?.bangla}
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {options.map((option, index) => (
+                    <button
+                      key={index}
+                      className={`p-2 rounded-md border border-fuchsia-700 ${
+                        selectedAnswer === option
+                          ? "bg-lime-400 ring-2"
+                          : "bg-fuchsia-50"
+                      }`}
+                      onClick={() => {
+                        setSelectedAnswer(option);
+                      }}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {mcqdirection === "germanToBangla" && (
+              <>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-5">
+                  {currentWord?.id}. {currentWord?.word}
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {options.map((option, index) => (
+                    <button
+                      key={index}
+                      className={`p-2 rounded-md border border-fuchsia-700 ${
+                        selectedAnswer === option
+                          ? "bg-lime-400 ring-2"
+                          : "bg-fuchsia-50"
+                      }`}
+                      onClick={() => {
+                        setSelectedAnswer(option);
+                      }}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {mcqdirection === "germanToEnglish" && (
+              <>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-5">
+                  {currentWord?.id}. {currentWord?.word}
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {options.map((option, index) => (
+                    <button
+                      key={index}
+                      className={`p-2 rounded-md border border-fuchsia-700 ${
+                        selectedAnswer === option
+                          ? "bg-lime-400 ring-2"
+                          : "bg-fuchsia-50"
+                      }`}
+                      onClick={() => {
+                        setSelectedAnswer(option);
+                      }}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {mcqdirection === "meaningToGerman" && (
+              <>
+                <h1 className="text-xl sm:text-2xl font-semibold mb-2">
+                  {currentWord?.id}. {currentWord?.bangla}
+                </h1>
+                <h1 className="text-xl sm:text-2xl font-semibold mb-2">
+                  {currentWord?.english}
+                </h1>
+                <div className="mt-5 grid grid-cols-2 gap-2">
+                  {options.map((option, index) => (
+                    <button
+                      key={index}
+                      className={`p-2 rounded-md border border-fuchsia-700 ${
+                        selectedAnswer === option
+                          ? "bg-lime-400 ring-2"
+                          : "bg-fuchsia-50"
+                      }`}
+                      onClick={() => {
+                        setSelectedAnswer(option);
+                      }}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </>
       )}
       {examFinished && (
-        <div className="flex items-center justify-center p-3 h-full w-full">
-          <div className="p-2 flex flex-col items-center">
-            <span className="text-2xl font-bold">
-              Congratulation! you have finised the test! Here is your result:
+        <div className="flex items-center justify-center w-full">
+          <div className="p-1 flex flex-col items-center">
+            <span className="mt-5 text-2xl font-bold text-center">
+              Congratulation! Here is your test result:
             </span>
             <span>
               Total Questions: {1 + (selectedWordIdTo - selectedWordIdFrom)}
@@ -277,14 +273,14 @@ const ExamMCQCard = ({
             >
               Back to question again
             </Button>
-            <ul className="mt-2">
+            <ul className="mt-2 w-full">
               {examQuestionInfos.map((item) => (
                 <li
                   key={item.id}
                   className={` p-2 border rounded mb-2 ${
                     item.seletedAnswer === item.correctAnswer
-                      ? "bg-green-200"
-                      : "bg-red-200"
+                      ? "bg-green-300"
+                      : "bg-red-300"
                   }`}
                 >
                   <span className="flex flex-col">
