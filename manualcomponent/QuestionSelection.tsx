@@ -15,7 +15,7 @@ export default function DifficultySelector({
   const [range, setRange] = useState({ from: 1, to: 7 });
 
   return (
-    <div className="flex items-center gap-3 p-2">
+    <div className="flex items-center gap-2 p-2">
       {/* Difficulty Selection */}
       <div className="relative">
         <select

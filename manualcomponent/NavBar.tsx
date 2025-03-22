@@ -42,7 +42,7 @@ export default function Navbar({
               {isOpen ? (
                 <div className="w-full flex flex-col justify-between items-center gap-3">
                   <Link href="/learning">
-                    <h1 className="text-white text-xl font-bold">
+                    <h1 className="text-white text-2xl font-bold p-2">
                       Vocabulary Learner
                     </h1>
                   </Link>
@@ -66,11 +66,11 @@ export default function Navbar({
 function NavLinks() {
   const [dropdown, setDropdown] = useState("null");
   return (
-    <ul className="flex space-x-6">
+    <ul className="flex space-x-2 sm:space-x-6">
       <li className="mt-2">
         <Link
           href="/learning"
-          className="border text-white px-4 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
+          className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
         >
           Learning
         </Link>
@@ -81,7 +81,7 @@ function NavLinks() {
         onMouseLeave={() => setDropdown("")}
       >
         <button
-          className="border text-white px-4 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
+          className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
         >
           Practising
         </button>
@@ -92,7 +92,7 @@ function NavLinks() {
         onMouseEnter={() => setDropdown("Test")}
         onMouseLeave={() => setDropdown("")}
       >
-        <button className="border text-white px-4 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
+        <button className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
         >
           Test
         </button>
@@ -104,7 +104,7 @@ function NavLinks() {
 
 function PractiseMenu() {
   return (
-    <ul className="text-sm text-white absolute right-0 w-56 shadow-lg rounded-lg">
+    <ul className="text-sm text-white absolute right-0 w-56 shadow-lg rounded-lg z-1000">
       <li className="mt-0.5 bg-green-500 hover:bg-green-700 rounded-lg">
         <Link
           href="/practising/german-to-meaning"
@@ -175,7 +175,7 @@ function PractiseMenu() {
 
 function TestMenu() {
   return (
-    <ul className="text-sm text-white absolute right-0 w-48 shadow-lg">
+    <ul className="text-sm text-white absolute right-0 w-48 shadow-lg z-1000">
       <li className="mt-0.5 bg-green-500 hover:bg-green-700 rounded-lg">
         <Link
           href="/exam/mcq-bangla-to-german"
