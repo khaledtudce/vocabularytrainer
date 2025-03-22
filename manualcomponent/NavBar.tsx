@@ -64,17 +64,13 @@ export default function Navbar({
 }
 
 function NavLinks() {
-  const [active, setActive] = useState("");
   const [dropdown, setDropdown] = useState("null");
   return (
     <ul className="flex space-x-6">
       <li className="mt-2">
         <Link
           href="/learning"
-          className={`border text-white px-4 py-2 rounded-lg transition duration-600 ${
-            active === "Learning" ? "bg-green-800" : "hover:bg-green-700"
-          }`}
-          onClick={() => setActive("Learning")}
+          className="border text-white px-4 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
         >
           Learning
         </Link>
@@ -85,9 +81,7 @@ function NavLinks() {
         onMouseLeave={() => setDropdown("")}
       >
         <button
-          className={`border text-white px-4 py-2 rounded-lg transition duration-600 ${
-            active === "Practising" ? "bg-green-800" : "hover:bg-green-700"
-          }`}
+          className="border text-white px-4 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
         >
           Practising
         </button>
@@ -98,10 +92,7 @@ function NavLinks() {
         onMouseEnter={() => setDropdown("Test")}
         onMouseLeave={() => setDropdown("")}
       >
-        <button
-          className={`border text-white px-4 py-2 rounded-lg transition duration-600 ${
-            active === "Test" ? "bg-green-500" : "hover:bg-green-700"
-          }`}
+        <button className="border text-white px-4 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
         >
           Test
         </button>
