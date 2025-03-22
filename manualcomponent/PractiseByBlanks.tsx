@@ -54,7 +54,6 @@ export default function PractiseByBlanks({
   };
 
   const nextWord = async () => {
-    // insert data into setExamFillInBlankQuestionInfo, in case of exam
     if (reason === "exam") await saveCurrentQuestionInfo();
     setInput("");
     setIndex((prev) => {
@@ -103,28 +102,32 @@ export default function PractiseByBlanks({
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow-md w-full">
-      <div className="">
-        <Button className="mt-6 bg-lime-700" onClick={prevWord}>
-          Previous
-        </Button>
-      </div>
+    <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
+      {!examFinished && (
+        <div className="flex py-5 items-center gap-20">
+          <Button className="bg-lime-700" onClick={prevWord}>
+            Previous
+          </Button>
+          <Button className="bg-lime-700" onClick={nextWord}>
+            Next
+          </Button>
+        </div>
+      )}
       {reason === "practise" && (
-        <div className="flex flex-col items-center justify-center bg-gray-100 p-5">
-          <h1 className="text-xl font-bold">
-            <span className="text-blue-500">
+        <div className="p-2 w-full flex flex-col items-center justify-center gap-1 bg-gray-100">
+          <h1 className="text-md text-center sm:text-xl font-bold">
+            <span>
               {WordList[index]?.id}. {WordList[index]?.bangla}
             </span>
           </h1>
-          <h1 className="text-xl font-bold mb-4">
-            English:{" "}
-            <span className="text-blue-500">{WordList[index]?.english}</span>
+          <h1 className="text-md sm:text-xl text-center font-bold mb-6">
+            <span>{WordList[index]?.english}</span>
           </h1>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {germanWord.split("").map((letter, index) => (
               <span
                 key={index}
-                className={`w-10 h-10 flex items-center justify-center border-2 text-lg font-semibold rounded-md shadow-md ${
+                className={`w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center border-2 text-lg font-semibold rounded-md shadow-md ${
                   input[index] === undefined
                     ? "border-yellow-500"
                     : input[index] === letter
@@ -141,14 +144,14 @@ export default function PractiseByBlanks({
               Wrong Input: {wrongInput}
             </p>
           )}
-          <div className="flex items-center justify-center gap-1">
+          <div className="mt-1 flex flex-col sm:flex-row items-center justify-center gap-1">
             <h1 className="font-semibold mt-2">Please write here: </h1>
             <input
               type="text"
               value={input}
               onChange={handleInputChange}
               disabled={completed}
-              className={`mt-4 p-2 border border-blue-500 rounded w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`mt-2 p-1 border border-blue-500 rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 wrongInput ? "border-red-500" : ""
               }`}
             />
@@ -158,7 +161,7 @@ export default function PractiseByBlanks({
               🎉 Well done! You completed the word! 🎉
             </p>
           )}
-          <div className="mt-4 flex gap-2">
+          <div className="mt-7 flex gap-5">
             <button
               onClick={revealHint}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -175,25 +178,24 @@ export default function PractiseByBlanks({
         </div>
       )}
       {reason === "exam" && !examFinished && (
-        <div className="flex flex-col items-center justify-center bg-gray-100 p-5">
-          <h1 className="text-xl font-bold">
-            <span className="text-blue-500">
+        <div className="p-2 w-full flex flex-col items-center justify-center gap-1 bg-gray-100">
+          <h1 className="text-md text-center sm:text-xl font-bold">
+            <span>
               {WordList[index]?.id}. {WordList[index]?.bangla}
             </span>
           </h1>
-          <h1 className="text-xl font-bold mb-4">
-            English:{" "}
-            <span className="text-blue-500">{WordList[index]?.english}</span>
+          <h1 className="text-md sm:text-xl text-center font-bold mb-6">
+            <span>{WordList[index]?.english}</span>
           </h1>
 
-          <div className="flex items-center justify-center gap-1">
+          <div className="mt-1 flex flex-col sm:flex-row items-center justify-center gap-1">
             <h1 className="font-semibold mt-2">Please write here: </h1>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               className={
-                "mt-4 p-2 border border-blue-500 rounded w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                "mt-2 p-1 border border-blue-500 rounded w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
               }
             />
           </div>
@@ -208,10 +210,10 @@ export default function PractiseByBlanks({
         </div>
       )}
       {reason === "exam" && examFinished && (
-        <div className="flex items-center justify-center p-3 h-full w-full">
-          <div className="p-2 flex flex-col items-center">
-            <span className="text-2xl font-bold">
-              Congratulation! you have finised the test! Here is your result:
+        <div className="flex items-center justify-center w-full">
+          <div className="p-1 flex flex-col items-center">
+            <span className="mt-5 text-2xl font-bold text-center">
+              Congratulation! Here is your test result:
             </span>
             <span>
               Total Questions: {1 + (selectedWordIdTo - selectedWordIdFrom)}
@@ -227,14 +229,14 @@ export default function PractiseByBlanks({
             >
               Back to question again
             </Button>
-            <ul className="mt-2">
+            <ul className="mt-3 w-full">
               {examFillInBlankQuestionInfos.map((item) => (
                 <li
                   key={item.id}
-                  className={` p-2 border rounded mb-2 ${
+                  className={`p-2 border rounded mb-2 ${
                     item.userAnswer === item.correctAnswer
-                      ? "bg-green-200"
-                      : "bg-red-200"
+                      ? "bg-green-300"
+                      : "bg-red-300"
                   }`}
                 >
                   <span className="flex flex-col">
@@ -266,11 +268,6 @@ export default function PractiseByBlanks({
           </div>
         </div>
       )}
-      <div>
-        <Button className="mt-6 bg-lime-600" onClick={nextWord}>
-          Next
-        </Button>
-      </div>
     </div>
   );
 }
