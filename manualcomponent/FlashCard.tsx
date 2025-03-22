@@ -49,7 +49,7 @@ const FlashCard = ({
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow-md w-full">
+    <div className="w-full h-[86vh] flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow-md">
       <div className="">
         <Button className="mt-6 bg-lime-700" onClick={prevWord}>
           Previous

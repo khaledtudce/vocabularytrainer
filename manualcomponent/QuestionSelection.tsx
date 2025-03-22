@@ -13,59 +13,69 @@ export default function DifficultySelector({
 }: DifficultySelectorType) {
   const [difficulty, setDifficulty] = useState("Custom");
   const [range, setRange] = useState({ from: 1, to: 7 });
-  // in case of custom and hard, we provide another new list
 
   return (
-    <div
-      className={`p-4 flex bg-gray-100 rounded-lg shadow-md ${
-        difficulty === "Custom" ? "w-72" : "w-44"
-      }`}
-    >
-      <select
-        className="w-full rounded border"
-        value={difficulty}
-        onChange={(e) => setDifficulty(e.target.value)}
-      >
-        <option value="Medium">Medium</option>
-        <option value="Hard">Hard</option>
-        <option value="Custom">Select range</option>
-      </select>
+    <div className="flex items-center gap-3 p-2">
+      {/* Difficulty Selection */}
+      <div className="relative">
+        <select
+          className="px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-black appearance-none focus:ring-2 focus:ring-green-300 hover:bg-green-700"
+          value={difficulty}
+          onChange={(e) => setDifficulty(e.target.value)}
+        >
+          <option className="bg-green-500 text-white hover:bg-green-700" value="Medium">
+            Medium
+          </option>
+          <option className="bg-green-500 text-white hover:bg-green-700" value="Hard">
+            Hard
+          </option>
+          <option className="bg-green-500 text-white hover:bg-green-700" value="Custom">
+            Custom
+          </option>
+        </select>
+      </div>
 
+      {/* Custom Range Selection */}
       {difficulty === "Custom" && (
-        <>
-          <div className="flex pl-2 pt-2 w-full">
-            <span>from</span>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-600 text-sm">From</span>
+          <div className="relative">
             <select
-              className="w-full rounded border"
+              className="px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-black text-center appearance-none focus:ring-2 focus:ring-green-300 hover:bg-green-700"
               value={range.from}
               onChange={(e) => {
-                setRange({ ...range, from: Number(e.target.value) });
-                onSelectWordIdFrom(Number(e.target.value));
+                const newFrom = Number(e.target.value);
+                setRange((prev) => ({ ...prev, from: newFrom }));
+                onSelectWordIdFrom(newFrom);
               }}
             >
               {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
-            <span>to</span>
-            <select
-              className="w-full rounded border"
-              value={range.to}
-              onChange={(e) => {
-                setRange({ ...range, to: Number(e.target.value) });
-                onSelectWordIdTo(Number(e.target.value));
-              }}
-            >
-              {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
-                <option key={num} value={num}>
+                <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>
                   {num}
                 </option>
               ))}
             </select>
           </div>
-        </>
+
+          <span className="text-gray-600 text-sm">To</span>
+          <div className="relative">
+            <select
+              className="px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-black text-center appearance-none focus:ring-2 focus:ring-green-300 hover:bg-green-700"
+              value={range.to}
+              onChange={(e) => {
+                const newTo = Number(e.target.value);
+                setRange((prev) => ({ ...prev, to: newTo }));
+                onSelectWordIdTo(newTo);
+              }}
+            >
+              {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
+                <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       )}
     </div>
   );
