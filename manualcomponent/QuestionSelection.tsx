@@ -62,7 +62,7 @@ export default function DifficultySelector() {
                 value={range.from}
                 onChange={(e) => {
                   const newFrom = Number(e.target.value);
-                  setRange((prev) => ({ ...prev, from: newFrom }));
+                  setRange((prev: any) => ({ ...prev, from: newFrom }));
                 }}
               >
                 {Array.from({ length: 1999 }, (_, i) => i + 1).map(
@@ -89,7 +89,7 @@ export default function DifficultySelector() {
                 value={range.to}
                 onChange={(e) => {
                   const newTo = Number(e.target.value);
-                  setRange((prev) => ({ ...prev, to: newTo }));
+                  setRange((prev: any) => ({ ...prev, to: newTo }));
                 }}
               >
                 {Array.from({ length: 1999 }, (_, i) => i + 1).map(
