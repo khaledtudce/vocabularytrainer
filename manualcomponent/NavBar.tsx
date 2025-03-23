@@ -5,15 +5,7 @@ import { useState } from "react";
 import QuestionSelection from "./QuestionSelection";
 import { Menu, X } from "lucide-react";
 
-type NavbarType = {
-  onSelectWordIdFrom: (selectedWordIdFrom: number) => void;
-  onSelectWordIdTo: (selectedWordIdTo: number) => void;
-};
-
-export default function Navbar({
-  onSelectWordIdFrom,
-  onSelectWordIdTo,
-}: NavbarType) {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleNavbar = () => {
@@ -28,10 +20,7 @@ export default function Navbar({
             <h1 className="text-white text-xl font-bold">Vocabulary Learner</h1>
           </Link>
           <NavLinks />
-          <QuestionSelection
-            onSelectWordIdFrom={onSelectWordIdFrom}
-            onSelectWordIdTo={onSelectWordIdTo}
-          />
+          <QuestionSelection />
         </div>
         <div className="w-full sm:hidden">
           <span className="w-full">
@@ -48,8 +37,6 @@ export default function Navbar({
                   </Link>
                   <NavLinks />
                   <QuestionSelection
-                    onSelectWordIdFrom={onSelectWordIdFrom}
-                    onSelectWordIdTo={onSelectWordIdTo}
                   />
                 </div>
               ) : (

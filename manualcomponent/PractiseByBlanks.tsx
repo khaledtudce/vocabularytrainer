@@ -3,8 +3,6 @@ import { WordList } from "@/data/wordlists";
 import { ChangeEvent, useEffect, useState } from "react";
 
 type PractiseByBlanksType = {
-  selectedWordIdFrom: number;
-  selectedWordIdTo: number;
   reason: string;
 };
 
@@ -15,11 +13,7 @@ type ExamFillInBlankQuestionInfo = {
   correctAnswer: string;
 };
 
-export default function PractiseByBlanks({
-  selectedWordIdFrom,
-  selectedWordIdTo,
-  reason,
-}: PractiseByBlanksType) {
+export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
   const [index, setIndex] = useState(1);
   const germanWord = WordList[index]?.word;
   const [input, setInput] = useState("");
@@ -28,6 +22,29 @@ export default function PractiseByBlanks({
   const [examFillInBlankQuestionInfos, setExamFillInBlankQuestionInfo] =
     useState<ExamFillInBlankQuestionInfo[]>([]);
   const [examFinished, setExamFinished] = useState<boolean>(false);
+  const [selectedWordIdFrom, setSelectedWordIdFrom] = useState(1);
+  const [selectedWordIdTo, setSelectedWordIdTo] = useState(30);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const storedRange = localStorage.getItem("wordRange");
+    if (storedRange) {
+      const parsedRange = JSON.parse(storedRange);
+      setSelectedWordIdFrom(parsedRange.from);
+      setSelectedWordIdTo(parsedRange.to);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleRangeUpdate = (event: any) => {
+      console.log(event);
+      setSelectedWordIdFrom(event.detail.from);
+      setSelectedWordIdTo(event.detail.to);
+    };
+    window.addEventListener("wordRangeUpdated", handleRangeUpdate);
+    return () =>
+      window.removeEventListener("wordRangeUpdated", handleRangeUpdate);
+  }, []);
 
   useEffect(() => {
     setIndex(selectedWordIdFrom - 1);
@@ -38,7 +55,7 @@ export default function PractiseByBlanks({
       if (prev <= selectedWordIdFrom) {
         return selectedWordIdFrom - 1;
       } else {
-        return (prev - 1) % selectedWordIdFrom;
+        return prev - 1;
       }
     });
   };
@@ -61,7 +78,7 @@ export default function PractiseByBlanks({
         setExamFinished(true);
         return selectedWordIdTo - 1;
       } else {
-        return (prev + 1) % selectedWordIdTo;
+        return prev + 1;
       }
     });
   };

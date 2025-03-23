@@ -2,23 +2,13 @@
 
 import FlashCard from "@/manualcomponent/FlashCard";
 import Navbar from "@/manualcomponent/NavBar";
-import React, { useState } from "react";
+import React from "react";
 
 const LearningPage = () => {
-  const [selectedWordIdFrom, setSelectedWordIdFrom] = useState(1);
-  const [selectedWordIdTo, setSelectedWordIdTo] = useState(30);
   return (
     <div className="bg-bgcolor h-screen">
-      <Navbar
-        onSelectWordIdFrom={setSelectedWordIdFrom}
-        onSelectWordIdTo={setSelectedWordIdTo}
-      />
-      <FlashCard
-        page={"learning"}
-        direction={""}
-        selectedWordIdFrom={selectedWordIdFrom}
-        selectedWordIdTo={selectedWordIdTo}
-      />
+      <Navbar />
+      <FlashCard page={"learning"} direction={""} />
     </div>
   );
 };

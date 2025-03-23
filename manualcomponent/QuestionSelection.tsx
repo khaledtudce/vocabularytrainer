@@ -1,18 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-type DifficultySelectorType = {
-  onSelectWordIdFrom: (selectedWordIdFrom: number) => void;
-  onSelectWordIdTo: (selectedWordIdTo: number) => void;
-};
-
-export default function DifficultySelector({
-  onSelectWordIdFrom,
-  onSelectWordIdTo,
-}: DifficultySelectorType) {
+export default function DifficultySelector() {
   const [difficulty, setDifficulty] = useState("Custom");
-  const [range, setRange] = useState({ from: 1, to: 30 });
+  const [range, setRange] = useState(() => {
+    if (typeof window !== "undefined") {
+      const storedRange = localStorage.getItem("wordRange");
+      return storedRange ? JSON.parse(storedRange) : { from: 1, to: 30 };
+    }
+    return { from: 1, to: 30 };
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("wordRange", JSON.stringify(range));
+      window.dispatchEvent(
+        new CustomEvent("wordRangeUpdated", { detail: range })
+      );
+    }
+  }, [range]);
 
   return (
     <div className="flex items-center gap-2 p-2">
@@ -56,18 +63,20 @@ export default function DifficultySelector({
                 onChange={(e) => {
                   const newFrom = Number(e.target.value);
                   setRange((prev) => ({ ...prev, from: newFrom }));
-                  onSelectWordIdFrom(newFrom);
                 }}
               >
-                {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
-                  <option
-                    className="bg-green-500 text-white hover:bg-green-700"
-                    key={num}
-                    value={num}
-                  >
-                    {num}
-                  </option>
-                ))}
+                {Array.from({ length: 1999 }, (_, i) => i + 1).map(
+                  (num) =>
+                    num <= range.to && (
+                      <option
+                        className="bg-green-500 text-white hover:bg-green-700"
+                        key={num}
+                        value={num}
+                      >
+                        {num}
+                      </option>
+                    )
+                )}
               </select>
             </div>
           </span>
@@ -81,18 +90,20 @@ export default function DifficultySelector({
                 onChange={(e) => {
                   const newTo = Number(e.target.value);
                   setRange((prev) => ({ ...prev, to: newTo }));
-                  onSelectWordIdTo(newTo);
                 }}
               >
-                {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
-                  <option
-                    className="bg-green-500 text-white hover:bg-green-700"
-                    key={num}
-                    value={num}
-                  >
-                    {num}
-                  </option>
-                ))}
+                {Array.from({ length: 1999 }, (_, i) => i + 1).map(
+                  (num) =>
+                    num >= range.from && (
+                      <option
+                        className="bg-green-500 text-white hover:bg-green-700"
+                        key={num}
+                        value={num}
+                      >
+                        {num}
+                      </option>
+                    )
+                )}
               </select>
             </div>
           </span>

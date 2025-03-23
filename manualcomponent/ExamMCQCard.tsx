@@ -3,8 +3,6 @@ import { WordList } from "@/data/wordlists";
 import React, { useEffect, useState } from "react";
 
 type ExamMCQCardType = {
-  selectedWordIdFrom: number;
-  selectedWordIdTo: number;
   mcqdirection: string;
 };
 
@@ -15,11 +13,7 @@ type ExamQuestionInfo = {
   correctAnswer: string;
 };
 
-const ExamMCQCard = ({
-  selectedWordIdFrom,
-  selectedWordIdTo,
-  mcqdirection,
-}: ExamMCQCardType) => {
+const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
   const [index, setIndex] = useState(1);
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [options, setOptions] = useState<string[]>([]);
@@ -28,6 +22,29 @@ const ExamMCQCard = ({
   );
   const [examFinished, setExamFinished] = useState<boolean>(false);
   const currentWord = WordList[index];
+  const [selectedWordIdFrom, setSelectedWordIdFrom] = useState(1);
+  const [selectedWordIdTo, setSelectedWordIdTo] = useState(30);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const storedRange = localStorage.getItem("wordRange");
+    if (storedRange) {
+      const parsedRange = JSON.parse(storedRange);
+      setSelectedWordIdFrom(parsedRange.from);
+      setSelectedWordIdTo(parsedRange.to);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleRangeUpdate = (event: any) => {
+      console.log(event);
+      setSelectedWordIdFrom(event.detail.from);
+      setSelectedWordIdTo(event.detail.to);
+    };
+    window.addEventListener("wordRangeUpdated", handleRangeUpdate);
+    return () =>
+      window.removeEventListener("wordRangeUpdated", handleRangeUpdate);
+  }, []);
 
   useEffect(() => {
     setIndex(selectedWordIdFrom - 1);
@@ -82,7 +99,7 @@ const ExamMCQCard = ({
       if (prev <= selectedWordIdFrom) {
         return selectedWordIdFrom - 1;
       } else {
-        return (prev - 1) % selectedWordIdFrom;
+        return prev - 1;
       }
     });
   };
@@ -129,7 +146,7 @@ const ExamMCQCard = ({
         setExamFinished(true);
         return selectedWordIdTo - 1;
       } else {
-        return (prev + 1) % selectedWordIdTo;
+        return prev + 1;
       }
     });
   };

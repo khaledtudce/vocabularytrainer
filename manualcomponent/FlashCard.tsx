@@ -9,18 +9,34 @@ import { Card, CardContent } from "@/components/ui/card";
 type PageType = {
   page: string;
   direction: string;
-  selectedWordIdFrom: number;
-  selectedWordIdTo: number;
 };
 
-const FlashCard = ({
-  page: page,
-  direction,
-  selectedWordIdFrom,
-  selectedWordIdTo,
-}: PageType) => {
+const FlashCard = ({ page, direction }: PageType) => {
   const [index, setIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(true);
+  const [selectedWordIdFrom, setSelectedWordIdFrom] = useState(1);
+  const [selectedWordIdTo, setSelectedWordIdTo] = useState(30);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const storedRange = localStorage.getItem("wordRange");
+    if (storedRange) {
+      const parsedRange = JSON.parse(storedRange);
+      setSelectedWordIdFrom(parsedRange.from);
+      setSelectedWordIdTo(parsedRange.to);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleRangeUpdate = (event: any) => {
+      console.log(event);
+      setSelectedWordIdFrom(event.detail.from);
+      setSelectedWordIdTo(event.detail.to);
+    };
+    window.addEventListener("wordRangeUpdated", handleRangeUpdate);
+    return () =>
+      window.removeEventListener("wordRangeUpdated", handleRangeUpdate);
+  }, []);
 
   useEffect(() => {
     setIndex(selectedWordIdFrom - 1);
@@ -32,7 +48,7 @@ const FlashCard = ({
       if (prev <= selectedWordIdFrom) {
         return selectedWordIdFrom - 1;
       } else {
-        return (prev - 1) % selectedWordIdFrom;
+        return prev - 1;
       }
     });
   };
@@ -43,7 +59,7 @@ const FlashCard = ({
       if (prev >= selectedWordIdTo - 1) {
         return selectedWordIdTo - 1;
       } else {
-        return (prev + 1) % selectedWordIdTo;
+        return prev + 1;
       }
     });
   };
