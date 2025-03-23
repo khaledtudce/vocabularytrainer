@@ -32,7 +32,7 @@ const FlashCard = ({
       if (prev <= selectedWordIdFrom) {
         return selectedWordIdFrom - 1;
       } else {
-        return (prev - 1) % WordList.length;
+        return (prev - 1) % selectedWordIdFrom;
       }
     });
   };
@@ -43,7 +43,7 @@ const FlashCard = ({
       if (prev >= selectedWordIdTo - 1) {
         return selectedWordIdTo - 1;
       } else {
-        return (prev + 1) % WordList.length;
+        return (prev + 1) % selectedWordIdTo;
       }
     });
   };
@@ -59,7 +59,7 @@ const FlashCard = ({
         </Button>
       </div>
       {page === "learning" && (
-        <div className="p-2 border border-amber-500 bg-cyan-200 ring-2">
+        <div className="p-2 border border-amber-500 bg-cyan-200 ring-2 rounded-md">
           <div className="py-3 text-xl sm:text-3xl font-bold">
             {WordList[index]?.id}. {WordList[index]?.word}
           </div>

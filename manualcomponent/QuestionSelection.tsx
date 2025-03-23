@@ -12,7 +12,7 @@ export default function DifficultySelector({
   onSelectWordIdTo,
 }: DifficultySelectorType) {
   const [difficulty, setDifficulty] = useState("Custom");
-  const [range, setRange] = useState({ from: 1, to: 7 });
+  const [range, setRange] = useState({ from: 1, to: 30 });
 
   return (
     <div className="flex items-center gap-2 p-2">
@@ -23,13 +23,22 @@ export default function DifficultySelector({
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value)}
         >
-          <option className="bg-green-500 text-white hover:bg-green-700" value="Medium">
+          <option
+            className="bg-green-500 text-white hover:bg-green-700"
+            value="Medium"
+          >
             Medium
           </option>
-          <option className="bg-green-500 text-white hover:bg-green-700" value="Hard">
+          <option
+            className="bg-green-500 text-white hover:bg-green-700"
+            value="Hard"
+          >
             Hard
           </option>
-          <option className="bg-green-500 text-white hover:bg-green-700" value="Custom">
+          <option
+            className="bg-green-500 text-white hover:bg-green-700"
+            value="Custom"
+          >
             Custom
           </option>
         </select>
@@ -51,7 +60,11 @@ export default function DifficultySelector({
                 }}
               >
                 {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
-                  <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>
+                  <option
+                    className="bg-green-500 text-white hover:bg-green-700"
+                    key={num}
+                    value={num}
+                  >
                     {num}
                   </option>
                 ))}
@@ -72,7 +85,11 @@ export default function DifficultySelector({
                 }}
               >
                 {Array.from({ length: 1999 }, (_, i) => i + 1).map((num) => (
-                  <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>
+                  <option
+                    className="bg-green-500 text-white hover:bg-green-700"
+                    key={num}
+                    value={num}
+                  >
                     {num}
                   </option>
                 ))}

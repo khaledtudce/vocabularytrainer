@@ -86,7 +86,7 @@ const MCQCard = ({
       if (prev <= selectedWordIdFrom) {
         return selectedWordIdFrom - 1;
       } else {
-        return (prev - 1) % WordList.length;
+        return (prev - 1) % selectedWordIdFrom;
       }
     });
   };
@@ -97,7 +97,7 @@ const MCQCard = ({
       if (prev >= selectedWordIdTo - 1) {
         return selectedWordIdTo - 1;
       } else {
-        return (prev + 1) % WordList.length;
+        return (prev + 1) % selectedWordIdTo;
       }
     });
   };

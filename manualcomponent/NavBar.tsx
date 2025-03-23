@@ -14,7 +14,7 @@ export default function Navbar({
   onSelectWordIdFrom,
   onSelectWordIdTo,
 }: NavbarType) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
@@ -36,8 +36,8 @@ export default function Navbar({
         <div className="w-full sm:hidden">
           <span className="w-full">
             <span className="w-full justify-end flex" onClick={toggleNavbar}>
-                {isOpen ? <X /> : <Menu />}
-              </span>
+              {isOpen ? <X /> : <Menu />}
+            </span>
             <span>
               {isOpen ? (
                 <div className="w-full flex flex-col justify-between items-center gap-3">
@@ -80,9 +80,7 @@ function NavLinks() {
         onMouseEnter={() => setDropdown("Practising")}
         onMouseLeave={() => setDropdown("")}
       >
-        <button
-          className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
-        >
+        <button className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700">
           Practising
         </button>
         {dropdown === "Practising" && <PractiseMenu />}
@@ -92,8 +90,7 @@ function NavLinks() {
         onMouseEnter={() => setDropdown("Test")}
         onMouseLeave={() => setDropdown("")}
       >
-        <button className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
-        >
+        <button className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700">
           Test
         </button>
         {dropdown === "Test" && <TestMenu />}
