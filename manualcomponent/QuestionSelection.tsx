@@ -65,7 +65,7 @@ export default function DifficultySelector() {
                   setRange((prev: any) => ({ ...prev, from: newFrom }));
                 }}
               >
-                {Array.from({ length: 1999 }, (_, i) => i + 1).map(
+                {Array.from({ length: 1613 }, (_, i) => i + 1).map(
                   (num) =>
                     num <= range.to && (
                       <option
@@ -92,7 +92,7 @@ export default function DifficultySelector() {
                   setRange((prev: any) => ({ ...prev, to: newTo }));
                 }}
               >
-                {Array.from({ length: 1999 }, (_, i) => i + 1).map(
+                {Array.from({ length: 1614 }, (_, i) => i + 1).map(
                   (num) =>
                     num >= range.from && (
                       <option
