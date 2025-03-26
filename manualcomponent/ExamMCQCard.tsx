@@ -159,15 +159,7 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
       {!examFinished && (
         <>
-          <div className="flex py-5 items-center gap-20">
-            <Button className="bg-lime-700" onClick={prevWord}>
-              Previous
-            </Button>
-            <Button className="bg-lime-700" onClick={nextWord}>
-              Next
-            </Button>
-          </div>
-          <div className="p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
+          <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
             {mcqdirection === "banglaToGerman" && (
               <>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-5">
@@ -267,6 +259,14 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
                 </div>
               </>
             )}
+          </div>
+          <div className="flex py-5 items-center gap-20">
+            <Button className="bg-lime-700" onClick={prevWord}>
+              Previous
+            </Button>
+            <Button className="bg-lime-700" onClick={nextWord}>
+              Next
+            </Button>
           </div>
         </>
       )}

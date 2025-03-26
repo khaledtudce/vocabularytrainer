@@ -120,16 +120,6 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
 
   return (
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
-      {!examFinished && (
-        <div className="flex py-5 items-center gap-20">
-          <Button className="bg-lime-700" onClick={prevWord}>
-            Previous
-          </Button>
-          <Button className="bg-lime-700" onClick={nextWord}>
-            Next
-          </Button>
-        </div>
-      )}
       {reason === "practise" && (
         <div className="p-2 w-full flex flex-col items-center justify-center gap-1 bg-gray-100">
           <h1 className="text-md text-center sm:text-xl font-bold">
@@ -283,6 +273,16 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
               ))}
             </ul>
           </div>
+        </div>
+      )}
+      {!examFinished && (
+        <div className="flex py-5 items-center gap-20">
+          <Button className="bg-lime-700" onClick={prevWord}>
+            Previous
+          </Button>
+          <Button className="bg-lime-700" onClick={nextWord}>
+            Next
+          </Button>
         </div>
       )}
     </div>

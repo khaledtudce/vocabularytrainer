@@ -66,16 +66,8 @@ const FlashCard = ({ page, direction }: PageType) => {
 
   return (
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
-      <div className="flex py-5 items-center gap-20">
-        <Button className="bg-lime-700" onClick={prevWord}>
-          Previous
-        </Button>
-        <Button className="bg-lime-700" onClick={nextWord}>
-          Next
-        </Button>
-      </div>
       {page === "learning" && (
-        <div className="p-2 border border-amber-500 bg-cyan-200 ring-2 rounded-md">
+        <div className="mt-5 p-2 border border-amber-500 bg-cyan-200 ring-2 rounded-md">
           <div className="py-3 text-xl sm:text-3xl font-bold">
             {WordList[index]?.id}. {WordList[index]?.word}
           </div>
@@ -91,7 +83,7 @@ const FlashCard = ({ page, direction }: PageType) => {
         </div>
       )}
       {page === "practising" && direction === "german_to_meaning" && (
-        <div className="p-1">
+        <div className="mt-5 p-1">
           <div className="text-center">
             Please click on flashcard to switch it!
           </div>
@@ -122,7 +114,7 @@ const FlashCard = ({ page, direction }: PageType) => {
         </div>
       )}
       {page === "practising" && direction === "meaning_to_german" && (
-        <div className="p-1">
+        <div className="mt-5 p-1">
           <div className="text-center">
             Please click on flashcard to switch it!
           </div>
@@ -154,6 +146,14 @@ const FlashCard = ({ page, direction }: PageType) => {
           </Card>
         </div>
       )}
+      <div className="flex py-5 items-center gap-20">
+        <Button className="bg-lime-700" onClick={prevWord}>
+          Previous
+        </Button>
+        <Button className="bg-lime-700" onClick={nextWord}>
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
