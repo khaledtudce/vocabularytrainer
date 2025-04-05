@@ -11316,7 +11316,8 @@ export const WordList = [
   {
     id: 1095,
     word: "herausgearbeitet",
-    bangla: "বিষদ ভাবে বিবরণ, স্পষ্টভাবে বিশ্লেষণ করা, স্পষ্ট করা",
+    bangla:
+      "বিষদ ভাবে বিবরণ, স্পষ্টভাবে বিশ্লেষণ করা (উপস্থাপনায় সবচেয়ে গুরুত্বপূর্ণ যুক্তিগুলো ভালোভাবে ব্যাখ্যা করা হয়েছে), স্পষ্ট করা (চিত্রকর্মে মুখগুলো বিশেষভাবে ফুটিয়ে তোলা হয়েছে), কঠিন পরিস্থিতি থেকে বেরিয়ে আসা (কঠোর পরিশ্রমের মাধ্যমে সে দারিদ্র্য থেকে বেরিয়ে এসেছে)",
     english: "elaborated, extracted",
     synonym: "",
     example: "",
@@ -11534,7 +11535,8 @@ export const WordList = [
   {
     id: 1116,
     word: "unstillbaren",
-    bangla: "ক্ষুদার্থ (জ্ঞানের প্রতি, অর্থের), অপ্রতিরোদ্ধ কৌতুহল, আকাঙ্ক্ষা",
+    bangla:
+      "অতৃপ্ত, ক্ষুদার্থ (জ্ঞানের প্রতি, অর্থের), অপ্রতিরোদ্ধ কৌতুহল, আকাঙ্ক্ষা",
     english: "unsatisfiable, insatiable, hunger (to learn, to earn money)",
     synonym: "unersättlich (যা পরিতৃপ্ত করা যায় না)",
     example: "",
@@ -11913,9 +11915,11 @@ export const WordList = [
   {
     id: 1153,
     word: "gefällig",
-    bangla: "মনোরম, সাহায্যকারী, সদয়, খুশিমন",
+    bangla:
+      "সাহায্যকারী (সে খুব সাহায্যপ্রবণ একজন মানুষ এবং সবসময় সাহায্য করতে ভালোবাসে।), সদয়, খুশিমন, মনোরম (সঙ্গীতটি খুব মনোরম ছিল), আরামদায়ক,",
     english: "pleasing, accommodating, agreeable",
-    synonym: "hilfsbereit (সাহায্যকারী), zuvorkommend (সহায়ক)",
+    synonym:
+      "hilfsbereit (সাহায্যকারী), zuvorkommend (সহায়ক), wohlklingend (শ্রুতিমধুর)",
     example: "",
     picture: "",
     hardlevel: "",
@@ -11933,9 +11937,11 @@ export const WordList = [
   {
     id: 1155,
     word: "anstrengen",
-    bangla: "প্রচেষ্টা করা, পরিশ্রম করা, চাপ দেওয়া, ক্লান্তি অনুভব",
+    bangla:
+      "চেষ্টা করা (আমি প্রতিদিন কঠোর চেষ্টা করি উন্নত হওয়ার জন্য), চাপ সৃষ্টি করা, পরিশ্রম করা (পাস করতে চাইলে তাকে আরও পরিশ্রম করতে হবে)",
     english: "to exert, to strain, to make an effort",
-    synonym: "bemühen (চেষ্টা করা), erschöpfen (ক্লান্ত করা)",
+    synonym:
+      "anstrengend (ক্লান্তিকর adj.), bemühen (চেষ্টা করা), erschöpfen (ক্লান্ত করা)",
     example: "",
     picture: "",
     hardlevel: "",
@@ -11973,7 +11979,8 @@ export const WordList = [
   {
     id: 1159,
     word: "Unterhaltungsvorgang",
-    bangla: "বিনোদনের প্রক্রিয়া, আলাপের প্রক্রিয়া/ধারা, আনন্দ ঘটনা",
+    bangla:
+      "আলাপের প্রক্রিয়া/ধারা (আলাপ-আলোচনার প্রক্রিয়া খুব আনুষ্ঠানিক এবং পেশাদার ছিল), আনন্দ ঘটনা",
     english: "entertainment process, conversation process",
     synonym: "",
     example: "",
@@ -11983,7 +11990,8 @@ export const WordList = [
   {
     id: 1160,
     word: "abtun",
-    bangla: "তুচ্ছ মনে করা, উড়িয়ে দেওয়া, এড়িয়ে যাওয়া, সরিয়ে ফেলা",
+    bangla:
+      "তুচ্ছ মনে করা (সে সবসময় আমার চিন্তা-ভাবনাগুলো অগ্রাহ্য করে), উড়িয়ে দেওয়া, এড়িয়ে যাওয়া, সরিয়ে ফেলা",
     english: "to dismiss, to brush off, to take off",
     synonym:
       "unbedeutend (তুচ্ছ), belanglos (গুরুত্বহীন), geringfügig (সামান্য), nichtig (তুচ্ছ), nebensächlich (গৌণ)",
@@ -12005,7 +12013,7 @@ export const WordList = [
   {
     id: 1162,
     word: "zeitgenössisch",
-    bangla: "সমসাময়িক, বর্তমানকালের, আধুনিক",
+    bangla: "সমসাময়িক (এটি একটি সমসাময়িক আধুনিক বাড়ি), বর্তমানকালের, আধুনিক",
     english: "contemporary, modern",
     synonym: "aktuell (আপডেটেড, বর্তমান)",
     example: "",
@@ -12067,9 +12075,11 @@ export const WordList = [
   {
     id: 1168,
     word: "knacken",
-    bangla: "ফাটানো, ভাঙা, চূর্ণ করা",
-    english: "",
-    synonym: "",
+    bangla:
+      "ফাটানো, ভাঙা (সে তার দাঁতের সাহায্যে আখরোট ভেঙে ফেলেছিল), চূর্ণ করা, সমাধান করা (সে কোডটি খুব দ্রুত সমাধান করেছিল), ভালোভাবে সম্পন্ন করা (সে প্রকল্পটি সত্যিই ভালোভাবে সম্পন্ন করেছে)",
+    english: "to break, to solve, to nail",
+    synonym:
+      "zerschlagen (টুকরো টুকরো করে ভাঙা), lösen, entschlüsseln (কোড বা সংকেত সমাধান করা)",
     example: "",
     picture: "",
     hardlevel: "",
@@ -12102,7 +12112,7 @@ export const WordList = [
     id: 1171,
     word: "unmittelbar",
     bangla:
-      "তৎক্ষণাৎ (সাফল্যের প্রকাশ করতে ব্যবহার হয় না), তাত্ক্ষণিক (পুলিশ জরুরি কল পেয়ে তাৎক্ষণিকভাবে সাড়া দিল), নিকটবর্তী (হোটেলটি সমুদ্রতটের একেবারে পাশে), বিলম্ব না করে, সরাসরি (দুটি ঘটনার মধ্যে সরাসরি একটি সম্পর্ক রয়েছে)",
+      "নিকটবর্তী (হোটেলটি সমুদ্রতটের একেবারে পাশে), বিলম্ব না করে, সরাসরি (সে সরাসরি বাসায় চলে আসছে), তাত্ক্ষণিক (প্রতিক্রিয়া তাত্ক্ষণিক ছিল, ঘটনাটির পর কোনও বিরতি ছিল না)",
     english:
       "immediate (not applied to show success), direct, without delay, instantly",
     synonym: "",
@@ -12123,7 +12133,8 @@ export const WordList = [
   {
     id: 1173,
     word: "klemmert es aus / etwas ausklemmen",
-    bangla: "কিছু বাদ দেয়া, কিছু সংযোগ বিচ্ছিন্ন করা (যেমন বিদ্যুৎ সংযোগ)",
+    bangla:
+      "কিছু বাদ দেয়া (বস অপ্রয়োজনীয় খরচগুলি কমাতে চেয়েছিলেন), কিছু সংযোগ বিচ্ছিন্ন করা (যেমন বিদ্যুৎ সংযোগ)",
     english: "to disconnect something (e.g., an electrical connection)",
     synonym: "",
     example: "",
@@ -12239,7 +12250,7 @@ export const WordList = [
     word: "eignen sich",
     bangla: "উপযুক্ত হওয়া (এই কাপড় শীতের পোশাকের জন্য উপযুক্ত), মানানসই হওয়া",
     english: "to be suitable, to be appropriate",
-    synonym: "taugen (উপযুক্ত হওয়া)",
+    synonym: "taugen (উপযুক্ত হওয়া), entsprechend",
     example: "",
     picture: "",
     hardlevel: "",

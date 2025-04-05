@@ -36,8 +36,7 @@ export default function Navbar() {
                     </h1>
                   </Link>
                   <NavLinks />
-                  <QuestionSelection
-                  />
+                  <QuestionSelection />
                 </div>
               ) : (
                 ""
