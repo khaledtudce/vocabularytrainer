@@ -71,13 +71,27 @@ const FlashCard = ({ page, direction }: PageType) => {
           <div className="py-3 text-xl sm:text-3xl font-bold">
             {WordList[index]?.id}. {WordList[index]?.word}
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
             <span>{WordList[index]?.bangla}</span>
             <span>{WordList[index]?.english}</span>
             <span>{WordList[index]?.synonym}</span>
             <span>{WordList[index]?.example}</span>
             {WordList[index]?.picture && (
-              <Image src={WordList[index].picture} alt="img" />
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  aspectRatio: "16 / 9",
+                }}
+              >
+                <Image
+                  src={WordList[index].picture}
+                  className="rounded-md"
+                  alt="Responsive Image"
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
             )}
           </div>
         </div>

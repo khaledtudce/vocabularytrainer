@@ -1,5 +1,3 @@
-"use client";
-
 import FlashCard from "@/manualcomponent/FlashCard";
 import Navbar from "@/manualcomponent/NavBar";
 import React from "react";
