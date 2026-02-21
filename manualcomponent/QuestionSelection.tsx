@@ -66,8 +66,7 @@ export default function DifficultySelector() {
         setRanges((prev: any) => {
           const next = { ...prev };
           for (const key of ["Known", "Unknown", "Hard"]) {
-            const rawMax = (data?.[key.toLowerCase()] || []).length || 0;
-            const max = Math.min(rawMax, 30);
+            const max = (data?.[key.toLowerCase()] || []).length || 0;
             if (next[key].from > max) next[key].from = max > 0 ? 1 : 0;
             if (next[key].to > max) next[key].to = max;
             if (next[key].from < 1 && max > 0) next[key].from = 1;
@@ -132,7 +131,7 @@ export default function DifficultySelector() {
                 }}
               >
                 {(() => {
-                  const total = mode === "Custom" ? WordList.length : Math.min((userCounts as any)[mode] || 0, 30);
+                  const total = mode === "Custom" ? WordList.length : ((userCounts as any)[mode] || 0);
                   if (total <= 0) return <option value={0}>0</option>;
                   return Array.from({ length: total }, (_, i) => i + 1).map((num) => num <= ranges[mode].to && (
                     <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>{num}</option>
@@ -154,7 +153,7 @@ export default function DifficultySelector() {
                 }}
               >
                 {(() => {
-                  const total = mode === "Custom" ? WordList.length : Math.min((userCounts as any)[mode] || 0, 30);
+                  const total = mode === "Custom" ? WordList.length : ((userCounts as any)[mode] || 0);
                   if (total <= 0) return <option value={0}>0</option>;
                   return Array.from({ length: total }, (_, i) => i + 1).map((num) => num >= ranges[mode].from && (
                     <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>{num}</option>
