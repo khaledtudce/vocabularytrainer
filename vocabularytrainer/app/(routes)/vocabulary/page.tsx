@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useEffect } from 'react';
-import { WordList } from '@/data/wordlists';
-import NavBar from '@/manualcomponent/NavBar';
-import AddWordModal from '@/manualcomponent/AddWordModal';
+import { useState, useMemo, useEffect } from "react";
+import useActiveWords from "@/lib/useActiveWords";
+import NavBar from "@/manualcomponent/NavBar";
+import AddWordModal from "@/manualcomponent/AddWordModal";
 
 export default function VocabularyPage() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [isClient, setIsClient] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [words, setWords] = useState(WordList);
+  const { words: activeWords } = useActiveWords();
+  const [addedWords, setAddedWords] = useState<any[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -19,18 +20,19 @@ export default function VocabularyPage() {
 
   const filteredItems = useMemo(() => {
     if (!isClient) return [];
-    
-    return words.filter((item) => {
+
+    const source = [...activeWords, ...addedWords];
+    return source.filter((item) => {
       const searchLower = searchTerm.toLowerCase();
-      
+
       return (
-        item.word.toLowerCase().includes(searchLower) ||
-        item.bangla.toLowerCase().includes(searchLower) ||
-        item.english.toLowerCase().includes(searchLower) ||
-        item.synonym.toLowerCase().includes(searchLower)
+        (item.word || "").toLowerCase().includes(searchLower) ||
+        (item.bangla || "").toLowerCase().includes(searchLower) ||
+        (item.english || "").toLowerCase().includes(searchLower) ||
+        (item.synonym || "").toLowerCase().includes(searchLower)
       );
     });
-  }, [searchTerm, isClient, words]);
+  }, [searchTerm, isClient, activeWords, addedWords]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice(
@@ -43,7 +45,7 @@ export default function VocabularyPage() {
   };
 
   const handleAddWord = (newWord: any) => {
-    setWords([...words, newWord]);
+    setAddedWords((prev) => [...prev, newWord]);
     setShowModal(false);
   };
 
