@@ -1,0 +1,87 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { WordList } from "@/data/wordlists";
+
+type Mode = "Custom" | "Known" | "Unknown" | "Hard";
+
+export default function useActiveWords() {
+  const [mode, setMode] = useState<Mode>("Custom");
+  const [range, setRange] = useState({ from: 1, to: 30 });
+  const [words, setWords] = useState<any[]>(WordList.slice(0, 30));
+
+  // helper: map id array to WordList entries (preserve order, ignore missing)
+  const mapIdsToWords = (ids: number[]) => {
+    const idSet = new Set(ids);
+    const mapped = ids.map((id) => WordList.find((w) => w?.id === id)).filter(Boolean) as any[];
+    return mapped;
+  };
+
+  const refreshWords = async (m: Mode, r: { from: number; to: number }) => {
+    if (m === "Custom") {
+      // Custom mode: show the whole WordList
+      setWords(WordList.slice());
+      return;
+    }
+
+    // Known/Unknown/Hard: try to fetch user-specific lists (based on localStorage userId)
+    try {
+      const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+      if (!userId) {
+        setWords([]);
+        return;
+      }
+      const res = await fetch(`/api/user/${userId}/wordlists`);
+      if (!res.ok) {
+        setWords([]);
+        return;
+      }
+      const data = await res.json();
+      const key = m.toLowerCase();
+      const ids: number[] = data?.[key] ?? [];
+      const mapped = mapIdsToWords(ids);
+      const sliced = mapped.slice(r.from - 1, r.to);
+      setWords(sliced);
+    } catch (err) {
+      console.error("Error fetching user wordlists:", err);
+      setWords([]);
+    }
+  };
+
+  useEffect(() => {
+    // initial load from localStorage
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("wordSource");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        const m: Mode = parsed.mode || "Custom";
+        const r = parsed.ranges?.[m] || { from: 1, to: 30 };
+        setMode(m);
+        setRange(r);
+        refreshWords(m, r);
+      } catch {
+        setMode("Custom");
+        setRange({ from: 1, to: 30 });
+        refreshWords("Custom", { from: 1, to: 30 });
+      }
+    } else {
+      refreshWords("Custom", { from: 1, to: 30 });
+    }
+
+    const handler = (e: any) => {
+      const detail = e?.detail || {};
+      const m: Mode = detail.mode || "Custom";
+      const r = detail.range || { from: 1, to: 30 };
+      setMode(m);
+      setRange(r);
+      refreshWords(m, r);
+    };
+
+    window.addEventListener("wordSourceUpdated", handler as EventListener);
+    return () => window.removeEventListener("wordSourceUpdated", handler as EventListener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { words, mode, range };
+}

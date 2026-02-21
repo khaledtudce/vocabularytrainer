@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import QuestionSelection from "./QuestionSelection";
 import { Menu, X } from "lucide-react";
 
@@ -51,6 +52,24 @@ export default function Navbar() {
 
 function NavLinks() {
   const [dropdown, setDropdown] = useState("null");
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+      
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      document.cookie = 'userId=; path=/; max-age=0';
+      
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
     <ul className="flex space-x-2 sm:space-x-6">
       <li className="mt-2">
@@ -80,6 +99,24 @@ function NavLinks() {
           Test
         </button>
         {dropdown === "Test" && <TestMenu />}
+      </li>
+      <li className="mt-2">
+        <Link
+          href="/vocabulary"
+          className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700"
+        >
+          Wordlists
+        </Link>
+      </li>
+      <li
+        className="relative"
+        onMouseEnter={() => setDropdown("User")}
+        onMouseLeave={() => setDropdown("")}
+      >
+        <button className="border text-white px-3 py-2 rounded-lg transition duration-600 focus:ring-2 hover:bg-green-700">
+          User
+        </button>
+        {dropdown === "User" && <UserMenu handleLogout={handleLogout} />}
       </li>
     </ul>
   );
@@ -198,6 +235,37 @@ function TestMenu() {
         >
           Fill in the blank
         </Link>
+      </li>
+    </ul>
+  );
+}
+
+function UserMenu({ handleLogout }: { handleLogout: () => void }) {
+  return (
+    <ul className="text-sm text-white absolute right-0 w-48 shadow-lg rounded-lg z-1000">
+      <li className="mt-0.5 bg-green-500 hover:bg-green-700 rounded-lg">
+        <Link
+          href="/user-details"
+          className="block px-4 py-2 hover:bg-green-700 rounded-lg"
+        >
+          User Details
+        </Link>
+      </li>
+      <li className="mt-0.5 bg-green-500 hover:bg-green-700 rounded-lg">
+        <Link
+          href="/user-details/progress"
+          className="block px-4 py-2 hover:bg-green-700 rounded-lg"
+        >
+          Progress
+        </Link>
+      </li>
+      <li className="mt-0.5 bg-red-500 hover:bg-red-700 rounded-lg">
+        <button
+          onClick={handleLogout}
+          className="w-full text-left block px-4 py-2 hover:bg-red-700 rounded-lg font-medium"
+        >
+          Logout
+        </button>
       </li>
     </ul>
   );

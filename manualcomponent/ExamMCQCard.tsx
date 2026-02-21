@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { WordList } from "@/data/wordlists";
 import React, { useEffect, useState } from "react";
+import useActiveWords from "@/lib/useActiveWords";
 
 type ExamMCQCardType = {
   mcqdirection: string;
@@ -14,41 +14,19 @@ type ExamQuestionInfo = {
 };
 
 const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
-  const [index, setIndex] = useState(1);
+  const [index, setIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [options, setOptions] = useState<string[]>([]);
   const [examQuestionInfos, setExamQuestionInfo] = useState<ExamQuestionInfo[]>(
     []
   );
   const [examFinished, setExamFinished] = useState<boolean>(false);
-  const currentWord = WordList[index];
-  const [selectedWordIdFrom, setSelectedWordIdFrom] = useState(1);
-  const [selectedWordIdTo, setSelectedWordIdTo] = useState(30);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const storedRange = localStorage.getItem("wordRange");
-    if (storedRange) {
-      const parsedRange = JSON.parse(storedRange);
-      setSelectedWordIdFrom(parsedRange.from);
-      setSelectedWordIdTo(parsedRange.to);
-    }
-  }, []);
+  const { words, range } = useActiveWords();
+  const currentWord = words[index];
 
   useEffect(() => {
-    const handleRangeUpdate = (event: any) => {
-      console.log(event);
-      setSelectedWordIdFrom(event.detail.from);
-      setSelectedWordIdTo(event.detail.to);
-    };
-    window.addEventListener("wordRangeUpdated", handleRangeUpdate);
-    return () =>
-      window.removeEventListener("wordRangeUpdated", handleRangeUpdate);
-  }, []);
-
-  useEffect(() => {
-    setIndex(selectedWordIdFrom - 1);
-  }, [selectedWordIdFrom]);
+    setIndex(0);
+  }, [words]);
 
   useEffect(() => {
     if (
@@ -57,9 +35,8 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
     ) {
       const getRandomGermanOptionsForBangla = () => {
         const correctAnswer = currentWord?.word;
-        const wrongAnswers = WordList.filter(
-          (w) => w?.bangla !== currentWord?.bangla
-        )
+        const wrongAnswers = words
+          .filter((w) => w?.bangla !== currentWord?.bangla)
           .map((w) => w?.word)
           .sort(() => 0.5 - Math.random())
           .slice(0, 3);
@@ -69,9 +46,8 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
     } else if (mcqdirection === "germanToBangla") {
       const getRandomBanglaOptionsForGerman = () => {
         const correctAnswer = currentWord?.bangla;
-        const wrongAnswers = WordList.filter(
-          (w) => w?.word !== currentWord?.word
-        )
+        const wrongAnswers = words
+          .filter((w) => w?.word !== currentWord?.word)
           .map((w) => w?.bangla)
           .sort(() => 0.5 - Math.random())
           .slice(0, 3);
@@ -81,9 +57,8 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
     } else if (mcqdirection === "germanToEnglish") {
       const getRandomBanglaOptionsForGerman = () => {
         const correctAnswer = currentWord?.english;
-        const wrongAnswers = WordList.filter(
-          (w) => w?.word !== currentWord?.word
-        )
+        const wrongAnswers = words
+          .filter((w) => w?.word !== currentWord?.word)
           .map((w) => w?.english)
           .sort(() => 0.5 - Math.random())
           .slice(0, 3);
@@ -95,13 +70,7 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
 
   const prevWord = () => {
     setSelectedAnswer("");
-    setIndex((prev) => {
-      if (prev <= selectedWordIdFrom) {
-        return selectedWordIdFrom - 1;
-      } else {
-        return prev - 1;
-      }
-    });
+    setIndex((prev) => (prev <= 0 ? 0 : prev - 1));
   };
 
   const saveCurrentQuestionInfo = () => {
@@ -142,18 +111,16 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
     await saveCurrentQuestionInfo();
     setSelectedAnswer("");
     setIndex((prev) => {
-      if (prev >= selectedWordIdTo - 1) {
+      if (prev >= (words.length - 1 || 0)) {
         setExamFinished(true);
-        return selectedWordIdTo - 1;
+        return words.length - 1 || 0;
       } else {
         return prev + 1;
       }
     });
   };
 
-  const correctAnswerCount = examQuestionInfos.filter(
-    (item) => item.seletedAnswer === item.correctAnswer
-  ).length;
+  const correctAnswerCount = examQuestionInfos.filter((item) => item.seletedAnswer === item.correctAnswer).length;
 
   return (
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
@@ -273,12 +240,8 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
       {examFinished && (
         <div className="flex items-center justify-center w-full">
           <div className="p-1 flex flex-col items-center">
-            <span className="mt-5 text-2xl font-bold text-center">
-              Congratulation! Here is your test result:
-            </span>
-            <span>
-              Total Questions: {1 + (selectedWordIdTo - selectedWordIdFrom)}
-            </span>
+            <span className="mt-5 text-2xl font-bold text-center">Congratulation! Here is your test result:</span>
+            <span>Total Questions: {words.length}</span>
             <span>Correct Answer: {correctAnswerCount}</span>
             <Button
               className="mt-2 bg-gray-500"
