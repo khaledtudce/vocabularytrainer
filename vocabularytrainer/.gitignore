@@ -1,0 +1,104 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+/standalone
+package-lock.json
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Common OS / editor / build artifacts to ignore
+# Node / Next.js / package artifacts (already present above but made explicit)
+node_modules/
+.next/
+build/
+out/
+.vercel/
+.turbo/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment files (do not ignore data/*.json)
+.env
+.env.*
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.iml
+
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Temporary / swap
+*.tmp
+*.swp
+*.bak
+*.orig
+
+# Archives / binaries / compiled
+*.exe
+*.dll
+*.so
+*.dylib
+*.class
+*.pyc
+__pycache__/
+
+# Build/test output
+coverage/
+dist/
+out/
+
+# Compression files
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
