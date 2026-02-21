@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { WordList } from "@/data/wordlists";
 import NavBar from "@/manualcomponent/NavBar";
+import dynamic from "next/dynamic";
+const PieChart = dynamic(() => import("./PieChart"), { ssr: false });
 
 function mapIdsToWords(ids: number[]) {
   return ids
@@ -50,30 +52,40 @@ export default function ProgressPage() {
             <p className="text-lg text-gray-500">No user logged in.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { label: "Known Words", key: "known", color: "green" },
-              { label: "Unknown Words", key: "unknown", color: "yellow" },
-              { label: "Hard Words", key: "hard", color: "red" },
-            ].map(({ label, key, color }) => (
-              <div key={key} className="bg-white rounded-lg shadow-md p-6">
-                <h2 className={`text-xl font-bold mb-4 text-${color}-700`}>{label} ({lists[key].length})</h2>
-                <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-                  {lists[key].length === 0 ? (
-                    <p className="text-gray-400 italic">No words.</p>
-                  ) : (
-                    lists[key].map((item: any) => (
-                      <div key={item.id} className="border-b pb-2 mb-2">
-                        <span className="font-semibold text-indigo-700">{item.word}</span>
-                        <span className="ml-2 text-gray-600">({item.english})</span>
-                        <div className="text-sm text-gray-500">{item.bangla}</div>
-                      </div>
-                    ))
-                  )}
+          <>
+            <div className="mb-8 max-w-md mx-auto">
+              <PieChart
+                known={lists.known.length}
+                unknown={lists.unknown.length}
+                hard={lists.hard.length}
+                total={WordList.length}
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { label: "Known Words", key: "known", color: "green" },
+                { label: "Unknown Words", key: "unknown", color: "yellow" },
+                { label: "Hard Words", key: "hard", color: "red" },
+              ].map(({ label, key, color }) => (
+                <div key={key} className="bg-white rounded-lg shadow-md p-6">
+                  <h2 className={`text-xl font-bold mb-4 text-${color}-700`}>{label} ({lists[key].length})</h2>
+                  <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                    {lists[key].length === 0 ? (
+                      <p className="text-gray-400 italic">No words.</p>
+                    ) : (
+                      lists[key].map((item: any) => (
+                        <div key={item.id} className="border-b pb-2 mb-2">
+                          <span className="font-semibold text-indigo-700">{item.word}</span>
+                          <span className="ml-2 text-gray-600">({item.english})</span>
+                          <div className="text-sm text-gray-500">{item.bangla}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
