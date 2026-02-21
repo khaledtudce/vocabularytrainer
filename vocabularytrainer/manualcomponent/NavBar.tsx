@@ -251,6 +251,14 @@ function UserMenu({ handleLogout }: { handleLogout: () => void }) {
           User Details
         </Link>
       </li>
+      <li className="mt-0.5 bg-green-500 hover:bg-green-700 rounded-lg">
+        <Link
+          href="/user-details/progress"
+          className="block px-4 py-2 hover:bg-green-700 rounded-lg"
+        >
+          Progress
+        </Link>
+      </li>
       <li className="mt-0.5 bg-red-500 hover:bg-red-700 rounded-lg">
         <button
           onClick={handleLogout}

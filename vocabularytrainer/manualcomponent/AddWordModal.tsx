@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { WordList } from '@/data/wordlists';
+import { useState, useEffect } from "react";
+import useActiveWords from "@/lib/useActiveWords";
 
 interface AddWordModalProps {
   onClose: () => void;
@@ -9,6 +9,8 @@ interface AddWordModalProps {
 }
 
 export default function AddWordModal({ onClose, onAddWord }: AddWordModalProps) {
+  const { words } = useActiveWords();
+
   const [formData, setFormData] = useState({
     word: '',
     bangla: '',
@@ -30,9 +32,7 @@ export default function AddWordModal({ onClose, onAddWord }: AddWordModalProps) 
     // Check if German word already exists when typing in the word field
     if (name === 'word') {
       if (value.trim()) {
-        const exists = WordList.some(
-          (item) => item.word.toLowerCase() === value.toLowerCase()
-        );
+        const exists = words.some((item) => item.word.toLowerCase() === value.toLowerCase());
         setWordExists(exists);
       } else {
         setWordExists(false);
