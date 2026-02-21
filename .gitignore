@@ -1,0 +1,88 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp
+.pnp.js
+
+# Yarn / NPM
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+package-lock.json
+yarn.lock
+
+# Next.js / Build output
+/.next/
+/out/
+/build/
+/standalone/
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+/coverage
+/.nyc_output
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Development
+.turbo/
+.cache/
+.eslintcache
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# System files
+.AppleDouble
+.LSOverride
+*.tar
+*.tar.gz
+*.tgz
+*.7z
