@@ -1,3 +1,52 @@
+## VocabularyTrainer
+
+Simple Next.js (App Router) project for practising vocabulary between Bangla, German and English.
+
+### Quickstart
+
+- Requirements: Node.js (>=18), npm
+- Install dependencies:
+
+```bash
+npm install
+```
+
+- Run development server:
+
+```bash
+cd vocabularytrainer
+npm run dev
+```
+
+- Build for production:
+
+```bash
+npm run build
+npm start
+```
+
+### Project structure (high level)
+
+- `app/` — Next.js App Router pages and API routes
+- `components/`, `ui/`, `manualcomponent/` — UI components used across the app
+- `data/` — local JSON fixtures used by APIs (e.g. `users.json`)
+- `public/` — static assets
+- `lib/` — helper utilities
+- `build/` — generated Next.js build output (can be removed)
+
+### Notable scripts
+
+- `dev` — start Next.js dev server
+- `build` — production build
+- `start` — start production server
+
+### Contributing / Notes
+
+- The repository uses the Next.js app directory and server components.
+- Keep `data/*.json` under version control if they represent seed data.
+- The `build/` folder is generated and may be removed or ignored (already in `.gitignore`).
+
+For more details see the `docs/` folder.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
