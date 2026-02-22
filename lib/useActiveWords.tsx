@@ -54,7 +54,8 @@ export default function useActiveWords() {
       const key = m.toLowerCase();
       const ids: number[] = data?.[key] ?? [];
       const mapped = mapIdsToWords(ids);
-      const sliced = mapped.slice(r.from - 1, r.to);
+      // Filter by ID range instead of array slice (r.from and r.to are actual word IDs now)
+      const sliced = mapped.filter(word => word.id >= r.from && word.id <= r.to);
       setWords(sliced);
     } catch (err) {
       console.error("Error fetching user wordlists:", err);

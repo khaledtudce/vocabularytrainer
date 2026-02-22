@@ -50,27 +50,41 @@ export default function DifficultySelector() {
   }, [mode, ranges]);
 
   // Track per-user counts for Known/Unknown/Hard so selects reflect actual sizes
+  // Also track the actual IDs in each array for range selection
   const [userCounts, setUserCounts] = useState({ Known: 0, Unknown: 0, Hard: 0 });
+  const [userIds, setUserIds] = useState({ Known: [] as number[], Unknown: [] as number[], Hard: [] as number[] });
 
   const fetchWordlists = (userId: string) => {
     fetch(`/api/user/${userId}/wordlists`)
       .then((r) => r.json())
       .then((data) => {
-        setUserCounts({ Known: (data?.known || []).length, Unknown: (data?.unknown || []).length, Hard: (data?.hard || []).length });
-        // clamp existing ranges to available counts
+        const knownIds = (data?.known || []) as number[];
+        const unknownIds = (data?.unknown || []) as number[];
+        const hardIds = (data?.hard || []) as number[];
+
+        setUserCounts({ 
+          Known: knownIds.length, 
+          Unknown: unknownIds.length, 
+          Hard: hardIds.length 
+        });
+
+        // Store the actual IDs for range selection
+        setUserIds({ Known: knownIds, Unknown: unknownIds, Hard: hardIds });
+
+        // Set ranges based on actual IDs in arrays
         setRanges((prev: any) => {
           const next = { ...prev };
+          const arrays = { Known: knownIds, Unknown: unknownIds, Hard: hardIds };
+
           for (const key of ["Known", "Unknown", "Hard"]) {
-            const max = (data?.[key.toLowerCase()] || []).length || 0;
-            if (max > 0) {
-              // Ensure from is at least 1 and doesn't exceed max
-              if (next[key].from < 1 || next[key].from > max) next[key].from = 1;
-              // Set to to the maximum available (up to 30), but at least from
-              next[key].to = Math.min(max, 30);
-              if (next[key].to < next[key].from) next[key].to = next[key].from;
+            const ids = (arrays as any)[key];
+            if (ids && ids.length > 0) {
+              const minId = Math.min(...ids);
+              // If more than 30 items, use the 30th item's ID as max; otherwise use actual max
+              const maxId = ids.length > 30 ? ids[29] : Math.max(...ids);
+              next[key] = { from: minId, to: maxId };
             } else {
-              next[key].from = 0;
-              next[key].to = 0;
+              next[key] = { from: 0, to: 0 };
             }
           }
           return next;
@@ -139,11 +153,17 @@ export default function DifficultySelector() {
                 }}
               >
                 {(() => {
-                  const total = mode === "Custom" ? WordList.length : ((userCounts as any)[mode] || 0);
-                  if (total <= 0) return <option value={0}>0</option>;
-                  return Array.from({ length: total }, (_, i) => i + 1).map((num) => num <= ranges[mode].to && (
-                    <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>{num}</option>
-                  ));
+                  if (mode === "Custom") {
+                    return Array.from({ length: WordList.length }, (_, i) => i + 1).map((num) => num <= ranges[mode].to && (
+                      <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>{num}</option>
+                    ));
+                  } else {
+                    const ids = (userIds as any)[mode] || [];
+                    if (ids.length === 0) return <option value={0}>0</option>;
+                    return ids.map((id: number) => id <= ranges[mode].to && (
+                      <option className="bg-green-500 text-white hover:bg-green-700" key={id} value={id}>{id}</option>
+                    ));
+                  }
                 })()}
               </select>
             </div>
@@ -161,11 +181,17 @@ export default function DifficultySelector() {
                 }}
               >
                 {(() => {
-                  const total = mode === "Custom" ? WordList.length : ((userCounts as any)[mode] || 0);
-                  if (total <= 0) return <option value={0}>0</option>;
-                  return Array.from({ length: total }, (_, i) => i + 1).map((num) => num >= ranges[mode].from && (
-                    <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>{num}</option>
-                  ));
+                  if (mode === "Custom") {
+                    return Array.from({ length: WordList.length }, (_, i) => i + 1).map((num) => num >= ranges[mode].from && (
+                      <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>{num}</option>
+                    ));
+                  } else {
+                    const ids = (userIds as any)[mode] || [];
+                    if (ids.length === 0) return <option value={0}>0</option>;
+                    return ids.map((id: number) => id >= ranges[mode].from && (
+                      <option className="bg-green-500 text-white hover:bg-green-700" key={id} value={id}>{id}</option>
+                    ));
+                  }
                 })()}
               </select>
             </div>
