@@ -32,7 +32,12 @@ const FlashCard = ({ page, direction }: PageType) => {
 
   return (
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
-      {page === "learning" && (
+      {words.length === 0 && page === "learning" && (
+        <div className="mt-5 p-4 text-center text-gray-600">
+          <p className="text-lg font-semibold">No words available</p>
+        </div>
+      )}
+      {page === "learning" && words.length > 0 && (
         <div className="mt-5 p-2 border border-amber-500 bg-cyan-200 ring-2 rounded-md">
             <div className="py-3 text-xl sm:text-3xl font-bold">
             {words[index]?.id}. {words[index]?.word}
@@ -111,10 +116,10 @@ const FlashCard = ({ page, direction }: PageType) => {
         </div>
       )}
       <div className="flex py-5 items-center gap-20">
-        <Button className="bg-lime-700" onClick={prevWord}>
+        <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0}>
           Previous
         </Button>
-        <Button className="bg-lime-700" onClick={nextWord}>
+        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0}>
           Next
         </Button>
       </div>
