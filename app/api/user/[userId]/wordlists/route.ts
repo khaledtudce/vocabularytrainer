@@ -22,3 +22,37 @@ export async function GET(request: Request, context: { params: any }) {
     return NextResponse.json({ known: [], unknown: [], hard: [] }, { status: 500 });
   }
 }
+
+export async function POST(request: Request, context: { params: any }) {
+  try {
+    const params = await context.params;
+    const userId = params?.userId ?? params;
+    const body = await request.json();
+    const { known, unknown, hard } = body;
+
+    const userListsPath = path.join(process.cwd(), 'data', 'user_wordlists', `${userId}.json`);
+    
+    // Ensure directory exists
+    const dir = path.dirname(userListsPath);
+    try {
+      await fs.mkdir(dir, { recursive: true });
+    } catch {
+      // Directory might already exist
+    }
+
+    const wordlists = {
+      known: Array.isArray(known) ? known : [],
+      unknown: Array.isArray(unknown) ? unknown : [],
+      hard: Array.isArray(hard) ? hard : [],
+    };
+
+    await fs.writeFile(userListsPath, JSON.stringify(wordlists, null, 2), 'utf-8');
+    return NextResponse.json(wordlists);
+  } catch (error) {
+    console.error('Error updating user wordlists:', error);
+    return NextResponse.json(
+      { error: 'Failed to update wordlists' },
+      { status: 500 }
+    );
+  }
+}

@@ -58,9 +58,77 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
     });
   };
 
+  useEffect(() => {
+    if (examFinished && reason === "exam" && examFillInBlankQuestionInfos.length > 0) {
+      saveExamResultsToWordlists();
+    }
+  }, [examFinished]);
+
   const correctAnswerCount = examFillInBlankQuestionInfos.filter(
     (item) => item.userAnswer === item.correctAnswer
   ).length;
+
+  const saveExamResultsToWordlists = async () => {
+    if (reason !== "exam") return;
+    
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+
+      // Get current wordlists
+      const response = await fetch(`/api/user/${userId}/wordlists`);
+      const currentLists = await response.json();
+
+      const known = new Set(currentLists.known || []);
+      const hard = new Set(currentLists.hard || []);
+      const unknown = new Set(currentLists.unknown || []);
+
+      // Process exam results
+      examFillInBlankQuestionInfos.forEach((item) => {
+        if (item.userAnswer === item.correctAnswer) {
+          // Correct answer: add to known
+          known.add(item.id);
+          hard.delete(item.id);
+          unknown.delete(item.id);
+        } else if (item.userAnswer === "") {
+          // No attempt: add to hard
+          hard.add(item.id);
+          known.delete(item.id);
+          unknown.delete(item.id);
+        } else {
+          // Wrong answer: add to hard
+          hard.add(item.id);
+          known.delete(item.id);
+          unknown.delete(item.id);
+        }
+      });
+
+      // Add untouched words to unknown
+      words.forEach((word) => {
+        const wasAnswered = examFillInBlankQuestionInfos.some(
+          (item) => item.id === word.id
+        );
+        if (!wasAnswered) {
+          unknown.add(word.id);
+          known.delete(word.id);
+          hard.delete(word.id);
+        }
+      });
+
+      // Save updated lists
+      await fetch(`/api/user/${userId}/wordlists`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          known: Array.from(known),
+          unknown: Array.from(unknown),
+          hard: Array.from(hard),
+        }),
+      });
+    } catch (error) {
+      console.error("Error saving exam results:", error);
+    }
+  };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

@@ -50,6 +50,21 @@ export async function POST(request: Request) {
     // Write updated users list
     await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), 'utf-8');
 
+    // Create user-specific wordlists file with empty lists
+    const userWordlistsDir = path.join(process.cwd(), 'data', 'user_wordlists');
+    try {
+      await fs.mkdir(userWordlistsDir, { recursive: true });
+    } catch {
+      // Directory might already exist
+    }
+    const userWordlistsPath = path.join(userWordlistsDir, `${userId}.json`);
+    const userWordlists = {
+      known: [],
+      unknown: [],
+      hard: [],
+    };
+    await fs.writeFile(userWordlistsPath, JSON.stringify(userWordlists, null, 2), 'utf-8');
+
     // Create user-specific data file
     const userDataFilePath = path.join(process.cwd(), 'data', `user_${userId}.json`);
     const userData = {
