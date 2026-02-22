@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#fbbf24" opacity="0.1" stroke="#fbbf24" stroke-width="2"/>
+  
+  <!-- Upper left wing -->
+  <ellipse cx="70" cy="70" rx="30" ry="40" fill="#f59e0b" stroke="#d97706" stroke-width="2" transform="rotate(-30 70 70)"/>
+  
+  <!-- Upper right wing -->
+  <ellipse cx="130" cy="70" rx="30" ry="40" fill="#f59e0b" stroke="#d97706" stroke-width="2" transform="rotate(30 130 70)"/>
+  
+  <!-- Lower left wing -->
+  <ellipse cx="65" cy="130" rx="25" ry="35" fill="#fbbf24" stroke="#d97706" stroke-width="2" transform="rotate(-35 65 130)"/>
+  
+  <!-- Lower right wing -->
+  <ellipse cx="135" cy="130" rx="25" ry="35" fill="#fbbf24" stroke="#d97706" stroke-width="2" transform="rotate(35 135 130)"/>
+  
+  <!-- Wing patterns - upper left -->
+  <circle cx="60" cy="60" r="6" fill="#fef08a" opacity="0.8"/>
+  <circle cx="75" cy="75" r="5" fill="#fef08a" opacity="0.8"/>
+  
+  <!-- Wing patterns - upper right -->
+  <circle cx="140" cy="60" r="6" fill="#fef08a" opacity="0.8"/>
+  <circle cx="125" cy="75" r="5" fill="#fef08a" opacity="0.8"/>
+  
+  <!-- Wing patterns - lower left -->
+  <circle cx="55" cy="125" r="4" fill="#fef08a" opacity="0.8"/>
+  
+  <!-- Wing patterns - lower right -->
+  <circle cx="145" cy="125" r="4" fill="#fef08a" opacity="0.8"/>
+  
+  <!-- Body -->
+  <ellipse cx="100" cy="100" rx="12" ry="35" fill="#d97706" stroke="#92400e" stroke-width="2"/>
+  
+  <!-- Head -->
+  <circle cx="100" cy="65" r="8" fill="#d97706" stroke="#92400e" stroke-width="2"/>
+  
+  <!-- Eyes -->
+  <circle cx="97" cy="63" r="2" fill="#ffffff"/>
+  <circle cx="103" cy="63" r="2" fill="#ffffff"/>
+  
+  <!-- Antennae -->
+  <line x1="100" y1="57" x2="95" y2="45" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+  <line x1="100" y1="57" x2="105" y2="45" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="95" cy="45" r="2.5" fill="#fbbf24"/>
+  <circle cx="105" cy="45" r="2.5" fill="#fbbf24"/>
+  
+  <!-- Decorative glow -->
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#fbbf24" stroke-width="1" opacity="0.2" stroke-dasharray="5,5"/>
+</svg>

@@ -38,13 +38,13 @@ export default function ProgressPieChart({ known, unknown, hard, total }: { know
     maintainAspectRatio: true,
     plugins: {
       legend: {
-        position: "right" as const,
+        position: typeof window !== 'undefined' && window.innerWidth < 640 ? "bottom" : "right",
         labels: {
           font: {
-            size: 14,
+            size: typeof window !== 'undefined' && window.innerWidth < 640 ? 11 : 14,
             weight: "500"
           },
-          padding: 15,
+          padding: typeof window !== 'undefined' && window.innerWidth < 640 ? 8 : 15,
           usePointStyle: true,
           pointStyle: "circle"
         }

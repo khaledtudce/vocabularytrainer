@@ -1,13 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import QuestionSelection from "./QuestionSelection";
 import { Menu, X } from "lucide-react";
+import { WordList } from "@/data/wordlists";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [progress, setProgress] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (typeof window === "undefined") return;
+      
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setProgress(undefined);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/user/${userId}/wordlists`);
+        const data = await response.json();
+        const knownCount = (data.known || []).length;
+        const progressPercent = (knownCount / WordList.length) * 100;
+        setProgress(progressPercent);
+      } catch (error) {
+        console.error("Failed to fetch progress:", error);
+      }
+    };
+
+    fetchProgress();
+    
+    // Optional: Refresh progress every 2 seconds
+    const interval = setInterval(fetchProgress, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
@@ -17,9 +47,19 @@ export default function Navbar() {
     <nav className="w-full bg-green-600 p-2 shadow-md">
       <div className="container w-full flex items-center justify-between">
         <div className="hidden w-full sm:flex sm:flex-row justify-between items-center gap-5">
-          <Link href="/learning">
-            <h1 className="text-white text-xl font-bold">Vocabulary Learner</h1>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/learning">
+              <div className="flex items-center gap-2 cursor-pointer">
+                <img src="/vocab-icon.svg" alt="Vocabulary" width="32" height="32" />
+                <h1 className="text-white text-xl font-bold">Vocabulary</h1>
+              </div>
+            </Link>
+            {progress !== undefined && (
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full px-6 py-2 shadow-lg">
+                <p className="text-gray-800 text-sm font-bold">📚 {progress.toFixed(1)}%</p>
+              </div>
+            )}
+          </div>
           <NavLinks />
           <QuestionSelection />
         </div>
@@ -31,11 +71,21 @@ export default function Navbar() {
             <span>
               {isOpen ? (
                 <div className="w-full flex flex-col justify-between items-center gap-3">
-                  <Link href="/learning">
-                    <h1 className="text-white text-2xl font-bold p-2">
-                      Vocabulary Learner
-                    </h1>
-                  </Link>
+                  <div className="flex flex-col items-center gap-2 w-full">
+                    <Link href="/learning">
+                      <div className="flex flex-col items-center gap-2 cursor-pointer">
+                        <img src="/vocab-icon.svg" alt="Vocabulary" width="40" height="40" />
+                        <h1 className="text-white text-2xl font-bold">
+                          Vocabulary
+                        </h1>
+                      </div>
+                    </Link>
+                    {progress !== undefined && (
+                      <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full px-6 py-2 shadow-lg">
+                        <p className="text-gray-800 text-sm font-bold">📚 {progress.toFixed(1)}%</p>
+                      </div>
+                    )}
+                  </div>
                   <NavLinks />
                   <QuestionSelection />
                 </div>

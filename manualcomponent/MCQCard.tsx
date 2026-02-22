@@ -72,25 +72,25 @@ const MCQCard = ({ mcqdirection }: MCQCardType) => {
   };
 
   return (
-    <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
+    <div className="w-full flex flex-col items-center p-2 sm:p-4 bg-gray-100 rounded-lg shadow-md gap-2 min-h-[85vh]">
       {words.length === 0 && (
-        <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
-          <p className="text-lg font-semibold text-gray-600">No words available</p>
+        <div className="mt-5 p-2 sm:p-4 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
+          <p className="text-base sm:text-lg font-semibold text-gray-600">No words available</p>
         </div>
       )}
       {words.length > 0 && (
         <>
-          <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
+          <div className="mt-3 sm:mt-5 p-2 sm:p-4 max-w-2xl w-full mx-auto bg-white rounded-lg shadow-md text-center">
         {mcqdirection === "germanToBangla" && (
           <>
-            <h3 className="text-xl sm:text-2xl font-semibold mb-5">
+            <h3 className="text-base sm:text-2xl font-semibold mb-3 sm:mb-5 break-words">
               {currentWord?.id}. {currentWord?.word}
             </h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-1 sm:gap-3">
               {options.map((option, idx) => (
                 <button
                   key={idx}
-                  className={`p-2 rounded-md border border-fuchsia-700 ${
+                  className={`p-1.5 sm:p-3 rounded-md border border-fuchsia-700 text-xs sm:text-base break-words ${
                     selectedAnswer === option
                       ? option === currentWord?.bangla
                         ? "bg-lime-400 ring-2"
@@ -104,9 +104,9 @@ const MCQCard = ({ mcqdirection }: MCQCardType) => {
               ))}
             </div>
             {selectedAnswer && (
-              <div className="mt-4 font-semibold flex items-center justify-center gap-5">
+              <div className="mt-2 sm:mt-4 font-semibold flex items-center justify-center gap-2 sm:gap-5 flex-wrap text-xs sm:text-base">
                 <p className="font-semibold">{selectedAnswer === currentWord?.bangla ? "Correct! ✅" : "Wrong ❌"}</p>
-                <Button className="bg-gray-400" onClick={() => setSelectedAnswer("")}>Clear</Button>
+                <Button className="bg-gray-400 text-xs sm:text-base py-1 sm:py-2" onClick={() => setSelectedAnswer("")}>Clear</Button>
               </div>
             )}
           </>

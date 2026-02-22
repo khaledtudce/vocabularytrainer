@@ -28428,15 +28428,4 @@ export const WordList = [
     picture: "",
     hardlevel: "",
   },
-  {
-    id: NaN,
-    word: "zztestword",
-    bangla: "টেস্ট",
-    english: "test",
-    synonym: "",
-    example:
-      "",
-    picture: "",
-    hardlevel: "",
-  },
 ];
