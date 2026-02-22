@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ChangeEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import useActiveWords from "@/lib/useActiveWords";
 
 type PractiseByBlanksType = {
@@ -16,6 +17,7 @@ type ExamFillInBlankQuestionInfo = {
 };
 
 export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
+  const router = useRouter();
   const { words } = useActiveWords();
   const [index, setIndex] = useState(0);
   const germanWord = words[index]?.word || "";
@@ -304,7 +306,7 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
             <span className="mt-5 text-2xl font-bold text-center">Congratulation! Here is your test result:</span>
             <span>Total Questions: {examFillInBlankQuestionInfos.length}</span>
             <span>Correct Answer: {correctAnswerCount}</span>
-            <Button className="mt-2 bg-gray-500" onClick={() => { setExamFillInBlankQuestionInfo([]); setIndex(0); setExamFinished(false); }}>Back to question again</Button>
+            <Button className="mt-2 bg-green-600 text-white" onClick={() => router.push("/")}>Back</Button>
             <ul className="mt-3 w-full">
               {examFillInBlankQuestionInfos.map((item) => (
                 <li key={item.id} className={`p-2 border rounded mb-2 ${item.userAnswer === item.correctAnswer ? "bg-green-300" : "bg-red-300"}`}>

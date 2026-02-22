@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import useActiveWords from "@/lib/useActiveWords";
 
 type ExamMCQCardType = {
@@ -14,6 +15,7 @@ type ExamQuestionInfo = {
 };
 
 const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
+  const router = useRouter();
   const [index, setIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [options, setOptions] = useState<string[]>([]);
@@ -21,6 +23,7 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
     []
   );
   const [examFinished, setExamFinished] = useState<boolean>(false);
+  const [submitClicked, setSubmitClicked] = useState(false);
   const { words, range } = useActiveWords();
   const currentWord = words[index];
 
@@ -118,6 +121,12 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
         return prev + 1;
       }
     });
+  };
+
+  const submitExam = async () => {
+    await saveCurrentQuestionInfo();
+    setSubmitClicked(true);
+    setExamFinished(true);
   };
 
   const saveExamResultsToWordlists = async () => {
@@ -309,14 +318,10 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
             <span>Total Questions: {words.length}</span>
             <span>Correct Answer: {correctAnswerCount}</span>
             <Button
-              className="mt-2 bg-gray-500"
-              onClick={() => {
-                setExamQuestionInfo([]);
-                setIndex(0);
-                setExamFinished(false);
-              }}
+              className="mt-2 bg-green-600 text-white"
+              onClick={() => router.push("/")}
             >
-              Back to question again
+              Back
             </Button>
             <ul className="mt-2 w-full">
               {examQuestionInfos.map((item) => (
@@ -363,9 +368,19 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
         <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0 || index === 0}>
           Previous
         </Button>
-        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1}>
-          Next
-        </Button>
+        {index === words.length - 1 ? (
+          <Button 
+            className="bg-blue-600 text-white" 
+            onClick={submitExam} 
+            disabled={words.length === 0 || submitClicked}
+          >
+            Submit
+          </Button>
+        ) : (
+          <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1}>
+            Next
+          </Button>
+        )}
       </div>
     </div>
   );
