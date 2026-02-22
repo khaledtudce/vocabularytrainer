@@ -25,6 +25,8 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
   const [examFillInBlankQuestionInfos, setExamFillInBlankQuestionInfo] =
     useState<ExamFillInBlankQuestionInfo[]>([]);
   const [examFinished, setExamFinished] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   useEffect(() => {
     setIndex(0);
@@ -45,6 +47,8 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
   const nextWord = async () => {
     if (reason === "exam") await saveCurrentQuestionInfo();
     setInput("");
+    setSubmitted(false);
+    setIsCorrect(false);
     setIndex((p) => {
       if (p >= (words.length - 1 || 0)) {
         setExamFinished(true);
@@ -77,6 +81,12 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
 
   const revealHint = () => {
     if (input.length < germanWord.length) setInput((prev) => prev + germanWord[input.length]);
+  };
+
+  const handleSubmit = () => {
+    const correct = input.toLowerCase() === germanWord.toLowerCase();
+    setIsCorrect(correct);
+    setSubmitted(true);
   };
 
   const resetGame = () => {
@@ -145,10 +155,20 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
 
           <div className="mt-1 flex flex-col sm:flex-row items-center justify-center gap-1">
             <h1 className="font-semibold mt-2">Please write here: </h1>
-            <input type="text" value={input} onChange={(e) => setInput(e.target.value)} className={"mt-2 p-1 border border-blue-500 rounded w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"} />
+            <input type="text" value={input} onChange={(e) => setInput(e.target.value)} disabled={submitted} className={"mt-2 p-1 border border-blue-500 rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"} />
           </div>
+          {submitted && (
+            <p className={`font-bold mt-2 ${isCorrect ? "text-green-600" : "text-red-600"}`}>
+              {isCorrect ? "✓ Your answer was correct!" : `✗ Incorrect. The correct answer is: ${germanWord}`}
+            </p>
+          )}
           <div className="mt-4 flex gap-2">
-            <button onClick={() => setInput("")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reset</button>
+            {!submitted ? (
+              <>
+                <button onClick={handleSubmit} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Submit</button>
+                <button onClick={() => setInput("")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reset</button>
+              </>
+            ) : null}
           </div>
         </div>
       )}
