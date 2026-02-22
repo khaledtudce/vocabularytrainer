@@ -11,15 +11,20 @@ export async function GET(request: Request, context: { params: any }) {
     try {
       const content = await fs.readFile(userListsPath, 'utf-8');
       const parsed = JSON.parse(content);
-      // expected shape: { known: [ids], unknown: [ids], hard: [ids] }
-      return NextResponse.json(parsed);
+      // Ensure correct key order: known, hard, unknown
+      const ordered = {
+        known: parsed.known || [],
+        hard: parsed.hard || [],
+        unknown: parsed.unknown || [],
+      };
+      return NextResponse.json(ordered);
     } catch (err) {
-      // file not found: return empty lists
-      return NextResponse.json({ known: [], unknown: [], hard: [] });
+      // file not found: return empty lists in correct order
+      return NextResponse.json({ known: [], hard: [], unknown: [] });
     }
   } catch (error) {
     console.error('Error reading user wordlists:', error);
-    return NextResponse.json({ known: [], unknown: [], hard: [] }, { status: 500 });
+    return NextResponse.json({ known: [], hard: [], unknown: [] }, { status: 500 });
   }
 }
 
@@ -42,8 +47,8 @@ export async function POST(request: Request, context: { params: any }) {
 
     const wordlists = {
       known: Array.isArray(known) ? known : [],
-      unknown: Array.isArray(unknown) ? unknown : [],
       hard: Array.isArray(hard) ? hard : [],
+      unknown: Array.isArray(unknown) ? unknown : [],
     };
 
     await fs.writeFile(userListsPath, JSON.stringify(wordlists, null, 2), 'utf-8');

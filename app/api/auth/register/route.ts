@@ -60,8 +60,8 @@ export async function POST(request: Request) {
     const userWordlistsPath = path.join(userWordlistsDir, `${userId}.json`);
     const userWordlists = {
       known: [],
-      unknown: [],
       hard: [],
+      unknown: [],
     };
     await fs.writeFile(userWordlistsPath, JSON.stringify(userWordlists, null, 2), 'utf-8');
 

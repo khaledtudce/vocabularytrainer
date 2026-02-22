@@ -165,14 +165,14 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
         }
       });
 
-      // Save updated lists
+      // Save updated lists (sorted in ascending order)
       await fetch(`/api/user/${userId}/wordlists`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          known: Array.from(known),
-          unknown: Array.from(unknown),
-          hard: Array.from(hard),
+          known: (Array.from(known) as number[]).sort((a, b) => a - b),
+          hard: (Array.from(hard) as number[]).sort((a, b) => a - b),
+          unknown: (Array.from(unknown) as number[]).sort((a, b) => a - b),
         }),
       });
     } catch (error) {
