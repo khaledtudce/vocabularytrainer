@@ -73,7 +73,14 @@ const MCQCard = ({ mcqdirection }: MCQCardType) => {
 
   return (
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
-      <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
+      {words.length === 0 && (
+        <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
+          <p className="text-lg font-semibold text-gray-600">No words available</p>
+        </div>
+      )}
+      {words.length > 0 && (
+        <>
+          <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
         {mcqdirection === "germanToBangla" && (
           <>
             <h3 className="text-xl sm:text-2xl font-semibold mb-5">
@@ -229,9 +236,11 @@ const MCQCard = ({ mcqdirection }: MCQCardType) => {
           </>
         )}
       </div>
+        </>
+      )}
       <div className="flex py-5 items-center gap-20">
-        <Button className="bg-lime-700" onClick={prevWord}>Previous</Button>
-        <Button className="bg-lime-700" onClick={nextWord}>Next</Button>
+        <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0}>Previous</Button>
+        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0}>Next</Button>
       </div>
     </div>
   );

@@ -165,7 +165,12 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
 
   return (
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
-      {reason === "practise" && (
+      {words.length === 0 && (
+        <div className="mt-5 p-4 text-center text-gray-600">
+          <p className="text-lg font-semibold">No words available</p>
+        </div>
+      )}
+      {reason === "practise" && words.length > 0 && (
         <div className="p-2 w-full flex flex-col items-center justify-center gap-1 bg-gray-100">
           <h1 className="text-md text-center sm:text-xl font-bold">
             <span>
@@ -176,7 +181,7 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
             <span>{words[index]?.english}</span>
           </h1>
           <div className="flex flex-wrap items-center justify-center gap-2">
-            {germanWord.split("").map((letter, i) => (
+            {germanWord.split("").map((letter: string, i: number) => (
               <span
                 key={i}
                 className={`w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center border-2 text-lg font-semibold rounded-md shadow-md ${
@@ -210,7 +215,7 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
         </div>
       )}
 
-      {reason === "exam" && !examFinished && (
+      {reason === "exam" && !examFinished && words.length > 0 && (
         <div className="p-2 w-full flex flex-col items-center justify-center gap-1 bg-gray-100">
           <h1 className="text-md text-center sm:text-xl font-bold">
             <span>
@@ -233,7 +238,7 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
           <div className="mt-4 flex gap-2">
             {!submitted ? (
               <>
-                <button onClick={handleSubmit} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Submit</button>
+                <button onClick={handleSubmit} disabled={words.length === 0} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Submit</button>
                 <button onClick={() => setInput("")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reset</button>
               </>
             ) : null}
@@ -265,8 +270,8 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
 
       {!examFinished && (
         <div className="flex py-5 items-center gap-20">
-          <Button className="bg-lime-700" onClick={prevWord}>Previous</Button>
-          <Button className="bg-lime-700" onClick={nextWord}>Next</Button>
+          <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0}>Previous</Button>
+          <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0}>Next</Button>
         </div>
       )}
     </div>

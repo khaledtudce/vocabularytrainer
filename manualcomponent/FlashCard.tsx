@@ -32,7 +32,7 @@ const FlashCard = ({ page, direction }: PageType) => {
 
   return (
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
-      {words.length === 0 && page === "learning" && (
+      {words.length === 0 && (
         <div className="mt-5 p-4 text-center text-gray-600">
           <p className="text-lg font-semibold">No words available</p>
         </div>
@@ -55,7 +55,7 @@ const FlashCard = ({ page, direction }: PageType) => {
           </div>
         </div>
       )}
-      {page === "practising" && direction === "german_to_meaning" && (
+      {page === "practising" && direction === "german_to_meaning" && words.length > 0 && (
         <div className="mt-5 p-1">
           <div className="text-center">
             Please click on flashcard to switch it!
@@ -84,7 +84,7 @@ const FlashCard = ({ page, direction }: PageType) => {
           </Card>
         </div>
       )}
-      {page === "practising" && direction === "meaning_to_german" && (
+      {page === "practising" && direction === "meaning_to_german" && words.length > 0 && (
         <div className="mt-5 p-1">
           <div className="text-center">
             Please click on flashcard to switch it!

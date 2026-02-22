@@ -190,9 +190,16 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
 
   return (
     <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
-      {!examFinished && (
+      {words.length === 0 && (
+        <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
+          <p className="text-lg font-semibold text-gray-600">No words available</p>
+        </div>
+      )}
+      {words.length > 0 && (
         <>
-          <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
+          {!examFinished && (
+            <>
+              <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
             {mcqdirection === "banglaToGerman" && (
               <>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-5">
@@ -293,19 +300,11 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
               </>
             )}
           </div>
-          <div className="flex py-5 items-center gap-20">
-            <Button className="bg-lime-700" onClick={prevWord}>
-              Previous
-            </Button>
-            <Button className="bg-lime-700" onClick={nextWord}>
-              Next
-            </Button>
-          </div>
-        </>
-      )}
-      {examFinished && (
-        <div className="flex items-center justify-center w-full">
-          <div className="p-1 flex flex-col items-center">
+            </>
+          )}
+          {examFinished && (
+            <div className="flex items-center justify-center w-full">
+              <div className="p-1 flex flex-col items-center">
             <span className="mt-5 text-2xl font-bold text-center">Congratulation! Here is your test result:</span>
             <span>Total Questions: {words.length}</span>
             <span>Correct Answer: {correctAnswerCount}</span>
@@ -313,7 +312,7 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
               className="mt-2 bg-gray-500"
               onClick={() => {
                 setExamQuestionInfo([]);
-                setIndex(selectedWordIdFrom - 1);
+                setIndex(0);
                 setExamFinished(false);
               }}
             >
@@ -357,7 +356,17 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
             </ul>
           </div>
         </div>
+            )}
+        </>
       )}
+      <div className="flex py-5 items-center gap-20">
+        <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0}>
+          Previous
+        </Button>
+        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0}>
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
