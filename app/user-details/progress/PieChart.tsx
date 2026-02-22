@@ -16,19 +16,60 @@ export default function ProgressPieChart({ known, unknown, hard, total }: { know
       {
         data: [known, unknown, hard, remaining],
         backgroundColor: [
-          "#22c55e", // green
-          "#000000", // black
+          "#10b981", // emerald green
+          "#64748b", // slate gray
           "#ef4444", // red
-          "#a3a3a3"  // gray
+          "#d1d5db"  // light gray
         ],
-        borderWidth: 1,
+        borderColor: [
+          "#059669",
+          "#475569",
+          "#dc2626",
+          "#9ca3af"
+        ],
+        borderWidth: 2,
+        hoverBorderWidth: 3,
       },
     ],
   };
+
+  const options: any = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        position: "right" as const,
+        labels: {
+          font: {
+            size: 14,
+            weight: "500"
+          },
+          padding: 15,
+          usePointStyle: true,
+          pointStyle: "circle"
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context: any) {
+            const label = context.label || '';
+            const value = context.raw || 0;
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+            return `${label}: ${value} (${percentage}%)`;
+          }
+        }
+      }
+    }
+  };
+
   return (
-    <div className="w-full flex flex-col items-center">
-      <Pie data={data} options={{ plugins: { legend: { position: "bottom" } } }} />
-      <div className="mt-2 text-xs text-gray-500">Total words: {total}</div>
+    <div className="w-full flex flex-col items-center justify-center h-full">
+      <div className="w-full h-full flex items-center justify-center">
+        <Pie data={data} options={options} />
+      </div>
+      <div className="mt-6 text-center text-sm text-gray-600">
+        <p className="font-semibold">Total words: <span className="text-lg font-bold text-gray-800">{total}</span></p>
+      </div>
     </div>
   );
 }

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const wordListStr = match[1];
     const idMatches = wordListStr.match(/id: (\d+)/g);
     const maxId = idMatches
-      ? Math.max(...idMatches.map((m) => parseInt(m.replace('id: ', ''))) + 1)
+      ? Math.max(...idMatches.map((m) => parseInt(m.replace('id: ', '')))) + 1
       : 1;
 
     // Check if word already exists (case-insensitive)
