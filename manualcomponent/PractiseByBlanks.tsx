@@ -75,11 +75,20 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
     
     try {
       const userId = localStorage.getItem("userId");
-      if (!userId) return;
+      console.log("[Fill-in-blank] Saving exam results for userId:", userId);
+      if (!userId) {
+        console.error("[Fill-in-blank] No userId found");
+        return;
+      }
 
       // Get current wordlists
       const response = await fetch(`/api/user/${userId}/wordlists`);
+      if (!response.ok) {
+        console.error("[Fill-in-blank] Failed to fetch wordlists:", response.status, response.statusText);
+        return;
+      }
       const currentLists = await response.json();
+      console.log("[Fill-in-blank] Current wordlists fetched", currentLists);
 
       const known = new Set(currentLists.known || []);
       const hard = new Set(currentLists.hard || []);
@@ -87,21 +96,25 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
 
       // Process exam results
       examFillInBlankQuestionInfos.forEach((item) => {
+        console.log(`[Fill-in-blank] Word #${item.id}: user='${item.userAnswer}' correct='${item.correctAnswer}'`);
         if (item.userAnswer === item.correctAnswer) {
           // Correct answer: add to known
           known.add(item.id);
           hard.delete(item.id);
           unknown.delete(item.id);
+          console.log(`[Fill-in-blank] ✅ #${item.id} moved to known`);
         } else if (item.userAnswer === "") {
           // No attempt: add to hard
           hard.add(item.id);
           known.delete(item.id);
           unknown.delete(item.id);
+          console.log(`[Fill-in-blank] ❌ #${item.id} (no attempt) moved to hard`);
         } else {
           // Wrong answer: add to hard
           hard.add(item.id);
           known.delete(item.id);
           unknown.delete(item.id);
+          console.log(`[Fill-in-blank] ❌ #${item.id} (wrong) moved to hard`);
         }
       });
 
@@ -118,17 +131,27 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
       });
 
       // Save updated lists (sorted in ascending order)
-      await fetch(`/api/user/${userId}/wordlists`, {
+      const payload = {
+        known: (Array.from(known) as number[]).sort((a, b) => a - b),
+        hard: (Array.from(hard) as number[]).sort((a, b) => a - b),
+        unknown: (Array.from(unknown) as number[]).sort((a, b) => a - b),
+      };
+      console.log("[Fill-in-blank] Saving to API:", payload);
+      
+      const saveResponse = await fetch(`/api/user/${userId}/wordlists`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          known: (Array.from(known) as number[]).sort((a, b) => a - b),
-          hard: (Array.from(hard) as number[]).sort((a, b) => a - b),
-          unknown: (Array.from(unknown) as number[]).sort((a, b) => a - b),
-        }),
+        body: JSON.stringify(payload),
       });
+      
+      if (!saveResponse.ok) {
+        const errorText = await saveResponse.text();
+        console.error("[Fill-in-blank] Failed to save wordlists:", saveResponse.status, errorText);
+        return;
+      }
+      console.log("[Fill-in-blank] ✅ Results saved successfully");
     } catch (error) {
-      console.error("Error saving exam results:", error);
+      console.error("[Fill-in-blank] Error saving exam results:", error);
     }
   };
 

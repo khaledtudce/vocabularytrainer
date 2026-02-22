@@ -132,11 +132,21 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
   const saveExamResultsToWordlists = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      if (!userId) return;
+      console.log("[MCQ Exam] Saving exam results for userId:", userId);
+      console.log("[MCQ Exam] Total questions answered:", examQuestionInfos.length);
+      if (!userId) {
+        console.error("[MCQ Exam] No userId found");
+        return;
+      }
 
       // Get current wordlists
       const response = await fetch(`/api/user/${userId}/wordlists`);
+      if (!response.ok) {
+        console.error("[MCQ Exam] Failed to fetch wordlists:", response.status, response.statusText);
+        return;
+      }
       const currentLists = await response.json();
+      console.log("[MCQ Exam] Current wordlists fetched");
 
       const known = new Set(currentLists.known || []);
       const hard = new Set(currentLists.hard || []);
@@ -144,21 +154,25 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
 
       // Process exam results
       examQuestionInfos.forEach((item) => {
+        console.log(`[MCQ Exam] Word #${item.id}: selected='${item.seletedAnswer}' correct='${item.correctAnswer}'`);
         if (item.seletedAnswer === item.correctAnswer) {
           // Correct answer: add to known
           known.add(item.id);
           hard.delete(item.id);
           unknown.delete(item.id);
+          console.log(`[MCQ Exam] ✅ #${item.id} moved to known`);
         } else if (item.seletedAnswer === "") {
           // No attempt: add to hard
           hard.add(item.id);
           known.delete(item.id);
           unknown.delete(item.id);
+          console.log(`[MCQ Exam] ❌ #${item.id} (no attempt) moved to hard`);
         } else {
           // Wrong answer: add to hard
           hard.add(item.id);
           known.delete(item.id);
           unknown.delete(item.id);
+          console.log(`[MCQ Exam] ❌ #${item.id} (wrong) moved to hard`);
         }
       });
 
@@ -175,17 +189,27 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
       });
 
       // Save updated lists (sorted in ascending order)
-      await fetch(`/api/user/${userId}/wordlists`, {
+      const payload = {
+        known: (Array.from(known) as number[]).sort((a, b) => a - b),
+        hard: (Array.from(hard) as number[]).sort((a, b) => a - b),
+        unknown: (Array.from(unknown) as number[]).sort((a, b) => a - b),
+      };
+      console.log("[MCQ Exam] Saving to API with counts:", {known: payload.known.length, hard: payload.hard.length, unknown: payload.unknown.length});
+      
+      const saveResponse = await fetch(`/api/user/${userId}/wordlists`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          known: (Array.from(known) as number[]).sort((a, b) => a - b),
-          hard: (Array.from(hard) as number[]).sort((a, b) => a - b),
-          unknown: (Array.from(unknown) as number[]).sort((a, b) => a - b),
-        }),
+        body: JSON.stringify(payload),
       });
+      
+      if (!saveResponse.ok) {
+        const errorText = await saveResponse.text();
+        console.error("[MCQ Exam] Failed to save wordlists:", saveResponse.status, errorText);
+        return;
+      }
+      console.log("[MCQ Exam] ✅ Results saved successfully");
     } catch (error) {
-      console.error("Error saving exam results:", error);
+      console.error("[MCQ Exam] Error saving exam results:", error);
     }
   };
 

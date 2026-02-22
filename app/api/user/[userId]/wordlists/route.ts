@@ -35,6 +35,9 @@ export async function POST(request: Request, context: { params: any }) {
     const body = await request.json();
     const { known, unknown, hard } = body;
 
+    console.log(`[API] Updating wordlists for userId: ${userId}`);
+    console.log(`[API] Received data - known: ${known?.length || 0}, hard: ${hard?.length || 0}, unknown: ${unknown?.length || 0}`);
+
     const userListsPath = path.join(process.cwd(), 'data', 'user_wordlists', `${userId}.json`);
     
     // Ensure directory exists
@@ -51,12 +54,14 @@ export async function POST(request: Request, context: { params: any }) {
       unknown: Array.isArray(unknown) ? unknown : [],
     };
 
+    console.log(`[API] Saving to path: ${userListsPath}`);
     await fs.writeFile(userListsPath, JSON.stringify(wordlists, null, 2), 'utf-8');
+    console.log(`[API] ✅ Wordlists saved successfully`);
     return NextResponse.json(wordlists);
   } catch (error) {
-    console.error('Error updating user wordlists:', error);
+    console.error('[API] Error updating user wordlists:', error);
     return NextResponse.json(
-      { error: 'Failed to update wordlists' },
+      { error: 'Failed to update wordlists', details: String(error) },
       { status: 500 }
     );
   }
