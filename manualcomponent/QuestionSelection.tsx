@@ -52,32 +52,40 @@ export default function DifficultySelector() {
   // Track per-user counts for Known/Unknown/Hard so selects reflect actual sizes
   const [userCounts, setUserCounts] = useState({ Known: 0, Unknown: 0, Hard: 0 });
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const userId = localStorage.getItem("userId");
-    if (!userId) return;
-    let mounted = true;
+  const fetchWordlists = (userId: string) => {
     fetch(`/api/user/${userId}/wordlists`)
       .then((r) => r.json())
       .then((data) => {
-        if (!mounted) return;
         setUserCounts({ Known: (data?.known || []).length, Unknown: (data?.unknown || []).length, Hard: (data?.hard || []).length });
-        // clamp existing ranges to available counts, but cap per-mode lists at 30
+        // clamp existing ranges to available counts
         setRanges((prev: any) => {
           const next = { ...prev };
           for (const key of ["Known", "Unknown", "Hard"]) {
             const max = (data?.[key.toLowerCase()] || []).length || 0;
-            if (next[key].from > max) next[key].from = max > 0 ? 1 : 0;
-            if (next[key].to > max) next[key].to = max;
-            if (next[key].from < 1 && max > 0) next[key].from = 1;
+            if (max > 0) {
+              // Ensure from is at least 1 and doesn't exceed max
+              if (next[key].from < 1 || next[key].from > max) next[key].from = 1;
+              // Set to to the maximum available (up to 30), but at least from
+              next[key].to = Math.min(max, 30);
+              if (next[key].to < next[key].from) next[key].to = next[key].from;
+            } else {
+              next[key].from = 0;
+              next[key].to = 0;
+            }
           }
           return next;
         });
       })
       .catch(() => {});
-    return () => {
-      mounted = false;
-    };
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+    
+    // Fetch only on mount
+    fetchWordlists(userId);
   }, []);
 
   return (

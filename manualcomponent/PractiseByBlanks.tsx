@@ -155,6 +155,51 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
     const correct = input.toLowerCase() === germanWord.toLowerCase();
     setIsCorrect(correct);
     setSubmitted(true);
+    
+    // Save to wordlists immediately in exam mode
+    if (reason === "exam") {
+      saveSubmittedAnswerToWordlists(correct);
+    }
+  };
+
+  const saveSubmittedAnswerToWordlists = async (correct: boolean) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+
+      const response = await fetch(`/api/user/${userId}/wordlists`);
+      const currentLists = await response.json();
+
+      const known = new Set(currentLists.known || []);
+      const hard = new Set(currentLists.hard || []);
+      const unknown = new Set(currentLists.unknown || []);
+
+      const wordId = words[index]?.id;
+
+      if (correct) {
+        // Correct answer: add to known
+        known.add(wordId);
+        hard.delete(wordId);
+        unknown.delete(wordId);
+      } else {
+        // Wrong answer: add to hard
+        hard.add(wordId);
+        known.delete(wordId);
+        unknown.delete(wordId);
+      }
+
+      await fetch(`/api/user/${userId}/wordlists`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          known: Array.from(known),
+          unknown: Array.from(unknown),
+          hard: Array.from(hard),
+        }),
+      });
+    } catch (error) {
+      console.error("Error saving submitted answer:", error);
+    }
   };
 
   const resetGame = () => {
@@ -231,15 +276,22 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
             <input type="text" value={input} onChange={(e) => setInput(e.target.value)} disabled={submitted} className={"mt-2 p-1 border border-blue-500 rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"} />
           </div>
           {submitted && (
-            <p className={`font-bold mt-2 ${isCorrect ? "text-green-600" : "text-red-600"}`}>
-              {isCorrect ? "✓ Your answer was correct!" : `✗ Incorrect. The correct answer is: ${germanWord}`}
-            </p>
+            <div>
+              <p className={`font-bold mt-2 ${isCorrect ? "text-green-600" : "text-red-600"}`}>
+                {isCorrect ? "✓ Your answer was correct!" : `✗ Incorrect. The correct answer is: ${germanWord}`}
+              </p>
+              {!isCorrect && (
+                <div className="flex justify-center mt-2">
+                  <button onClick={() => { setInput(""); setSubmitted(false); setIsCorrect(false); }} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reset</button>
+                </div>
+              )}
+            </div>
           )}
           <div className="mt-4 flex gap-2">
             {!submitted ? (
               <>
-                <button onClick={handleSubmit} disabled={words.length === 0} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Submit</button>
                 <button onClick={() => setInput("")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reset</button>
+                <button onClick={handleSubmit} disabled={words.length === 0} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Submit</button>
               </>
             ) : null}
           </div>

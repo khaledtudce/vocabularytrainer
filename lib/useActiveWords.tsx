@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { WordList } from "@/data/wordlists";
 
 type Mode = "Custom" | "Known" | "Unknown" | "Hard";
@@ -9,6 +9,7 @@ export default function useActiveWords() {
   const [mode, setMode] = useState<Mode>("Custom");
   const [range, setRange] = useState({ from: 1, to: 30 });
   const [words, setWords] = useState<any[]>(WordList.slice(0, 30));
+  const previousDataRef = useRef<any>(null);
 
   // helper: map id array to WordList entries (preserve order, ignore missing)
   const mapIdsToWords = (ids: number[]) => {
@@ -17,7 +18,7 @@ export default function useActiveWords() {
     return mapped;
   };
 
-  const refreshWords = async (m: Mode, r: { from: number; to: number }) => {
+  const refreshWords = async (m: Mode, r: { from: number; to: number }, skipCompare: boolean = false) => {
     if (m === "Custom") {
       // Custom mode: show the whole WordList
       setWords(WordList.slice());
@@ -37,6 +38,19 @@ export default function useActiveWords() {
         return;
       }
       const data = await res.json();
+      
+      // Only update if data has changed or skipCompare is true
+      if (!skipCompare && previousDataRef.current) {
+        const key = m.toLowerCase();
+        const prevIds = previousDataRef.current[key] || [];
+        const currIds = data?.[key] ?? [];
+        // Compare arrays - if they're the same, don't update state
+        if (JSON.stringify(prevIds) === JSON.stringify(currIds)) {
+          return; // No change, skip update to avoid resetting index
+        }
+      }
+      
+      previousDataRef.current = data;
       const key = m.toLowerCase();
       const ids: number[] = data?.[key] ?? [];
       const mapped = mapIdsToWords(ids);
@@ -59,14 +73,14 @@ export default function useActiveWords() {
         const r = parsed.ranges?.[m] || { from: 1, to: 30 };
         setMode(m);
         setRange(r);
-        refreshWords(m, r);
+        refreshWords(m, r, true); // skipCompare = true on initial load
       } catch {
         setMode("Custom");
         setRange({ from: 1, to: 30 });
-        refreshWords("Custom", { from: 1, to: 30 });
+        refreshWords("Custom", { from: 1, to: 30 }, true);
       }
     } else {
-      refreshWords("Custom", { from: 1, to: 30 });
+      refreshWords("Custom", { from: 1, to: 30 }, true);
     }
 
     const handler = (e: any) => {
@@ -75,11 +89,14 @@ export default function useActiveWords() {
       const r = detail.range || { from: 1, to: 30 };
       setMode(m);
       setRange(r);
-      refreshWords(m, r);
+      refreshWords(m, r, true); // skipCompare = true on explicit event
     };
 
     window.addEventListener("wordSourceUpdated", handler as EventListener);
-    return () => window.removeEventListener("wordSourceUpdated", handler as EventListener);
+    
+    return () => {
+      window.removeEventListener("wordSourceUpdated", handler as EventListener);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
