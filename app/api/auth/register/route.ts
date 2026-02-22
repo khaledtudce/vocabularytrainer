@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
+import { WordList } from '@/data/wordlists';
 
 export async function POST(request: Request) {
   try {
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
     // Write updated users list
     await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), 'utf-8');
 
-    // Create user-specific wordlists file with empty lists
+    // Create user-specific wordlists file with all words in unknown list
     const userWordlistsDir = path.join(process.cwd(), 'data', 'user_wordlists');
     try {
       await fs.mkdir(userWordlistsDir, { recursive: true });
@@ -58,10 +59,12 @@ export async function POST(request: Request) {
       // Directory might already exist
     }
     const userWordlistsPath = path.join(userWordlistsDir, `${userId}.json`);
+    // Extract all word IDs from WordList and add to unknown list
+    const allWordIds = WordList.map((word: any) => word.id).sort((a: number, b: number) => a - b);
     const userWordlists = {
       known: [],
       hard: [],
-      unknown: [],
+      unknown: allWordIds,
     };
     await fs.writeFile(userWordlistsPath, JSON.stringify(userWordlists, null, 2), 'utf-8');
 
