@@ -20,8 +20,8 @@ export default function useActiveWords() {
 
   const refreshWords = async (m: Mode, r: { from: number; to: number }, skipCompare: boolean = false) => {
     if (m === "Custom") {
-      // Custom mode: show the whole WordList
-      setWords(WordList.slice());
+      // Custom mode: show WordList slice based on range
+      setWords(WordList.slice(r.from - 1, r.to));
       return;
     }
 

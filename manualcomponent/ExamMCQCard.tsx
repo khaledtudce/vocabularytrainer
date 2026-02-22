@@ -360,10 +360,10 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
         </>
       )}
       <div className="flex py-5 items-center gap-20">
-        <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0}>
+        <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0 || index === 0}>
           Previous
         </Button>
-        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0}>
+        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1}>
           Next
         </Button>
       </div>
