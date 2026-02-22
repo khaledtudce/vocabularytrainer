@@ -372,12 +372,12 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
           <Button 
             className="bg-blue-600 text-white" 
             onClick={submitExam} 
-            disabled={words.length === 0 || submitClicked}
+            disabled={words.length === 0 || submitClicked || selectedAnswer === ""}
           >
             Submit
           </Button>
         ) : (
-          <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1}>
+          <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1 || selectedAnswer === ""}>
             Next
           </Button>
         )}

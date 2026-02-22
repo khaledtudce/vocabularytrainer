@@ -240,7 +240,7 @@ const MCQCard = ({ mcqdirection }: MCQCardType) => {
       )}
       <div className="flex py-5 items-center gap-20">
         <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0 || index === 0}>Previous</Button>
-        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1}>Next</Button>
+        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1 || selectedAnswer === ""}>Next</Button>
       </div>
     </div>
   );
