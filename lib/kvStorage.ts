@@ -11,10 +11,18 @@ export interface UserWordlists {
 }
 
 let redisClient: RedisClientType | null = null;
+let connectionPromise: Promise<RedisClientType> | null = null;
 
 // Initialize Redis client (connection pooling)
 async function getRedisClient(): Promise<RedisClientType> {
+  // If connection is in progress, wait for it
+  if (connectionPromise) {
+    return connectionPromise;
+  }
+  
+  // If we have a working client, use it
   if (redisClient && redisClient.isOpen) {
+    console.log('[Redis] Reusing existing connection');
     return redisClient;
   }
 
@@ -24,13 +32,39 @@ async function getRedisClient(): Promise<RedisClientType> {
   }
 
   try {
-    redisClient = createClient({ url });
-    redisClient.on('error', (err) => console.error('[Redis] Client error:', err));
-    await redisClient.connect();
-    console.log('[Redis] ✅ Connected');
-    return redisClient;
+    console.log('[Redis] Creating new connection...');
+    
+    // Create connection promise to prevent race conditions
+    connectionPromise = (async () => {
+      const client = createClient({ 
+        url,
+        socket: {
+          reconnectStrategy: (retries) => Math.min(retries * 50, 500),
+          connectTimeout: 10000,
+        },
+      });
+      
+      client.on('error', (err) => {
+        console.error('[Redis] Client error:', err);
+        redisClient = null;
+      });
+      
+      client.on('connect', () => {
+        console.log('[Redis] Connected');
+      });
+      
+      await client.connect();
+      console.log('[Redis] ✅ Connected successfully');
+      redisClient = client;
+      connectionPromise = null;
+      return client;
+    })();
+    
+    return await connectionPromise;
   } catch (error) {
     console.error('[Redis] Connection error:', error);
+    connectionPromise = null;
+    redisClient = null;
     throw error;
   }
 }
