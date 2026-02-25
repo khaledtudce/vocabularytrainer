@@ -71,177 +71,143 @@ const MCQCard = ({ mcqdirection }: MCQCardType) => {
     setIndex((prev) => (prev >= (words?.length - 1 || 0) ? (words?.length - 1 || 0) : prev + 1));
   };
 
+  const progressPercent = words.length > 0 ? ((index + 1) / words.length) * 100 : 0;
+  const getCorrectAnswer = () => {
+    if (mcqdirection === "germanToBangla") return currentWord?.bangla;
+    if (mcqdirection === "banglaToGerman") return currentWord?.word;
+    if (mcqdirection === "germanToEnglish") return currentWord?.english;
+    if (mcqdirection === "englishToGerman") return currentWord?.word;
+    if (mcqdirection === "meaningToGerman") return currentWord?.word;
+    return "";
+  };
+
+  const getQuestion = () => {
+    if (mcqdirection === "germanToBangla") return currentWord?.word;
+    if (mcqdirection === "banglaToGerman") return currentWord?.bangla;
+    if (mcqdirection === "germanToEnglish") return currentWord?.word;
+    if (mcqdirection === "englishToGerman") return currentWord?.english;
+    if (mcqdirection === "meaningToGerman") {
+      return `${currentWord?.bangla} • ${currentWord?.english} • ${currentWord?.synonym}`;
+    }
+    return "";
+  };
+
   return (
-    <div className="w-full flex flex-col items-center p-2 sm:p-4 bg-gray-100 rounded-lg shadow-md gap-2 min-h-[85vh]">
+    <div className="w-full max-w-4xl mx-auto px-0">
       {words.length === 0 && (
-        <div className="mt-5 p-2 sm:p-4 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
-          <p className="text-base sm:text-lg font-semibold text-gray-600">No words available</p>
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-8 sm:p-12 text-center border border-gray-100">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C6.5 6.253 3 9.5 3 13.757c0 4.257 3 6.5 9 9.5m0-13c5.5-3 9-1.243 9-9.5 0-4.257-3-7.504-9-7.504z" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">No Words Available</p>
+          <p className="text-sm sm:text-base text-gray-600">Select words to start practicing</p>
         </div>
       )}
+
       {words.length > 0 && (
-        <>
-          <div className="mt-3 sm:mt-5 p-2 sm:p-4 max-w-2xl w-full mx-auto bg-white rounded-lg shadow-md text-center">
-        {mcqdirection === "germanToBangla" && (
-          <>
-            <h3 className="text-base sm:text-2xl font-semibold mb-3 sm:mb-5 break-words">
-              {currentWord?.id}. {currentWord?.word}
-            </h3>
-            <div className="grid grid-cols-2 gap-1 sm:gap-3">
-              {options.map((option, idx) => (
-                <button
-                  key={idx}
-                  className={`p-1.5 sm:p-3 rounded-md border border-fuchsia-700 text-xs sm:text-base break-words ${
-                    selectedAnswer === option
-                      ? option === currentWord?.bangla
-                        ? "bg-lime-400 ring-2"
-                        : "bg-red-400 ring-2"
-                      : "bg-fuchsia-50"
-                  }`}
-                  onClick={() => setSelectedAnswer(option)}
-                >
-                  {option}
-                </button>
-              ))}
+        <div className="space-y-4 sm:space-y-6 mx-0">
+          {/* Progress Bar */}
+          <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md">
+            <div className="flex justify-between items-center mb-2 sm:mb-3">
+              <span className="text-xs sm:text-sm font-semibold text-gray-700">Progress</span>
+              <span className="text-xs sm:text-sm font-bold text-indigo-600">{index + 1} / {words.length}</span>
             </div>
-            {selectedAnswer && (
-              <div className="mt-2 sm:mt-4 font-semibold flex items-center justify-center gap-2 sm:gap-5 flex-wrap text-xs sm:text-base">
-                <p className="font-semibold">{selectedAnswer === currentWord?.bangla ? "Correct! ✅" : "Wrong ❌"}</p>
-                <Button className="bg-gray-400 text-xs sm:text-base py-1 sm:py-2" onClick={() => setSelectedAnswer("")}>Clear</Button>
-              </div>
-            )}
-          </>
-        )}
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
 
-        {mcqdirection === "banglaToGerman" && (
-          <>
-            <h3 className="text-xl sm:text-2xl font-semibold mb-5">
-              {currentWord?.id}. {currentWord?.bangla}
-            </h3>
-            <div className="grid grid-cols-2 gap-2">
-              {options.map((option, idx) => (
-                <button
-                  key={idx}
-                  className={`p-2 rounded-md border border-fuchsia-700 ${
-                    selectedAnswer === option
-                      ? option === currentWord?.word
-                        ? "bg-lime-400 ring-2"
-                        : "bg-red-400 ring-2"
-                      : "bg-fuchsia-50"
-                  }`}
-                  onClick={() => setSelectedAnswer(option)}
-                >
-                  {option}
-                </button>
-              ))}
+          {/* MCQ Card */}
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 overflow-hidden hover:shadow-xl sm:hover:shadow-2xl transition-shadow duration-300">
+            <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 sm:px-6 py-3 sm:py-4">
+              <p className="text-white text-xs sm:text-sm font-semibold tracking-widest">QUESTION {index + 1}</p>
             </div>
-            {selectedAnswer && (
-              <div className="mt-4 font-semibold flex items-center justify-center gap-5">
-                <p className="font-semibold">{selectedAnswer === currentWord?.word ? "Correct! ✅" : "Wrong ❌"}</p>
-                <Button className="bg-gray-500" onClick={() => setSelectedAnswer("")}>Clear</Button>
-              </div>
-            )}
-          </>
-        )}
 
-        {mcqdirection === "germanToEnglish" && (
-          <>
-            <h3 className="text-xl sm:text-2xl font-semibold mb-5">
-              {currentWord?.id}. {currentWord?.word}
-            </h3>
-            <div className="grid grid-cols-2 gap-2">
-              {options.map((option, idx) => (
-                <button
-                  key={idx}
-                  className={`p-2 rounded-md border border-fuchsia-700 ${
-                    selectedAnswer === option
-                      ? option === currentWord?.english
-                        ? "bg-lime-400 ring-2"
-                        : "bg-red-400 ring-2"
-                      : "bg-fuchsia-50"
-                  }`}
-                  onClick={() => setSelectedAnswer(option)}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-            {selectedAnswer && (
-              <div className="mt-4 font-semibold flex items-center justify-center gap-5">
-                <p className="font-semibold">{selectedAnswer === currentWord?.english ? "Correct! ✅" : "Wrong ❌"}</p>
-                <Button className="bg-gray-500" onClick={() => setSelectedAnswer("")}>Clear</Button>
+            <div className="p-4 sm:p-8 md:p-12 space-y-4 sm:space-y-6">
+              {/* Question */}
+              <div className="text-center">
+                <p className="text-gray-500 text-xs sm:text-sm font-medium mb-3">Translate or choose:</p>
+                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-indigo-700 break-words leading-tight">
+                  {getQuestion()}
+                </p>
               </div>
-            )}
-          </>
-        )}
 
-        {mcqdirection === "englishToGerman" && (
-          <>
-            <h3 className="text-xl sm:text-2xl font-semibold mb-5">
-              {currentWord?.id}. {currentWord?.english}
-            </h3>
-            <div className="grid grid-cols-2 gap-2">
-              {options.map((option, idx) => (
-                <button
-                  key={idx}
-                  className={`p-2 rounded-md border border-fuchsia-700 ${
-                    selectedAnswer === option
-                      ? option === currentWord?.word
-                        ? "bg-lime-400 ring-2"
-                        : "bg-red-400 ring-2"
-                      : "bg-fuchsia-50"
-                  }`}
-                  onClick={() => setSelectedAnswer(option)}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-            {selectedAnswer && (
-              <div className="mt-4 font-semibold flex items-center justify-center gap-5">
-                <p className="font-semibold">{selectedAnswer === currentWord?.word ? "Correct! ✅" : "Wrong ❌"}</p>
-                <Button className="bg-gray-500" onClick={() => setSelectedAnswer("")}>Clear</Button>
+              {/* Options Grid */}
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
+                {options.map((option, idx) => {
+                  const isCorrect = option === getCorrectAnswer();
+                  const isSelected = selectedAnswer === option;
+                  
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedAnswer(option)}
+                      className={`px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm md:text-base border-2 transition-all duration-200 break-words ${
+                        isSelected
+                          ? isCorrect
+                            ? "bg-green-400 border-green-600 text-white shadow-lg"
+                            : "bg-red-400 border-red-600 text-white shadow-lg"
+                          : "bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200 text-gray-800 hover:border-indigo-400 hover:shadow-md"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
               </div>
-            )}
-          </>
-        )}
 
-        {mcqdirection === "meaningToGerman" && (
-          <>
-            <h1 className="text-xl sm:text-2xl font-semibold mb-2">{currentWord?.id}. {currentWord?.bangla}</h1>
-            <h1 className="text-xl sm:text-2xl font-semibold mb-2">{currentWord?.english}</h1>
-            <h1 className="text-xl sm:text-2xl font-semibold mb-2">{currentWord?.synonym}</h1>
-            <div className="mt-5 grid grid-cols-2 gap-2">
-              {options.map((option, idx) => (
-                <button
-                  key={idx}
-                  className={`p-2 rounded-md border border-fuchsia-700 ${
-                    selectedAnswer === option
-                      ? option === currentWord?.word
-                        ? "bg-lime-400 ring-2"
-                        : "bg-red-400 ring-2"
-                      : "bg-fuchsia-50"
-                  }`}
-                  onClick={() => setSelectedAnswer(option)}
-                >
-                  {option}
-                </button>
-              ))}
+              {/* Feedback */}
+              {selectedAnswer && (
+                <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl font-semibold text-center ${
+                  selectedAnswer === getCorrectAnswer()
+                    ? "bg-green-100 border-2 border-green-500 text-green-700"
+                    : "bg-red-100 border-2 border-red-500 text-red-700"
+                }`}>
+                  <p className="text-sm sm:text-base">
+                    {selectedAnswer === getCorrectAnswer() ? "✅ Correct!" : "❌ Wrong"}
+                  </p>
+                  {selectedAnswer !== getCorrectAnswer() && (
+                    <p className="text-xs sm:text-sm mt-1">Correct answer: <span className="font-bold">{getCorrectAnswer()}</span></p>
+                  )}
+                </div>
+              )}
             </div>
-            {selectedAnswer && (
-              <div className="mt-4 font-semibold flex items-center justify-center gap-5">
-                <p className="font-semibold">{selectedAnswer === currentWord?.word ? "Correct! ✅" : "Wrong ❌"}</p>
-                <Button className="bg-gray-500" onClick={() => setSelectedAnswer("")}>Clear</Button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-        </>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+            <Button
+              onClick={prevWord}
+              disabled={index === 0}
+              className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                index === 0
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95"
+              }`}
+            >
+              ← Previous
+            </Button>
+            <Button
+              onClick={nextWord}
+              disabled={index === words.length - 1 || selectedAnswer === ""}
+              className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                index === words.length - 1 || selectedAnswer === ""
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95"
+              }`}
+            >
+              Next →
+            </Button>
+          </div>
+        </div>
       )}
-      <div className="flex py-5 items-center gap-20">
-        <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0 || index === 0}>Previous</Button>
-        <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1 || selectedAnswer === ""}>Next</Button>
-      </div>
     </div>
   );
 };

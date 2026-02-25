@@ -234,121 +234,308 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
   };
 
   return (
-    <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
+    <div className="w-full max-w-4xl mx-auto px-0">
       {words.length === 0 && (
-        <div className="mt-5 p-4 text-center text-gray-600">
-          <p className="text-lg font-semibold">No words available</p>
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-8 sm:p-12 text-center border border-gray-100">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C6.5 6.253 3 9.5 3 13.757c0 4.257 3 6.5 9 9.5m0-13c5.5-3 9-1.243 9-9.5 0-4.257-3-7.504-9-7.504z" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">No Words Available</p>
+          <p className="text-sm sm:text-base text-gray-600">Select words to start practicing</p>
         </div>
       )}
+
       {reason === "practise" && words.length > 0 && (
-        <div className="p-2 w-full flex flex-col items-center justify-center gap-1 bg-gray-100">
-          <h1 className="text-md text-center sm:text-xl font-bold">
-            <span>
-              {words[index]?.id}. {words[index]?.bangla}
-            </span>
-          </h1>
-          <h1 className="text-md sm:text-xl text-center font-bold mb-6">
-            <span>{words[index]?.english}</span>
-          </h1>
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {germanWord.split("").map((letter: string, i: number) => (
-              <span
-                key={i}
-                className={`w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center border-2 text-lg font-semibold rounded-md shadow-md ${
-                  input[i] === undefined
-                    ? "border-yellow-500"
-                    : input[i] === letter
-                    ? "border-green-500 text-green-700"
-                    : "border-gray-300"
-                }`}
-              >
-                {input[i] || "_"}
-              </span>
-            ))}
+        <div className="space-y-4 sm:space-y-6">
+          {/* Progress Bar */}
+          <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md">
+            <div className="flex justify-between items-center mb-2 sm:mb-3">
+              <span className="text-xs sm:text-sm font-semibold text-gray-700">Progress</span>
+              <span className="text-xs sm:text-sm font-bold text-indigo-600">{index + 1} / {words.length}</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-300"
+                style={{ width: `${(index + 1) / words.length * 100}%` }}
+              />
+            </div>
           </div>
-          {wrongInput && <p className="text-red-600 font-bold mt-2">Wrong Input: {wrongInput}</p>}
-          <div className="mt-1 flex flex-col sm:flex-row items-center justify-center gap-1">
-            <h1 className="font-semibold mt-2">Please write here: </h1>
-            <input
-              type="text"
-              value={input}
-              onChange={handleInputChange}
-              disabled={completed}
-              className={`mt-2 p-1 border border-blue-500 rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 ${wrongInput ? "border-red-500" : ""}`}
-            />
+
+          {/* Flashcard */}
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 sm:px-6 py-3 sm:py-4">
+              <p className="text-white text-xs sm:text-sm font-semibold tracking-widest">WORD {index + 1}</p>
+            </div>
+
+            <div className="p-4 sm:p-8 md:p-12 space-y-4 sm:space-y-6">
+              {/* Definitions */}
+              <div className="text-center">
+                <p className="text-sm sm:text-base font-semibold text-indigo-600 mb-2">{words[index]?.bangla}</p>
+                <p className="text-sm sm:text-base font-semibold text-gray-700 mb-4">{words[index]?.english}</p>
+              </div>
+
+              {/* Letter Grid */}
+              <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 p-4 sm:p-6 bg-gray-50 rounded-lg sm:rounded-xl">
+                {germanWord.split("").map((letter: string, i: number) => (
+                  <div
+                    key={i}
+                    className={`w-6 h-6 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center border-2 text-sm sm:text-base md:text-lg font-bold rounded-md transition-colors ${
+                      input[i] === undefined
+                        ? "border-yellow-400 bg-yellow-50"
+                        : input[i] === letter
+                        ? "border-green-500 bg-green-100 text-green-700"
+                        : "border-gray-300 bg-gray-100"
+                    }`}
+                  >
+                    {input[i] || "_"}
+                  </div>
+                ))}
+              </div>
+
+              {/* Error Message */}
+              {wrongInput && (
+                <div className="p-2 sm:p-3 bg-red-100 border border-red-300 rounded-lg text-center">
+                  <p className="text-xs sm:text-sm text-red-700 font-semibold">Wrong Input: {wrongInput}</p>
+                </div>
+              )}
+
+              {/* Success Message */}
+              {completed && (
+                <div className="p-3 sm:p-4 bg-green-100 border-2 border-green-500 rounded-lg text-center">
+                  <p className="text-sm sm:text-base text-green-700 font-bold">🎉 Well done! 🎉</p>
+                </div>
+              )}
+
+              {/* Input Field */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+                <label className="text-xs sm:text-sm font-semibold text-gray-700">Type:</label>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={handleInputChange}
+                  disabled={completed}
+                  className={`w-32 sm:w-48 px-3 sm:px-4 py-2 sm:py-2.5 border-2 rounded-lg focus:outline-none focus:ring-2 transition-colors text-sm sm:text-base ${
+                    wrongInput
+                      ? "border-red-500 focus:ring-red-300"
+                      : "border-indigo-300 focus:ring-indigo-300"
+                  }`}
+                  placeholder="Type here..."
+                />
+              </div>
+            </div>
           </div>
-          {completed && <p className="text-green-600 font-bold mt-2">🎉 Well done! You completed the word! 🎉</p>}
-          <div className="mt-7 flex gap-5">
-            <button onClick={revealHint} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Help Guess!</button>
-            <button onClick={resetGame} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reset</button>
+
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
+            <Button
+              onClick={revealHint}
+              className="w-full sm:flex-1 bg-blue-600 text-white hover:bg-blue-700 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all active:scale-95"
+            >
+              💡 Hint
+            </Button>
+            <Button
+              onClick={resetGame}
+              className="w-full sm:flex-1 bg-red-600 text-white hover:bg-red-700 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all active:scale-95"
+            >
+              🔄 Reset
+            </Button>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+            <Button
+              onClick={prevWord}
+              disabled={index === 0}
+              className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                index === 0
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95"
+              }`}
+            >
+              ← Previous
+            </Button>
+            <Button
+              onClick={nextWord}
+              disabled={index === words.length - 1}
+              className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                index === words.length - 1
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95"
+              }`}
+            >
+              Next →
+            </Button>
           </div>
         </div>
       )}
 
       {reason === "exam" && !examFinished && words.length > 0 && (
-        <div className="p-2 w-full flex flex-col items-center justify-center gap-1 bg-gray-100">
-          <h1 className="text-md text-center sm:text-xl font-bold">
-            <span>
-              {words[index]?.id}. {words[index]?.bangla}
-            </span>
-          </h1>
-          <h1 className="text-md sm:text-xl text-center font-bold mb-6">
-            <span>{words[index]?.english}</span>
-          </h1>
-
-          <div className="mt-1 flex flex-col sm:flex-row items-center justify-center gap-1">
-            <h1 className="font-semibold mt-2">Please write here: </h1>
-            <input type="text" value={input} onChange={(e) => setInput(e.target.value)} disabled={submitted} className={"mt-2 p-1 border border-blue-500 rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"} />
+        <div className="space-y-4 sm:space-y-6">
+          {/* Progress Bar */}
+          <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md">
+            <div className="flex justify-between items-center mb-2 sm:mb-3">
+              <span className="text-xs sm:text-sm font-semibold text-gray-700">Progress</span>
+              <span className="text-xs sm:text-sm font-bold text-indigo-600">{index + 1} / {words.length}</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-300"
+                style={{ width: `${(index + 1) / words.length * 100}%` }}
+              />
+            </div>
           </div>
-          {submitted && (
-            <div>
-              <p className={`font-bold mt-2 ${isCorrect ? "text-green-600" : "text-red-600"}`}>
-                {isCorrect ? "✓ Your answer was correct!" : `✗ Incorrect. The correct answer is: ${germanWord}`}
-              </p>
-              {!isCorrect && (
-                <div className="flex justify-center mt-2">
-                  <button onClick={() => { setInput(""); setSubmitted(false); setIsCorrect(false); }} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reset</button>
+
+          {/* Card */}
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 sm:px-6 py-3 sm:py-4">
+              <p className="text-white text-xs sm:text-sm font-semibold tracking-widest">WORD {index + 1}</p>
+            </div>
+
+            <div className="p-4 sm:p-8 md:p-12 space-y-4 sm:space-y-6">
+              {/* Definitions */}
+              <div className="text-center">
+                <p className="text-sm sm:text-base font-semibold text-indigo-600 mb-2">{words[index]?.bangla}</p>
+                <p className="text-sm sm:text-base font-semibold text-gray-700">{words[index]?.english}</p>
+              </div>
+
+              {/* Input Field */}
+              <div className="flex flex-col items-center justify-center gap-2 sm:gap-3">
+                <label className="text-xs sm:text-sm font-semibold text-gray-700">Your answer:</label>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={submitted}
+                  className="w-32 sm:w-48 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 text-sm sm:text-base"
+                  placeholder="Type here..."
+                />
+              </div>
+
+              {/* Submitted Feedback */}
+              {submitted && (
+                <div className={`p-3 sm:p-4 rounded-lg text-center ${
+                  isCorrect
+                    ? "bg-green-100 border-2 border-green-500"
+                    : "bg-red-100 border-2 border-red-500"
+                }`}>
+                  <p className={`text-sm sm:text-base font-bold ${isCorrect ? "text-green-700" : "text-red-700"}`}>
+                    {isCorrect ? "✅ Correct!" : `❌ Incorrect. Answer: ${germanWord}`}
+                  </p>
                 </div>
               )}
             </div>
-          )}
-          <div className="mt-4 flex gap-2">
+          </div>
+
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
             {!submitted ? (
               <>
-                <button onClick={() => setInput("")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reset</button>
-                <button onClick={handleSubmit} disabled={words.length === 0} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Submit</button>
+                <Button
+                  onClick={() => setInput("")}
+                  className="w-full sm:flex-1 bg-red-600 text-white hover:bg-red-700 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg"
+                >
+                  🔄 Reset
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={words.length === 0}
+                  className="w-full sm:flex-1 bg-green-600 text-white hover:bg-green-700 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg"
+                >
+                  ✓ Submit
+                </Button>
               </>
             ) : null}
+          </div>
+
+          {/* Navigation */}
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+            <Button
+              onClick={prevWord}
+              disabled={index === 0}
+              className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                index === 0
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95"
+              }`}
+            >
+              ← Previous
+            </Button>
+            <Button
+              onClick={nextWord}
+              disabled={index === words.length - 1 || !submitted}
+              className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                index === words.length - 1 || !submitted
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95"
+              }`}
+            >
+              Next →
+            </Button>
           </div>
         </div>
       )}
 
       {reason === "exam" && examFinished && (
-        <div className="flex items-center justify-center w-full">
-          <div className="p-1 flex flex-col items-center">
-            <span className="mt-5 text-2xl font-bold text-center">Congratulation! Here is your test result:</span>
-            <span>Total Questions: {examFillInBlankQuestionInfos.length}</span>
-            <span>Correct Answer: {correctAnswerCount}</span>
-            <Button className="mt-2 bg-green-600 text-white" onClick={() => router.push("/")}>Back</Button>
-            <ul className="mt-3 w-full">
-              {examFillInBlankQuestionInfos.map((item) => (
-                <li key={item.id} className={`p-2 border rounded mb-2 ${item.userAnswer === item.correctAnswer ? "bg-green-300" : "bg-red-300"}`}>
-                  <span className="flex flex-col">
-                    <span className="flex flex-wrap"><strong>{item.id}. {item.questions}</strong></span>
-                    <span className="p-1 flex gap-1"><span>Your Answer:</span><span className={item.userAnswer === item.correctAnswer ? "text-green-700" : "text-red-700"}>{item.userAnswer}</span></span>
-                    <span className="p-1 flex gap-1"><span>Correct Answer:</span><span className="font-bold">{item.correctAnswer}</span></span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-10 border border-gray-100">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              Exam Complete! 🎉
+            </h2>
+            <p className="text-gray-600 text-sm sm:text-base">Here's your test result:</p>
           </div>
-        </div>
-      )}
 
-      {!examFinished && (
-        <div className="flex py-5 items-center gap-20">
-          <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0 || index === 0}>Previous</Button>
-          <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1 || (reason === "exam" && !submitted)}>Next</Button>
+          {/* Results Summary */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="bg-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-blue-200">
+              <p className="text-xs sm:text-sm text-blue-600 font-semibold mb-1">Total Questions</p>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-700">{examFillInBlankQuestionInfos.length}</p>
+            </div>
+            <div className="bg-green-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-green-200">
+              <p className="text-xs sm:text-sm text-green-600 font-semibold mb-1">Correct Answers</p>
+              <p className="text-2xl sm:text-3xl font-bold text-green-700">{correctAnswerCount}</p>
+            </div>
+          </div>
+
+          {/* Results List */}
+          <div className="max-h-96 overflow-y-auto space-y-2 sm:space-y-3 mb-6 sm:mb-8">
+            {examFillInBlankQuestionInfos.map((item) => (
+              <div
+                key={item.id}
+                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-l-4 ${
+                  item.userAnswer === item.correctAnswer
+                    ? "bg-green-50 border-green-500"
+                    : "bg-red-50 border-red-500"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-800 break-words">{item.id}. {item.questions}</p>
+                  </div>
+                  <p className={`text-xs sm:text-sm font-bold whitespace-nowrap ml-2 ${
+                    item.userAnswer === item.correctAnswer ? "text-green-700" : "text-red-700"
+                  }`}>
+                    {item.userAnswer === item.correctAnswer ? "✓" : "✗"}
+                  </p>
+                </div>
+                <p className="text-xs sm:text-sm margin-top mt-1 text-gray-600">Your answer: <span className="font-semibold">{item.userAnswer || "(empty)"}</span></p>
+                {item.userAnswer !== item.correctAnswer && (
+                  <p className="text-xs sm:text-sm text-gray-600">Correct: <span className="font-semibold">{item.correctAnswer}</span></p>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Home Button */}
+          <Button
+            onClick={() => router.push("/")}
+            className="w-full bg-indigo-600 text-white hover:bg-indigo-700 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-lg"
+          >
+            ← Back to Home
+          </Button>
         </div>
       )}
     </div>
