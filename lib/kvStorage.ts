@@ -1,4 +1,4 @@
-import { createClient, RedisClientType } from 'redis';
+import { createClient } from 'redis';
 import { WordList } from '@/data/wordlists';
 
 const VOCABULARY_KEY = 'vocabulary:master';
@@ -10,11 +10,11 @@ export interface UserWordlists {
   unknown: number[];
 }
 
-let redisClient: RedisClientType | null = null;
-let connectionPromise: Promise<RedisClientType> | null = null;
+let redisClient: any = null;
+let connectionPromise: Promise<any> | null = null;
 
 // Initialize Redis client (connection pooling)
-async function getRedisClient(): Promise<RedisClientType> {
+async function getRedisClient(): Promise<any> {
   // If connection is in progress, wait for it
   if (connectionPromise) {
     return connectionPromise;
@@ -39,12 +39,12 @@ async function getRedisClient(): Promise<RedisClientType> {
       const client = createClient({ 
         url,
         socket: {
-          reconnectStrategy: (retries) => Math.min(retries * 50, 500),
+          reconnectStrategy: (retries: number) => Math.min(retries * 50, 500),
           connectTimeout: 10000,
         },
-      });
+      } as any);
       
-      client.on('error', (err) => {
+      client.on('error', (err: any) => {
         console.error('[Redis] Client error:', err);
         redisClient = null;
       });
