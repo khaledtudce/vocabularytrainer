@@ -56,8 +56,12 @@ export default function RegisterPage() {
         }),
       });
 
+      console.log('[Register] Response status:', response.status);
+      console.log('[Register] Response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('[Register] Success:', data);
         localStorage.setItem('userId', data.id);
         localStorage.setItem('userName', data.userName);
         setSuccess(true);
@@ -66,11 +70,12 @@ export default function RegisterPage() {
         }, 1500);
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'Registration failed');
+        console.error('[Register] Error response:', errorData);
+        setError(errorData.error || errorData.details || `Registration failed (Status: ${response.status})`);
       }
     } catch (err) {
-      setError('Error during registration. Please try again.');
-      console.error(err);
+      console.error('[Register] Network/Parse error:', err);
+      setError(`Error during registration: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }

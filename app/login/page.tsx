@@ -25,18 +25,23 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('[Login] Response status:', response.status);
+      console.log('[Login] Response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('[Login] Success:', data);
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('userName', data.userName);
         router.push('/learning');
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'Login failed');
+        console.error('[Login] Error response:', errorData);
+        setError(errorData.error || errorData.details || `Login failed (Status: ${response.status})`);
       }
     } catch (err) {
-      setError('Error logging in. Please try again.');
-      console.error(err);
+      console.error('[Login] Network/Parse error:', err);
+      setError(`Error logging in: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
