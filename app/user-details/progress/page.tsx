@@ -147,17 +147,71 @@ export default function ProgressPage() {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Learning Progress</h1>
         
-        {/* Percentage Summary */}
+        {/* Progress Summary with Bars */}
         {!loading && userId && (
-          <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-6 sm:mb-8">
-            <div className="flex justify-center gap-4 sm:gap-8 flex-wrap">
-              <div className="text-center">
-                <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Known</p>
-                <p className="text-lg sm:text-2xl font-bold text-green-700">{lists.known.length} / {WordList.length} ({((lists.known.length / WordList.length) * 100).toFixed(1)}%)</p>
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 border border-gray-100">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-6 sm:mb-8">Overall Progress</h2>
+            
+            {/* Known Words Progress */}
+            <div className="mb-6 sm:mb-8">
+              <div className="flex justify-between items-center mb-2 sm:mb-3">
+                <div>
+                  <p className="text-sm sm:text-base font-semibold text-gray-800">Known Words</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Words mastered</p>
+                </div>
+                <span className="text-2xl sm:text-3xl font-bold text-green-600">✓</span>
               </div>
-              <div className="text-center">
-                <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Hard</p>
-                <p className="text-lg sm:text-2xl font-bold text-red-700">{lists.hard.length} / {WordList.length} ({((lists.hard.length / WordList.length) * 100).toFixed(1)}%)</p>
+              <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-green-400 to-green-600 h-full transition-all duration-300 rounded-full"
+                  style={{ width: `${((lists.known.length / WordList.length) * 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between items-center mt-2 sm:mt-3">
+                <p className="text-xs sm:text-sm text-gray-600">{lists.known.length} / {WordList.length} words</p>
+                <p className="text-sm sm:text-base font-bold text-green-700">{((lists.known.length / WordList.length) * 100).toFixed(1)}%</p>
+              </div>
+            </div>
+
+            {/* Hard Words Progress */}
+            <div className="mb-6 sm:mb-8">
+              <div className="flex justify-between items-center mb-2 sm:mb-3">
+                <div>
+                  <p className="text-sm sm:text-base font-semibold text-gray-800">Hard Words</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Words needing practice</p>
+                </div>
+                <span className="text-2xl sm:text-3xl font-bold text-red-600">⚡</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-red-400 to-red-600 h-full transition-all duration-300 rounded-full"
+                  style={{ width: `${((lists.hard.length / WordList.length) * 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between items-center mt-2 sm:mt-3">
+                <p className="text-xs sm:text-sm text-gray-600">{lists.hard.length} / {WordList.length} words</p>
+                <p className="text-sm sm:text-base font-bold text-red-700">{((lists.hard.length / WordList.length) * 100).toFixed(1)}%</p>
+              </div>
+            </div>
+
+            {/* Unknown Words Progress */}
+            <div>
+              <div className="flex justify-between items-center mb-2 sm:mb-3">
+                <div>
+                  <p className="text-sm sm:text-base font-semibold text-gray-800">Unknown Words</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Words to learn</p>
+                </div>
+                <span className="text-2xl sm:text-3xl font-bold text-gray-600">?</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-gray-400 to-gray-600 h-full transition-all duration-300 rounded-full"
+                  style={{ width: `${((totalUnknown / WordList.length) * 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between items-center mt-2 sm:mt-3">
+                <p className="text-xs sm:text-sm text-gray-600">{totalUnknown} / {WordList.length} words</p>
+                <p className="text-sm sm:text-base font-bold text-gray-700">{((totalUnknown / WordList.length) * 100).toFixed(1)}%</p>
               </div>
             </div>
           </div>
