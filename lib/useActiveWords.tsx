@@ -1,27 +1,45 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { WordList } from "@/data/wordlists";
 
 type Mode = "Custom" | "Known" | "Unknown" | "Hard";
 
 export default function useActiveWords() {
   const [mode, setMode] = useState<Mode>("Custom");
   const [range, setRange] = useState({ from: 1, to: 30 });
-  const [words, setWords] = useState<any[]>(WordList.slice(0, 30));
+  const [words, setWords] = useState<any[]>([]);
+  const [allVocabulary, setAllVocabulary] = useState<any[]>([]);
   const previousDataRef = useRef<any>(null);
 
-  // helper: map id array to WordList entries (preserve order, ignore missing)
+  // Load all vocabulary on component mount
+  useEffect(() => {
+    const loadVocabulary = async () => {
+      try {
+        const res = await fetch('/api/vocabulary');
+        if (res.ok) {
+          const vocab = await res.json();
+          setAllVocabulary(vocab);
+        }
+      } catch (err) {
+        console.error("[useActiveWords] Error fetching vocabulary:", err);
+      }
+    };
+    loadVocabulary();
+  }, []);
+
+  // helper: map id array to vocabulary entries (preserve order, ignore missing)
   const mapIdsToWords = (ids: number[]) => {
-    const idSet = new Set(ids);
-    const mapped = ids.map((id) => WordList.find((w) => w?.id === id)).filter(Boolean) as any[];
+    const mapped = ids
+      .map((id) => allVocabulary.find((w) => w?.id === id))
+      .filter(Boolean) as any[];
     return mapped;
   };
 
   const refreshWords = async (m: Mode, r: { from: number; to: number }, skipCompare: boolean = false) => {
     if (m === "Custom") {
-      // Custom mode: show WordList slice based on range
-      setWords(WordList.slice(r.from - 1, r.to));
+      // Custom mode: show vocabulary slice based on range
+      const sliced = allVocabulary.filter(word => word.id >= r.from && word.id <= r.to);
+      setWords(sliced);
       return;
     }
 

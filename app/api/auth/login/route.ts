@@ -1,7 +1,10 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server';
-import { WordList } from '@/data/wordlists';
+import { 
+  getUserByEmail, 
+  getUserWordlists, 
+  updateUserWordlists,
+  getVocabulary 
+} from '@/lib/kvStorage';
 
 export async function POST(request: Request) {
   try {
@@ -15,13 +18,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Read users.json to verify credentials
-    const usersFilePath = path.join(process.cwd(), 'data', 'users.json');
-    const usersContent = await fs.readFile(usersFilePath, 'utf-8');
-    const users = JSON.parse(usersContent);
-
     // Find user by email
-    const user = users.find((u: any) => u.email === email);
+    const user = await getUserByEmail(email);
 
     if (!user) {
       return NextResponse.json(
@@ -38,62 +36,47 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check and initialize wordlists if all are empty
-    const userWordlistsDir = path.join(process.cwd(), 'data', 'user_wordlists');
-    const userWordlistsPath = path.join(userWordlistsDir, `${user.id}.json`);
+    // Check and initialize wordlists if needed
     try {
-      try {
-        const wordlistsContent = await fs.readFile(userWordlistsPath, 'utf-8');
-        const wordlists = JSON.parse(wordlistsContent);
-        
-        // Check if all lists are empty
-        const knownEmpty = !wordlists.known || wordlists.known.length === 0;
-        const hardEmpty = !wordlists.hard || wordlists.hard.length === 0;
-        const unknownEmpty = !wordlists.unknown || wordlists.unknown.length === 0;
-        
-        if (knownEmpty && hardEmpty && unknownEmpty) {
-          // All lists are empty, populate unknown list with all word IDs
-          const allWordIds = WordList.map((word: any) => word.id).sort((a: number, b: number) => a - b);
-          const updatedWordlists = {
-            known: [],
-            hard: [],
-            unknown: allWordIds,
-          };
-          await fs.writeFile(userWordlistsPath, JSON.stringify(updatedWordlists, null, 2), 'utf-8');
-        } else {
-          // Check if all word IDs are accounted for - add missing ones to unknown
-          const allWordIds = WordList.map((word: any) => word.id);
-          const knownSet = new Set(wordlists.known || []);
-          const hardSet = new Set(wordlists.hard || []);
-          const unknownSet = new Set(wordlists.unknown || []);
-          
-          // Find missing IDs
-          const missingIds = allWordIds.filter(id => !knownSet.has(id) && !hardSet.has(id) && !unknownSet.has(id));
-          
-          // If there are missing IDs, add them to unknown list
-          if (missingIds.length > 0) {
-            const updatedUnknown = [...(wordlists.unknown || []), ...missingIds].sort((a: number, b: number) => a - b);
-            const updatedWordlists = {
-              known: wordlists.known || [],
-              hard: wordlists.hard || [],
-              unknown: updatedUnknown,
-            };
-            await fs.writeFile(userWordlistsPath, JSON.stringify(updatedWordlists, null, 2), 'utf-8');
-          }
-        }
-      } catch {
-        // Wordlists file doesn't exist, create it with all words in unknown
-        await fs.mkdir(userWordlistsDir, { recursive: true });
-        const allWordIds = WordList.map((word: any) => word.id).sort((a: number, b: number) => a - b);
-        const userWordlists = {
+      const wordlists = await getUserWordlists(user.id);
+      
+      // Check if all lists are empty
+      const knownEmpty = !wordlists.known || wordlists.known.length === 0;
+      const hardEmpty = !wordlists.hard || wordlists.hard.length === 0;
+      const unknownEmpty = !wordlists.unknown || wordlists.unknown.length === 0;
+      
+      if (knownEmpty && hardEmpty && unknownEmpty) {
+        // All lists are empty, populate unknown list with all word IDs
+        const vocabulary = await getVocabulary();
+        const allWordIds = vocabulary.map((w: any) => w.id).sort((a: number, b: number) => a - b);
+        await updateUserWordlists(user.id, {
           known: [],
           hard: [],
           unknown: allWordIds,
-        };
-        await fs.writeFile(userWordlistsPath, JSON.stringify(userWordlists, null, 2), 'utf-8');
+        });
+      } else {
+        // Check if all word IDs are accounted for - add missing ones to unknown
+        const vocabulary = await getVocabulary();
+        const allWordIds = vocabulary.map((w: any) => w.id);
+        const knownSet = new Set(wordlists.known || []);
+        const hardSet = new Set(wordlists.hard || []);
+        const unknownSet = new Set(wordlists.unknown || []);
+        
+        // Find missing IDs
+        const missingIds = allWordIds.filter((id: number) => !knownSet.has(id) && !hardSet.has(id) && !unknownSet.has(id));
+        
+        // If there are missing IDs, add them to unknown list
+        if (missingIds.length > 0) {
+          const updatedUnknown = [...(wordlists.unknown || []), ...missingIds].sort((a: number, b: number) => a - b);
+          await updateUserWordlists(user.id, {
+            known: wordlists.known || [],
+            hard: wordlists.hard || [],
+            unknown: updatedUnknown,
+          });
+        }
       }
     } catch (err) {
-      console.error('Error initializing wordlists:', err);
+      console.error('[API] Error initializing wordlists during login:', err);
       // Continue with login even if wordlist initialization fails
     }
 
@@ -113,7 +96,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Login failed' },
+      { error: 'Login failed', details: String(error) },
       { status: 500 }
     );
   }

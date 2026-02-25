@@ -1,8 +1,11 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
-import { WordList } from '@/data/wordlists';
+import { 
+  initializeUserWordlists, 
+  storeUser, 
+  getUserByEmail, 
+  registerEmailMapping 
+} from '@/lib/kvStorage';
 
 export async function POST(request: Request) {
   try {
@@ -16,20 +19,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const usersFilePath = path.join(process.cwd(), 'data', 'users.json');
-
-    // Read existing users
-    let users: any[] = [];
-    try {
-      const usersContent = await fs.readFile(usersFilePath, 'utf-8');
-      users = JSON.parse(usersContent);
-    } catch {
-      // File doesn't exist, create new array
-      users = [];
-    }
-
     // Check if email already exists
-    if (users.some((u) => u.email === email)) {
+    const existingUser = await getUserByEmail(email);
+    if (existingUser) {
       return NextResponse.json(
         { error: 'Email already registered' },
         { status: 409 }
@@ -46,41 +38,14 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    users.push(newUser);
+    // Store user account
+    await storeUser(newUser);
+    
+    // Register email mapping
+    await registerEmailMapping(email, userId);
 
-    // Write updated users list
-    await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), 'utf-8');
-
-    // Create user-specific wordlists file with all words in unknown list
-    const userWordlistsDir = path.join(process.cwd(), 'data', 'user_wordlists');
-    try {
-      await fs.mkdir(userWordlistsDir, { recursive: true });
-    } catch {
-      // Directory might already exist
-    }
-    const userWordlistsPath = path.join(userWordlistsDir, `${userId}.json`);
-    // Extract all word IDs from WordList and add to unknown list
-    const allWordIds = WordList.map((word: any) => word.id).sort((a: number, b: number) => a - b);
-    const userWordlists = {
-      known: [],
-      hard: [],
-      unknown: allWordIds,
-    };
-    await fs.writeFile(userWordlistsPath, JSON.stringify(userWordlists, null, 2), 'utf-8');
-
-    // Create user-specific data file
-    const userDataFilePath = path.join(process.cwd(), 'data', `user_${userId}.json`);
-    const userData = {
-      userId,
-      userName,
-      email,
-      createdAt: new Date().toISOString(),
-      progress: [],
-      favoriteWords: [],
-      quizResults: [],
-    };
-
-    await fs.writeFile(userDataFilePath, JSON.stringify(userData, null, 2), 'utf-8');
+    // Initialize user wordlists with all words in unknown list
+    await initializeUserWordlists(userId);
 
     const response = NextResponse.json({
       id: userId,
@@ -99,7 +64,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
-      { error: 'Registration failed' },
+      { error: 'Registration failed', details: String(error) },
       { status: 500 }
     );
   }
