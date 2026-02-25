@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { createClient, RedisClientType } from 'redis';
 import { WordList } from '@/data/wordlists';
 
 const VOCABULARY_KEY = 'vocabulary:master';
@@ -10,22 +10,49 @@ export interface UserWordlists {
   unknown: number[];
 }
 
+let redisClient: RedisClientType | null = null;
+
+// Initialize Redis client (connection pooling)
+async function getRedisClient(): Promise<RedisClientType> {
+  if (redisClient && redisClient.isOpen) {
+    return redisClient;
+  }
+
+  const url = process.env.REDIS_URL;
+  if (!url) {
+    throw new Error('Missing REDIS_URL in environment variables');
+  }
+
+  try {
+    redisClient = createClient({ url });
+    redisClient.on('error', (err) => console.error('[Redis] Client error:', err));
+    await redisClient.connect();
+    console.log('[Redis] ✅ Connected');
+    return redisClient;
+  } catch (error) {
+    console.error('[Redis] Connection error:', error);
+    throw error;
+  }
+}
+
 /**
- * Initialize/seed vocabulary in KV if it doesn't exist
+ * Initialize/seed vocabulary in Redis if it doesn't exist
  */
 export async function initializeVocabulary() {
   try {
-    const existing = await kv.get(VOCABULARY_KEY);
+    const client = await getRedisClient();
+    const existing = await client.get(VOCABULARY_KEY);
+    
     if (existing) {
-      console.log('[KV] Vocabulary already seeded');
+      console.log('[Redis] Vocabulary already seeded');
       return;
     }
 
-    console.log('[KV] Seeding vocabulary from wordlists.js...');
-    await kv.set(VOCABULARY_KEY, JSON.stringify(WordList));
-    console.log(`[KV] ✅ Vocabulary seeded with ${WordList.length} words`);
+    console.log('[Redis] Seeding vocabulary from wordlists.js...');
+    await client.set(VOCABULARY_KEY, JSON.stringify(WordList));
+    console.log(`[Redis] ✅ Vocabulary seeded with ${WordList.length} words`);
   } catch (error) {
-    console.error('[KV] Error initializing vocabulary:', error);
+    console.error('[Redis] Error initializing vocabulary:', error);
     throw error;
   }
 }
@@ -36,14 +63,17 @@ export async function initializeVocabulary() {
 export async function getVocabulary() {
   try {
     await initializeVocabulary();
-    const data = await kv.get(VOCABULARY_KEY);
+    const client = await getRedisClient();
+    const data = await client.get(VOCABULARY_KEY);
+    
     if (!data) {
-      console.warn('[KV] No vocabulary found after init');
+      console.warn('[Redis] No vocabulary found after init');
       return WordList;
     }
+    
     return typeof data === 'string' ? JSON.parse(data) : data;
   } catch (error) {
-    console.error('[KV] Error getting vocabulary:', error);
+    console.error('[Redis] Error getting vocabulary:', error);
     // Fallback to local wordlist.js
     return WordList;
   }
@@ -54,7 +84,7 @@ export async function getVocabulary() {
  */
 export async function addWordToVocabulary(wordData: any) {
   try {
-    console.log('[KV] Adding word:', wordData);
+    console.log('[Redis] Adding word:', wordData);
     const vocabulary = await getVocabulary();
     
     // Find max ID and add 1
@@ -62,12 +92,13 @@ export async function addWordToVocabulary(wordData: any) {
     const newWord = { ...wordData, id: maxId + 1 };
     
     vocabulary.push(newWord);
-    await kv.set(VOCABULARY_KEY, JSON.stringify(vocabulary));
-    console.log('[KV] ✅ Word added with ID:', newWord.id);
+    const client = await getRedisClient();
+    await client.set(VOCABULARY_KEY, JSON.stringify(vocabulary));
+    console.log('[Redis] ✅ Word added with ID:', newWord.id);
     
     return newWord;
   } catch (error) {
-    console.error('[KV] Error adding word:', error);
+    console.error('[Redis] Error adding word:', error);
     throw error;
   }
 }
@@ -77,11 +108,12 @@ export async function addWordToVocabulary(wordData: any) {
  */
 export async function getUserWordlists(userId: string): Promise<UserWordlists> {
   try {
+    const client = await getRedisClient();
     const key = `${USER_WORDLIST_PREFIX}${userId}`;
-    const data = await kv.get(key);
+    const data = await client.get(key);
     
     if (!data) {
-      console.log('[KV] No wordlists found for user, returning empty');
+      console.log('[Redis] No wordlists found for user, returning empty');
       return { known: [], hard: [], unknown: [] };
     }
     
@@ -92,7 +124,7 @@ export async function getUserWordlists(userId: string): Promise<UserWordlists> {
       unknown: parsed.unknown || [],
     };
   } catch (error) {
-    console.error('[KV] Error getting user wordlists:', error);
+    console.error('[Redis] Error getting user wordlists:', error);
     return { known: [], hard: [], unknown: [] };
   }
 }
@@ -105,13 +137,14 @@ export async function updateUserWordlists(
   wordlists: UserWordlists
 ): Promise<UserWordlists> {
   try {
-    console.log(`[KV] Updating wordlists for userId: ${userId}`);
+    console.log(`[Redis] Updating wordlists for userId: ${userId}`);
     console.log(
-      `[KV] Received data - known: ${wordlists.known?.length || 0}, hard: ${
+      `[Redis] Received data - known: ${wordlists.known?.length || 0}, hard: ${
         wordlists.hard?.length || 0
       }, unknown: ${wordlists.unknown?.length || 0}`
     );
     
+    const client = await getRedisClient();
     const key = `${USER_WORDLIST_PREFIX}${userId}`;
     const sanitized = {
       known: Array.isArray(wordlists.known) ? wordlists.known : [],
@@ -119,12 +152,12 @@ export async function updateUserWordlists(
       unknown: Array.isArray(wordlists.unknown) ? wordlists.unknown : [],
     };
     
-    await kv.set(key, JSON.stringify(sanitized));
-    console.log('[KV] ✅ Wordlists saved successfully');
+    await client.set(key, JSON.stringify(sanitized));
+    console.log('[Redis] ✅ Wordlists saved successfully');
     
     return sanitized;
   } catch (error) {
-    console.error('[KV] Error updating user wordlists:', error);
+    console.error('[Redis] Error updating user wordlists:', error);
     throw error;
   }
 }
@@ -134,7 +167,7 @@ export async function updateUserWordlists(
  */
 export async function initializeUserWordlists(userId: string): Promise<UserWordlists> {
   try {
-    console.log(`[KV] Initializing wordlists for new user: ${userId}`);
+    console.log(`[Redis] Initializing wordlists for new user: ${userId}`);
     const vocabulary = await getVocabulary();
     const allWordIds = vocabulary.map((w: any) => w.id).sort((a: number, b: number) => a - b);
     
@@ -146,7 +179,7 @@ export async function initializeUserWordlists(userId: string): Promise<UserWordl
     
     return updateUserWordlists(userId, wordlists);
   } catch (error) {
-    console.error('[KV] Error initializing user wordlists:', error);
+    console.error('[Redis] Error initializing user wordlists:', error);
     throw error;
   }
 }
@@ -156,12 +189,13 @@ export async function initializeUserWordlists(userId: string): Promise<UserWordl
  */
 export async function storeUser(userData: any) {
   try {
+    const client = await getRedisClient();
     const key = `user:account:${userData.id}`;
-    await kv.set(key, JSON.stringify(userData));
-    console.log(`[KV] ✅ User stored: ${userData.id}`);
+    await client.set(key, JSON.stringify(userData));
+    console.log(`[Redis] ✅ User stored: ${userData.id}`);
     return userData;
   } catch (error) {
-    console.error('[KV] Error storing user:', error);
+    console.error('[Redis] Error storing user:', error);
     throw error;
   }
 }
@@ -171,11 +205,12 @@ export async function storeUser(userData: any) {
  */
 export async function getUser(userId: string) {
   try {
+    const client = await getRedisClient();
     const key = `user:account:${userId}`;
-    const data = await kv.get(key);
+    const data = await client.get(key);
     return data ? (typeof data === 'string' ? JSON.parse(data) : data) : null;
   } catch (error) {
-    console.error('[KV] Error getting user:', error);
+    console.error('[Redis] Error getting user:', error);
     return null;
   }
 }
@@ -185,12 +220,13 @@ export async function getUser(userId: string) {
  */
 export async function getUserByEmail(email: string) {
   try {
+    const client = await getRedisClient();
     const key = `user:email:${email}`;
-    const userId = await kv.get(key);
+    const userId = await client.get(key);
     if (!userId) return null;
-    return getUser(userId as string);
+    return getUser(userId);
   } catch (error) {
-    console.error('[KV] Error getting user by email:', error);
+    console.error('[Redis] Error getting user by email:', error);
     return null;
   }
 }
@@ -200,10 +236,11 @@ export async function getUserByEmail(email: string) {
  */
 export async function registerEmailMapping(email: string, userId: string) {
   try {
+    const client = await getRedisClient();
     const key = `user:email:${email}`;
-    await kv.set(key, userId);
+    await client.set(key, userId);
   } catch (error) {
-    console.error('[KV] Error registering email mapping:', error);
+    console.error('[Redis] Error registering email mapping:', error);
     throw error;
   }
 }
