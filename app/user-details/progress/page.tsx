@@ -87,6 +87,12 @@ export default function ProgressPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Calculate remaining/unknown words (all words not in known or hard)
+  const unknownWords = WordList.filter(
+    word => !lists.known.find(w => w.id === word.id) && 
+             !lists.hard.find(w => w.id === word.id)
+  );
+
   const moveWord = async (wordId: number, fromCategory: "known" | "unknown" | "hard", toCategory: "known" | "unknown" | "hard") => {
     if (fromCategory === toCategory) return;
 
@@ -97,7 +103,7 @@ export default function ProgressPage() {
     };
 
     // Get the word object from current category
-    const wordObject = lists[fromCategory].find(w => w.id === wordId);
+    const wordObject = (fromCategory === 'unknown' ? unknownWords : lists[fromCategory]).find(w => w.id === wordId);
     if (!wordObject) return;
 
     newLists[toCategory] = [...newLists[toCategory], wordObject];
@@ -124,9 +130,11 @@ export default function ProgressPage() {
     }
   };
 
+  const totalUnknown = Math.max(WordList.length - lists.known.length - lists.hard.length, 0);
+
   const statsData = [
     { label: "Total Known", value: lists.known.length, color: "bg-green-100 border-green-400" },
-    { label: "Total Unknown", value: lists.unknown.length, color: "bg-gray-100 border-gray-400" },
+    { label: "Total Unknown", value: totalUnknown, color: "bg-gray-100 border-gray-400" },
     { label: "Total Hard", value: lists.hard.length, color: "bg-red-100 border-red-400" },
     { label: "Learned Today", value: stats.learnedToday, color: "bg-blue-100 border-blue-400" },
     { label: "Learned This Week", value: stats.learnedThisWeek, color: "bg-purple-100 border-purple-400" },
@@ -190,7 +198,7 @@ export default function ProgressPage() {
                 <div className="flex items-center justify-center flex-1 min-h-[60vh] sm:min-h-[80vh]">
                   <PieChart
                     known={lists.known.length}
-                    unknown={lists.unknown.length}
+                    unknown={totalUnknown}
                     hard={lists.hard.length}
                     total={WordList.length}
                   />
@@ -202,17 +210,17 @@ export default function ProgressPage() {
           {/* Word Lists Below */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mt-6 sm:mt-8">
             {[
-              { label: "Known Words", key: "known" as const, color: "green" },
-              { label: "Unknown Words", key: "unknown" as const, color: "gray" },
-              { label: "Hard Words", key: "hard" as const, color: "red" },
-            ].map(({ label, key, color }) => (
+              { label: "Known Words", key: "known" as const, color: "green", getWords: () => lists.known },
+              { label: "Unknown Words", key: "unknown" as const, color: "gray", getWords: () => unknownWords },
+              { label: "Hard Words", key: "hard" as const, color: "red", getWords: () => lists.hard },
+            ].map(({ label, key, color, getWords }) => (
               <div key={key} className="bg-white rounded-lg shadow-md p-3 sm:p-6">
-                <h2 className={`text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-${color}-700`}>{label} ({lists[key].length})</h2>
+                <h2 className={`text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-${color}-700`}>{label} ({getWords().length})</h2>
                 <div className="space-y-1 sm:space-y-2 max-h-[40vh] sm:max-h-[50vh] overflow-y-auto">
-                  {lists[key].length === 0 ? (
+                  {getWords().length === 0 ? (
                     <p className="text-gray-400 italic text-xs sm:text-base">No words.</p>
                   ) : (
-                    lists[key].map((item: any) => {
+                    getWords().map((item: any) => {
                       const otherCategories = (["known", "unknown", "hard"] as const).filter(cat => cat !== key);
                       return (
                         <div key={item.id} className="border-b pb-1 sm:pb-2 mb-1 sm:mb-2 flex justify-between items-start gap-1 sm:gap-2 text-xs sm:text-base">

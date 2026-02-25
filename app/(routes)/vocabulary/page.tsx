@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import useActiveWords from "@/lib/useActiveWords";
 import NavBar from "@/manualcomponent/NavBar";
 import AddWordModal from "@/manualcomponent/AddWordModal";
 
@@ -11,17 +10,34 @@ export default function VocabularyPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isClient, setIsClient] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const { words: activeWords } = useActiveWords();
+  const [allVocabulary, setAllVocabulary] = useState<any[]>([]);
   const [addedWords, setAddedWords] = useState<any[]>([]);
+  const [pageWindow, setPageWindow] = useState(0); // Track which set of 10 pages to display
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // Load ALL vocabulary on component mount
+  useEffect(() => {
+    const loadVocabulary = async () => {
+      try {
+        const res = await fetch('/api/vocabulary');
+        if (res.ok) {
+          const vocab = await res.json();
+          setAllVocabulary(vocab);
+        }
+      } catch (err) {
+        console.error("Error fetching vocabulary:", err);
+      }
+    };
+    loadVocabulary();
+  }, []);
+
   const filteredItems = useMemo(() => {
     if (!isClient) return [];
 
-    const source = [...activeWords, ...addedWords];
+    const source = [...allVocabulary, ...addedWords];
     return source.filter((item) => {
       const searchLower = searchTerm.toLowerCase();
 
@@ -32,7 +48,7 @@ export default function VocabularyPage() {
         (item.synonym || "").toLowerCase().includes(searchLower)
       );
     });
-  }, [searchTerm, isClient, activeWords, addedWords]);
+  }, [searchTerm, isClient, allVocabulary, addedWords]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice(
@@ -160,15 +176,18 @@ export default function VocabularyPage() {
           {totalPages > 1 && (
             <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 mt-6 sm:mt-8">
               <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
+                onClick={() => setPageWindow(Math.max(0, pageWindow - 1))}
+                disabled={pageWindow === 0}
                 className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
               >
                 Previous
               </button>
 
               <div className="flex flex-wrap justify-center gap-0.5 sm:gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                {Array.from(
+                  { length: Math.min(10, totalPages - pageWindow * 10) },
+                  (_, i) => pageWindow * 10 + i + 1
+                ).map((page) => (
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
@@ -184,8 +203,8 @@ export default function VocabularyPage() {
               </div>
 
               <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
+                onClick={() => setPageWindow(pageWindow + 1)}
+                disabled={(pageWindow + 1) * 10 >= totalPages}
                 className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
               >
                 Next

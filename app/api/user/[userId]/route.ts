@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { getUser } from '@/lib/kvStorage';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request, context: { params: any }) {
@@ -14,11 +13,7 @@ export async function GET(request: Request, context: { params: any }) {
       );
     }
 
-    const usersFilePath = path.join(process.cwd(), 'data', 'users.json');
-    const usersContent = await fs.readFile(usersFilePath, 'utf-8');
-    const users = JSON.parse(usersContent);
-
-    const user = users.find((u: any) => u.id === userId);
+    const user = await getUser(userId);
 
     if (!user) {
       return NextResponse.json(
@@ -31,7 +26,7 @@ export async function GET(request: Request, context: { params: any }) {
     const { password, ...userDetails } = user;
     return NextResponse.json(userDetails);
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error('[API] Error fetching user:', error);
     return NextResponse.json(
       { error: 'Failed to fetch user details' },
       { status: 500 }

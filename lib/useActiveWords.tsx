@@ -6,7 +6,7 @@ type Mode = "Custom" | "Known" | "Unknown" | "Hard";
 
 export default function useActiveWords() {
   const [mode, setMode] = useState<Mode>("Custom");
-  const [range, setRange] = useState({ from: 1, to: 30 });
+  const [range, setRange] = useState({ from: 1, to: 5000 });
   const [words, setWords] = useState<any[]>([]);
   const [allVocabulary, setAllVocabulary] = useState<any[]>([]);
   const previousDataRef = useRef<any>(null);
@@ -27,6 +27,13 @@ export default function useActiveWords() {
     loadVocabulary();
   }, []);
 
+  // Refresh words when vocab is loaded (Custom mode trigger)
+  useEffect(() => {
+    if (allVocabulary.length > 0 && mode && range) {
+      refreshWords(mode, range, true);
+    }
+  }, [allVocabulary.length, mode, range]);
+
   // helper: map id array to vocabulary entries (preserve order, ignore missing)
   const mapIdsToWords = (ids: number[]) => {
     const mapped = ids
@@ -38,6 +45,9 @@ export default function useActiveWords() {
   const refreshWords = async (m: Mode, r: { from: number; to: number }, skipCompare: boolean = false) => {
     if (m === "Custom") {
       // Custom mode: show vocabulary slice based on range
+      if (allVocabulary.length === 0) {
+        return;
+      }
       const sliced = allVocabulary.filter(word => word.id >= r.from && word.id <= r.to);
       setWords(sliced);
       return;
@@ -45,7 +55,12 @@ export default function useActiveWords() {
 
     // Known/Unknown/Hard: try to fetch user-specific lists (based on localStorage userId)
     try {
-      const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+      if (typeof window === "undefined") {
+        setWords([]);
+        return;
+      }
+      
+      const userId = localStorage.getItem("userId");
       if (!userId) {
         setWords([]);
         return;
@@ -82,33 +97,34 @@ export default function useActiveWords() {
   };
 
   useEffect(() => {
-    // initial load from localStorage
+    // initial load from localStorage - only set mode and range, don't call refreshWords yet
     if (typeof window === "undefined") return;
     const stored = localStorage.getItem("wordSource");
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
         const m: Mode = parsed.mode || "Custom";
-        const r = parsed.ranges?.[m] || { from: 1, to: 30 };
+        const r = parsed.ranges?.[m] || { from: 1, to: 5000 }; // Allow viewing all words up to 5000
         setMode(m);
         setRange(r);
-        refreshWords(m, r, true); // skipCompare = true on initial load
       } catch {
         setMode("Custom");
-        setRange({ from: 1, to: 30 });
-        refreshWords("Custom", { from: 1, to: 30 }, true);
+        setRange({ from: 1, to: 5000 }); // Allow viewing all words
       }
     } else {
-      refreshWords("Custom", { from: 1, to: 30 }, true);
+      setMode("Custom");
+      setRange({ from: 1, to: 5000 }); // Allow viewing all words
     }
 
     const handler = (e: any) => {
       const detail = e?.detail || {};
       const m: Mode = detail.mode || "Custom";
-      const r = detail.range || { from: 1, to: 30 };
+      const r = detail.range || { from: 1, to: 5000 };
       setMode(m);
       setRange(r);
-      refreshWords(m, r, true); // skipCompare = true on explicit event
+      if (allVocabulary.length > 0) {
+        refreshWords(m, r, true);
+      }
     };
 
     window.addEventListener("wordSourceUpdated", handler as EventListener);

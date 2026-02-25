@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { WordList } from "@/data/wordlists";
 
 export default function DifficultySelector() {
-  const defaultRanges = { from: 1, to: 30 };
+  const defaultRanges = { from: 1, to: 5000 }; // Allow viewing all words
   const [mode, setMode] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("wordSource");
