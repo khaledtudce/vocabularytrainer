@@ -220,192 +220,231 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
   }, [examFinished]);
 
   const correctAnswerCount = examQuestionInfos.filter((item) => item.seletedAnswer === item.correctAnswer).length;
+  const progressPercent = words.length > 0 ? ((index + 1) / words.length) * 100 : 0;
+
+  const getQuestion = () => {
+    if (mcqdirection === "germanToBangla") return currentWord?.word;
+    if (mcqdirection === "banglaToGerman") return currentWord?.bangla;
+    if (mcqdirection === "germanToEnglish") return currentWord?.word;
+    if (mcqdirection === "meaningToGerman") {
+      return `${currentWord?.bangla} • ${currentWord?.english}`;
+    }
+    return "";
+  };
+
+  const getCorrectAnswer = () => {
+    if (mcqdirection === "germanToBangla") return currentWord?.bangla;
+    if (mcqdirection === "banglaToGerman") return currentWord?.word;
+    if (mcqdirection === "germanToEnglish") return currentWord?.english;
+    if (mcqdirection === "meaningToGerman") return currentWord?.word;
+    return "";
+  };
 
   return (
-    <div className="w-full h-[83vh] flex flex-col items-center p-1 bg-gray-100 rounded-lg shadow-md gap-2">
+    <div className="w-full max-w-4xl mx-auto px-0">
       {words.length === 0 && (
-        <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
-          <p className="text-lg font-semibold text-gray-600">No words available</p>
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-8 sm:p-12 text-center border border-gray-100">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C6.5 6.253 3 9.5 3 13.757c0 4.257 3 6.5 9 9.5m0-13c5.5-3 9-1.243 9-9.5 0-4.257-3-7.504-9-7.504z" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">No Words Available</p>
+          <p className="text-sm sm:text-base text-gray-600">Select words to start the exam</p>
         </div>
       )}
-      {words.length > 0 && (
-        <>
-          {!examFinished && (
-            <>
-              <div className="mt-5 p-1 sm:p-3 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
-            {mcqdirection === "banglaToGerman" && (
-              <>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-5">
-                  {currentWord?.id}. {currentWord?.bangla}
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {options.map((option, index) => (
-                    <button
-                      key={index}
-                      className={`p-2 rounded-md border border-fuchsia-700 ${
-                        selectedAnswer === option
-                          ? "bg-lime-400 ring-2"
-                          : "bg-fuchsia-50"
-                      }`}
-                      onClick={() => {
-                        setSelectedAnswer(option);
-                      }}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-            {mcqdirection === "germanToBangla" && (
-              <>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-5">
-                  {currentWord?.id}. {currentWord?.word}
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {options.map((option, index) => (
-                    <button
-                      key={index}
-                      className={`p-2 rounded-md border border-fuchsia-700 ${
-                        selectedAnswer === option
-                          ? "bg-lime-400 ring-2"
-                          : "bg-fuchsia-50"
-                      }`}
-                      onClick={() => {
-                        setSelectedAnswer(option);
-                      }}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-            {mcqdirection === "germanToEnglish" && (
-              <>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-5">
-                  {currentWord?.id}. {currentWord?.word}
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {options.map((option, index) => (
-                    <button
-                      key={index}
-                      className={`p-2 rounded-md border border-fuchsia-700 ${
-                        selectedAnswer === option
-                          ? "bg-lime-400 ring-2"
-                          : "bg-fuchsia-50"
-                      }`}
-                      onClick={() => {
-                        setSelectedAnswer(option);
-                      }}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-            {mcqdirection === "meaningToGerman" && (
-              <>
-                <h1 className="text-xl sm:text-2xl font-semibold mb-2">
-                  {currentWord?.id}. {currentWord?.bangla}
-                </h1>
-                <h1 className="text-xl sm:text-2xl font-semibold mb-2">
-                  {currentWord?.english}
-                </h1>
-                <div className="mt-5 grid grid-cols-2 gap-2">
-                  {options.map((option, index) => (
-                    <button
-                      key={index}
-                      className={`p-2 rounded-md border border-fuchsia-700 ${
-                        selectedAnswer === option
-                          ? "bg-lime-400 ring-2"
-                          : "bg-fuchsia-50"
-                      }`}
-                      onClick={() => {
-                        setSelectedAnswer(option);
-                      }}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
+
+      {words.length > 0 && !examFinished && (
+        <div className="space-y-4 sm:space-y-6 mx-0">
+          {/* Progress Bar */}
+          <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md">
+            <div className="flex justify-between items-center mb-2 sm:mb-3">
+              <span className="text-xs sm:text-sm font-semibold text-gray-700">Progress</span>
+              <span className="text-xs sm:text-sm font-bold text-indigo-600">{index + 1} / {words.length}</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
-            </>
-          )}
-          {examFinished && (
-            <div className="flex items-center justify-center w-full">
-              <div className="p-1 flex flex-col items-center">
-            <span className="mt-5 text-2xl font-bold text-center">Congratulation! Here is your test result:</span>
-            <span>Total Questions: {words.length}</span>
-            <span>Correct Answer: {correctAnswerCount}</span>
+
+          {/* MCQ Card */}
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 overflow-hidden hover:shadow-xl sm:hover:shadow-2xl transition-shadow duration-300">
+            <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 sm:px-6 py-3 sm:py-4">
+              <p className="text-white text-xs sm:text-sm font-semibold tracking-widest">QUESTION {index + 1}</p>
+            </div>
+
+            <div className="p-4 sm:p-8 md:p-12 space-y-4 sm:space-y-6">
+              {/* Question */}
+              <div className="text-center">
+                <p className="text-gray-500 text-xs sm:text-sm font-medium mb-3">Translate or choose:</p>
+                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-indigo-700 break-words leading-tight">
+                  {getQuestion()}
+                </p>
+              </div>
+
+              {/* Options Grid */}
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
+                {options.map((option, idx) => {
+                  const isCorrect = option === getCorrectAnswer();
+                  const isSelected = selectedAnswer === option;
+
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedAnswer(option)}
+                      className={`px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm md:text-base border-2 transition-all duration-200 break-words ${
+                        isSelected
+                          ? isCorrect
+                            ? "bg-green-400 border-green-600 text-white shadow-lg"
+                            : "bg-red-400 border-red-600 text-white shadow-lg"
+                          : "bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200 text-gray-800 hover:border-indigo-400 hover:shadow-md"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Feedback */}
+              {selectedAnswer && (
+                <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl font-semibold text-center ${
+                  selectedAnswer === getCorrectAnswer()
+                    ? "bg-green-100 border-2 border-green-500 text-green-700"
+                    : "bg-red-100 border-2 border-red-500 text-red-700"
+                }`}>
+                  <p className="text-sm sm:text-base">
+                    {selectedAnswer === getCorrectAnswer() ? "✅ Correct!" : "❌ Wrong"}
+                  </p>
+                  {selectedAnswer !== getCorrectAnswer() && (
+                    <p className="text-xs sm:text-sm mt-1">Correct answer: <span className="font-bold">{getCorrectAnswer()}</span></p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
             <Button
-              className="mt-2 bg-green-600 text-white"
-              onClick={() => router.push("/")}
+              onClick={prevWord}
+              disabled={index === 0}
+              className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                index === 0
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95"
+              }`}
             >
-              Back
+              ← Previous
             </Button>
-            <ul className="mt-2 w-full">
-              {examQuestionInfos.map((item) => (
-                <li
-                  key={item.id}
-                  className={` p-2 border rounded mb-2 ${
-                    item.seletedAnswer === item.correctAnswer
-                      ? "bg-green-300"
-                      : "bg-red-300"
-                  }`}
-                >
-                  <span className="flex flex-col">
-                    <span className="flex flex-wrap">
-                      <strong>
-                        {item.id}. {item.questions}
-                      </strong>
-                    </span>
-                    <span className="p-1 flex gap-1">
-                      <span>Your Answer:</span>
-                      <span
-                        className={
-                          item.seletedAnswer === item.correctAnswer
-                            ? "text-green-700"
-                            : "text-red-700"
-                        }
-                      >
-                        {item.seletedAnswer}
-                      </span>
-                    </span>
-                    <span className="p-1 flex gap-1">
-                      <span>Correct Answer:</span>
-                      <span className="font-bold">{item.correctAnswer}</span>
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {index === words.length - 1 ? (
+              <Button
+                onClick={submitExam}
+                disabled={submitClicked || selectedAnswer === ""}
+                className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                  submitClicked || selectedAnswer === ""
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-green-600 text-white hover:bg-green-700 shadow-md hover:shadow-lg active:scale-95"
+                }`}
+              >
+                Submit Exam ✓
+              </Button>
+            ) : (
+              <Button
+                onClick={nextWord}
+                disabled={index === words.length - 1 || selectedAnswer === ""}
+                className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 ${
+                  index === words.length - 1 || selectedAnswer === ""
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95"
+                }`}
+              >
+                Next →
+              </Button>
+            )}
           </div>
         </div>
-            )}
-        </>
       )}
-      <div className="flex py-5 items-center gap-20">
-        <Button className="bg-lime-700" onClick={prevWord} disabled={words.length === 0 || index === 0}>
-          Previous
-        </Button>
-        {index === words.length - 1 ? (
-          <Button 
-            className="bg-blue-600 text-white" 
-            onClick={submitExam} 
-            disabled={words.length === 0 || submitClicked || selectedAnswer === ""}
-          >
-            Submit
-          </Button>
-        ) : (
-          <Button className="bg-lime-700" onClick={nextWord} disabled={words.length === 0 || index === words.length - 1 || selectedAnswer === ""}>
-            Next
-          </Button>
-        )}
-      </div>
+
+      {examFinished && (
+        <div className="space-y-6">
+          {/* Results Summary */}
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 px-4 sm:px-6 py-4 sm:py-6">
+              <h2 className="text-white text-xl sm:text-2xl md:text-3xl font-bold">Exam Completed! 🎉</h2>
+            </div>
+
+            <div className="p-4 sm:p-8 md:p-12">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 sm:p-6 text-center border border-blue-200">
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium mb-1">Total Questions</p>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-600">{words.length}</p>
+                </div>
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 sm:p-6 text-center border border-green-200">
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium mb-1">Correct Answers</p>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-600">{correctAnswerCount}</p>
+                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 sm:p-6 text-center border border-purple-200">
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium mb-1">Score</p>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-purple-600">{Math.round((correctAnswerCount / words.length) * 100)}%</p>
+                </div>
+              </div>
+
+              {/* Results List */}
+              <div className="max-h-96 overflow-y-auto space-y-2 sm:space-y-3 mb-6 sm:mb-8">
+                {examQuestionInfos.map((item, idx) => (
+                  <div
+                    key={item.id}
+                    className={`p-3 sm:p-4 rounded-lg border-2 ${
+                      item.seletedAnswer === item.correctAnswer
+                        ? "bg-green-50 border-green-300"
+                        : "bg-red-50 border-red-300"
+                    }`}
+                  >
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <span className={`text-lg sm:text-xl font-bold mt-0.5 ${
+                        item.seletedAnswer === item.correctAnswer ? "text-green-600" : "text-red-600"
+                      }`}>
+                        {item.seletedAnswer === item.correctAnswer ? "✓" : "✕"}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-semibold text-gray-800 break-words mb-2">
+                          Q{idx + 1}: {item.questions}
+                        </p>
+                        <div className="text-xs sm:text-sm space-y-1">
+                          <p className={item.seletedAnswer === item.correctAnswer ? "text-green-700" : "text-red-700"}>
+                            Your Answer: <span className="font-semibold">{item.seletedAnswer || "(No answer)"}</span>
+                          </p>
+                          {item.seletedAnswer !== item.correctAnswer && (
+                            <p className="text-gray-700">
+                              Correct Answer: <span className="font-semibold text-green-700">{item.correctAnswer}</span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Button
+                  onClick={() => router.push("/")}
+                  className="w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
+                >
+                  Back to Home
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
