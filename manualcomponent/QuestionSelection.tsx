@@ -103,49 +103,37 @@ export default function DifficultySelector() {
   }, []);
 
   return (
-    <div className="flex items-center gap-2 p-2">
+    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 p-2">
       {/* Difficulty Selection */}
-      <div className="relative">
+      <div className="w-full sm:w-auto relative">
         <select
-          className="px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-white appearance-none focus:ring-2 focus:ring-green-300 hover:bg-green-700"
+          className="w-full px-3 sm:px-4 py-2 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs sm:text-sm appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
           value={mode}
           onChange={(e) => setMode(e.target.value)}
         >
-          <option
-            className="bg-green-500 text-white hover:bg-green-700"
-            value="Known"
-          >
-            Known
+          <option className="bg-indigo-700 text-white" value="Known">
+            📚 Known
           </option>
-          <option
-            className="bg-green-500 text-white hover:bg-green-700"
-            value="Unknown"
-          >
-            Unknown
+          <option className="bg-indigo-700 text-white" value="Unknown">
+            ❓ Unknown
           </option>
-          <option
-            className="bg-green-500 text-white hover:bg-green-700"
-            value="Hard"
-          >
-            Hard
+          <option className="bg-indigo-700 text-white" value="Hard">
+            ⚡ Hard
           </option>
-          <option
-            className="bg-green-500 text-white hover:bg-green-700"
-            value="Custom"
-          >
-            Custom
+          <option className="bg-indigo-700 text-white" value="Custom">
+            ✏️ Custom
           </option>
         </select>
       </div>
 
       {/* Range Selection for active mode */}
       {mode && (
-        <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1">
-            <span className="text-white text-sm">from:</span>
-            <div className="relative">
+        <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+          <span className="w-full sm:w-auto flex items-center gap-1">
+            <span className="text-white text-xs sm:text-sm font-medium whitespace-nowrap">from:</span>
+            <div className="flex-1 sm:flex-none relative">
               <select
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-white text-center appearance-none focus:ring-2 focus:ring-green-300 hover:bg-green-700"
+                className="w-full px-3 sm:px-4 py-2 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs sm:text-sm text-center appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
                 value={ranges[mode].from}
                 onChange={(e) => {
                   const newFrom = Number(e.target.value);
@@ -155,13 +143,13 @@ export default function DifficultySelector() {
                 {(() => {
                   if (mode === "Custom") {
                     return Array.from({ length: WordList.length }, (_, i) => i + 1).map((num) => num <= ranges[mode].to && (
-                      <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>{num}</option>
+                      <option className="bg-indigo-600 text-white" key={num} value={num}>{num}</option>
                     ));
                   } else {
                     const ids = (userIds as any)[mode] || [];
                     if (ids.length === 0) return <option value={0}>0</option>;
                     return ids.map((id: number) => id <= ranges[mode].to && (
-                      <option className="bg-green-500 text-white hover:bg-green-700" key={id} value={id}>{id}</option>
+                      <option className="bg-indigo-600 text-white" key={id} value={id}>{id}</option>
                     ));
                   }
                 })()}
@@ -169,11 +157,11 @@ export default function DifficultySelector() {
             </div>
           </span>
 
-          <span className="flex items-center gap-1">
-            <span className="text-white text-sm">to:</span>
-            <div className="relative">
+          <span className="w-full sm:w-auto flex items-center gap-1">
+            <span className="text-white text-xs sm:text-sm font-medium whitespace-nowrap">to:</span>
+            <div className="flex-1 sm:flex-none relative">
               <select
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-white text-center appearance-none focus:ring-2 focus:ring-green-300 hover:bg-green-700"
+                className="w-full px-3 sm:px-4 py-2 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs sm:text-sm text-center appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
                 value={ranges[mode].to}
                 onChange={(e) => {
                   const newTo = Number(e.target.value);
@@ -183,13 +171,13 @@ export default function DifficultySelector() {
                 {(() => {
                   if (mode === "Custom") {
                     return Array.from({ length: WordList.length }, (_, i) => i + 1).map((num) => num >= ranges[mode].from && (
-                      <option className="bg-green-500 text-white hover:bg-green-700" key={num} value={num}>{num}</option>
+                      <option className="bg-indigo-600 text-white" key={num} value={num}>{num}</option>
                     ));
                   } else {
                     const ids = (userIds as any)[mode] || [];
                     if (ids.length === 0) return <option value={0}>0</option>;
                     return ids.map((id: number) => id >= ranges[mode].from && (
-                      <option className="bg-green-500 text-white hover:bg-green-700" key={id} value={id}>{id}</option>
+                      <option className="bg-indigo-600 text-white" key={id} value={id}>{id}</option>
                     ));
                   }
                 })()}
