@@ -196,32 +196,34 @@ export default function ProgressPage() {
 
     setLists(newLists);
 
-    // Update via API
+    // Update UI immediately, then update database asynchronously
     if (userId) {
-      try {
-        const newWordListsData = {
-          known: newLists.known.map(w => w.id),
-          hard: newLists.hard.map(w => w.id),
-          unknown: newLists.unknown.map(w => w.id),
-        };
-        
-        await fetch(`/api/user/${userId}/wordlists`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newWordListsData),
+      const newWordListsData = {
+        known: newLists.known.map(w => w.id),
+        hard: newLists.hard.map(w => w.id),
+        unknown: newLists.unknown.map(w => w.id),
+      };
+      
+      // Cache the updated wordlists immediately
+      localStorage.setItem(`wordlists_${userId}`, JSON.stringify(newWordListsData));
+      console.log('[ProgressPage] Cached updated wordlists');
+      
+      // Update database asynchronously (fire and forget)
+      fetch(`/api/user/${userId}/wordlists`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newWordListsData),
+      })
+        .then(() => {
+          console.log('[ProgressPage] ✅ Wordlists synced to database');
+          // Emit cache refresh event
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cacheRefreshed', { detail: { count: newWordListsData.known.length } }));
+          }
+        })
+        .catch((error) => {
+          console.error("[ProgressPage] Failed to update wordlists:", error);
         });
-        
-        // Cache the updated wordlists
-        localStorage.setItem(
-          `wordlists_${userId}`,
-          JSON.stringify(newWordListsData)
-        );
-        console.log('[ProgressPage] Cached updated wordlists');
-      } catch (error) {
-        console.error("Failed to update wordlists:", error);
-        // Revert on error
-        setLists(lists);
-      }
     }
   };
 

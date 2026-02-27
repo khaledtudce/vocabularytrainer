@@ -138,18 +138,33 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
       };
       console.log("[Fill-in-blank] Saving to API:", payload);
       
-      const saveResponse = await fetch(`/api/user/${userId}/wordlists`, {
+      // Update database asynchronously (fire and forget)
+      fetch(`/api/user/${userId}/wordlists`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      });
-      
-      if (!saveResponse.ok) {
-        const errorText = await saveResponse.text();
-        console.error("[Fill-in-blank] Failed to save wordlists:", saveResponse.status, errorText);
-        return;
-      }
-      console.log("[Fill-in-blank] ✅ Results saved successfully");
+      })
+        .then(async (saveResponse) => {
+          if (saveResponse.ok) {
+            // Cache the updated wordlists
+            localStorage.setItem(
+              `wordlists_${userId}`,
+              JSON.stringify(payload)
+            );
+            console.log("[Fill-in-blank] ✅ Results saved and cached");
+            
+            // Emit cache refresh event to notify other components
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('cacheRefreshed', { detail: { count: payload.known.length } }));
+            }
+          } else {
+            const errorText = await saveResponse.text();
+            console.error("[Fill-in-blank] Failed to save wordlists:", saveResponse.status, errorText);
+          }
+        })
+        .catch((error) => {
+          console.error("[Fill-in-blank] Error saving exam results:", error);
+        });
     } catch (error) {
       console.error("[Fill-in-blank] Error saving exam results:", error);
     }
@@ -192,8 +207,17 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
       const userId = localStorage.getItem("userId");
       if (!userId) return;
 
-      const response = await fetch(`/api/user/${userId}/wordlists`);
-      const currentLists = await response.json();
+      // Get current wordlists (from cache or API)
+      const cachedLists = localStorage.getItem(`wordlists_${userId}`);
+      let currentLists;
+      
+      if (cachedLists) {
+        currentLists = JSON.parse(cachedLists);
+        console.log("[Fill-in-blank] Using cached wordlists forsingle answer save");
+      } else {
+        const response = await fetch(`/api/user/${userId}/wordlists`);
+        currentLists = await response.json();
+      }
 
       const known = new Set(currentLists.known || []);
       const hard = new Set(currentLists.hard || []);
@@ -213,17 +237,33 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
         unknown.delete(wordId);
       }
 
-      await fetch(`/api/user/${userId}/wordlists`, {
+      const payload = {
+        known: (Array.from(known) as number[]).sort((a, b) => a - b),
+        unknown: (Array.from(unknown) as number[]).sort((a, b) => a - b),
+        hard: (Array.from(hard) as number[]).sort((a, b) => a - b),
+      };
+
+      // Update database asynchronously (fire and forget)
+      fetch(`/api/user/${userId}/wordlists`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          known: (Array.from(known) as number[]).sort((a, b) => a - b),
-          unknown: (Array.from(unknown) as number[]).sort((a, b) => a - b),
-          hard: (Array.from(hard) as number[]).sort((a, b) => a - b),
-        }),
-      });
+        body: JSON.stringify(payload),
+      })
+        .then(() => {
+          // Cache the updated wordlists
+          localStorage.setItem(`wordlists_${userId}`, JSON.stringify(payload));
+          console.log("[Fill-in-blank] ✅ Single answer saved and cached");
+          
+          // Emit cache refresh event
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cacheRefreshed', { detail: { count: payload.known.length } }));
+          }
+        })
+        .catch((error) => {
+          console.error("[Fill-in-blank] Error saving answer:", error);
+        });
     } catch (error) {
-      console.error("Error saving submitted answer:", error);
+      console.error("[Fill-in-blank] Error preparing answer save:", error);
     }
   };
 

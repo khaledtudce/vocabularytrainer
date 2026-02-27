@@ -196,18 +196,25 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
       };
       console.log("[MCQ Exam] Saving to API with counts:", {known: payload.known.length, hard: payload.hard.length, unknown: payload.unknown.length});
       
-      const saveResponse = await fetch(`/api/user/${userId}/wordlists`, {
+      // Update database asynchronously (fire and forget)
+      fetch(`/api/user/${userId}/wordlists`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      });
-      
-      if (!saveResponse.ok) {
-        const errorText = await saveResponse.text();
-        console.error("[MCQ Exam] Failed to save wordlists:", saveResponse.status, errorText);
-        return;
-      }
-      console.log("[MCQ Exam] ✅ Results saved successfully");
+      })
+        .then(() => {
+          // Cache the updated wordlists
+          localStorage.setItem(`wordlists_${userId}`, JSON.stringify(payload));
+          console.log("[MCQ Exam] ✅ Results saved and cached");
+          
+          // Emit cache refresh event to notify other components
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cacheRefreshed', { detail: { count: payload.known.length } }));
+          }
+        })
+        .catch((error) => {
+          console.error("[MCQ Exam] Failed to save wordlists:", error);
+        });
     } catch (error) {
       console.error("[MCQ Exam] Error saving exam results:", error);
     }

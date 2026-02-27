@@ -21,17 +21,58 @@ export default function VocabularyPage() {
   // Load ALL vocabulary on component mount
   useEffect(() => {
     const loadVocabulary = async () => {
+      const userId = localStorage.getItem('userId');
+      
+      // Try to load from cache first for instant display
+      const cachedVocab = localStorage.getItem('allVocabulary');
+      if (cachedVocab) {
+        try {
+          const vocab = JSON.parse(cachedVocab);
+          setAllVocabulary(vocab);
+          console.log('[Vocabulary] Loaded from cache');
+        } catch (e) {
+          console.error('[Vocabulary] Error parsing cached vocabulary:', e);
+        }
+      }
+
+      // Fetch fresh vocabulary in background
       try {
         const res = await fetch('/api/vocabulary');
         if (res.ok) {
           const vocab = await res.json();
           setAllVocabulary(vocab);
+          
+          // Cache the vocabulary
+          localStorage.setItem('allVocabulary', JSON.stringify(vocab));
+          console.log('[Vocabulary] Cached vocabulary from API');
         }
       } catch (err) {
         console.error("Error fetching vocabulary:", err);
       }
     };
+    
     loadVocabulary();
+    
+    // Listen for logout to clear cache
+    const handleLogout = () => {
+      localStorage.removeItem('allVocabulary');
+      console.log('[Vocabulary] Cleared cache on logout');
+    };
+
+    window.addEventListener("userLoggedOut", handleLogout);
+    
+    // Listen for cache refresh when words are added
+    const handleCacheRefresh = () => {
+      console.log('[Vocabulary] Cache refreshed, reloading vocabulary');
+      loadVocabulary();
+    };
+    
+    window.addEventListener("cacheRefreshed", handleCacheRefresh);
+    
+    return () => {
+      window.removeEventListener("userLoggedOut", handleLogout);
+      window.removeEventListener("cacheRefreshed", handleCacheRefresh);
+    };
   }, []);
 
   const filteredItems = useMemo(() => {

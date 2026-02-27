@@ -29,7 +29,32 @@ export default function UserDetailsPage() {
       return;
     }
 
-    // Fetch user details from users.json via API
+    // Try to load from cache first for instant display
+    const cachedUserDetails = localStorage.getItem(`userDetails_${storedUserId}`);
+    const cachedVocabStats = localStorage.getItem(`vocabStats_${storedUserId}`);
+    
+    if (cachedUserDetails) {
+      try {
+        const userData = JSON.parse(cachedUserDetails);
+        setUserName(userData.userName);
+        setEmail(userData.email);
+        setJoinDate(userData.joinDate);
+        console.log('[UserDetails] Loaded from cache');
+      } catch (e) {
+        console.error('[UserDetails] Error parsing cached user details:', e);
+      }
+    }
+
+    if (cachedVocabStats) {
+      try {
+        const stats = JSON.parse(cachedVocabStats);
+        setVocabStats(stats);
+      } catch (e) {
+        console.error('[UserDetails] Error parsing cached vocab stats:', e);
+      }
+    }
+
+    // Fetch fresh data in background
     const fetchUserDetails = async () => {
       try {
         const response = await fetch(`/api/user/${storedUserId}`);
@@ -37,11 +62,19 @@ export default function UserDetailsPage() {
           const userData = await response.json();
           setUserName(userData.userName);
           setEmail(userData.email);
-          setJoinDate(new Date(userData.createdAt).toLocaleDateString('en-US', {
+          const joinDateStr = new Date(userData.createdAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
-          }));
+          });
+          setJoinDate(joinDateStr);
+          
+          // Cache the data
+          localStorage.setItem(
+            `userDetails_${storedUserId}`,
+            JSON.stringify({ userName: userData.userName, email: userData.email, joinDate: joinDateStr })
+          );
+          console.log('[UserDetails] Cached user details from API');
         }
       } catch (error) {
         console.error('Error fetching user details:', error);
@@ -56,7 +89,12 @@ export default function UserDetailsPage() {
           const known = (vocabData.known || []).length;
           const hard = (vocabData.hard || []).length;
           const unknown = Math.max(WordList.length - known - hard, 0);
-          setVocabStats({ known, hard, unknown });
+          const stats = { known, hard, unknown };
+          setVocabStats(stats);
+          
+          // Cache the stats
+          localStorage.setItem(`vocabStats_${storedUserId}`, JSON.stringify(stats));
+          console.log('[UserDetails] Cached vocab stats from API');
         }
       } catch (error) {
         console.error('Error fetching vocabulary stats:', error);
@@ -65,7 +103,30 @@ export default function UserDetailsPage() {
       }
     };
 
+    // Fetch fresh data in background
     fetchUserDetails();
+    
+    // Listen for logout to clear cache
+    const handleLogout = () => {
+      localStorage.removeItem(`userDetails_${storedUserId}`);
+      localStorage.removeItem(`vocabStats_${storedUserId}`);
+      console.log('[UserDetails] Cleared cache on logout');
+    };
+
+    window.addEventListener("userLoggedOut", handleLogout);
+    
+    // Listen for cache refresh when words are added
+    const handleCacheRefresh = () => {
+      console.log('[UserDetails] Cache refreshed, reloading stats');
+      fetchUserDetails();
+    };
+    
+    window.addEventListener("cacheRefreshed", handleCacheRefresh);
+    
+    return () => {
+      window.removeEventListener("userLoggedOut", handleLogout);
+      window.removeEventListener("cacheRefreshed", handleCacheRefresh);
+    };
   }, [isClient, router]);
 
   if (!isClient || loading) {
