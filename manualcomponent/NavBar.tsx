@@ -10,7 +10,16 @@ import { WordList } from "@/data/wordlists";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [progress, setProgress] = useState<number | undefined>(undefined);
+  const [userName, setUserName] = useState<string | undefined>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    // Get userName from localStorage
+    const storedUserName = localStorage.getItem("userName");
+    setUserName(storedUserName || undefined);
+  }, []);
 
   useEffect(() => {
     const fetchProgress = async () => {
@@ -79,7 +88,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-3 lg:gap-6">
-            <NavLinks closeMenu={closeMenu} progress={progress} />
+            <NavLinks closeMenu={closeMenu} progress={progress} userName={userName} />
             <div className="w-px h-6 bg-white bg-opacity-20" />
             <QuestionSelection />
           </div>
@@ -117,7 +126,7 @@ export default function Navbar() {
         >
           <div className="bg-gradient-to-b from-indigo-700 via-purple-700 to-purple-800 backdrop-blur-lg rounded-lg border border-white border-opacity-30 overflow-hidden shadow-xl">
             <div className="flex flex-col gap-1 p-2 sm:p-3">
-              <NavLinks closeMenu={closeMenu} mobile={true} progress={progress} />
+              <NavLinks closeMenu={closeMenu} mobile={true} progress={progress} userName={userName} />
               <div className="border-t border-white border-opacity-20 my-2 pt-2">
                 <QuestionSelection />
               </div>
@@ -129,7 +138,7 @@ export default function Navbar() {
   );
 }
 
-function NavLinks({ closeMenu, mobile = false, progress }: { closeMenu: () => void; mobile?: boolean; progress?: number }) {
+function NavLinks({ closeMenu, mobile = false, progress, userName }: { closeMenu: () => void; mobile?: boolean; progress?: number; userName?: string }) {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const router = useRouter();
 
@@ -195,7 +204,7 @@ function NavLinks({ closeMenu, mobile = false, progress }: { closeMenu: () => vo
           onClick={() => toggleDropdown("user")}
           className="w-full text-left px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-white bg-indigo-600 bg-opacity-40 rounded-lg hover:bg-opacity-60 transition-all flex justify-between items-center"
         >
-          <span>👤 User</span>
+          <span>👤 {userName || "User"}</span>
           <span className="text-xs">{dropdownOpen === "user" ? "−" : "+"}</span>
         </button>
         {dropdownOpen === "user" && <UserMenu mobile={true} closeMenu={closeMenu} handleLogout={handleLogout} />}
@@ -251,7 +260,7 @@ function NavLinks({ closeMenu, mobile = false, progress }: { closeMenu: () => vo
         onMouseLeave={() => setDropdownOpen(null)}
       >
         <button className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
-          👤 User
+          👤 {userName || "User"}
         </button>
         {dropdownOpen === "user" && <UserMenu handleLogout={handleLogout} />}
       </li>
