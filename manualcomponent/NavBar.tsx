@@ -163,6 +163,22 @@ function NavLinks({ closeMenu, mobile = false, progress, userName }: { closeMenu
     setDropdownOpen(dropdownOpen === menu ? null : menu);
   };
 
+  // Close dropdown when clicking outside (for desktop click-based dropdowns)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Close if clicking outside the nav component on desktop
+      if (!mobile && !target.closest('.nav-dropdown-container')) {
+        setDropdownOpen(null);
+      }
+    };
+
+    if (dropdownOpen && !mobile) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [dropdownOpen, mobile]);
+
   if (mobile) {
     return (
       <div className="flex flex-col gap-2 w-full">
@@ -213,7 +229,8 @@ function NavLinks({ closeMenu, mobile = false, progress, userName }: { closeMenu
   }
 
   return (
-    <ul className="flex items-center gap-1 lg:gap-2">
+    <div className="nav-dropdown-container">
+      <ul className="flex items-center gap-1 lg:gap-2">
       <li>
         <Link
           href="/learning"
@@ -223,23 +240,19 @@ function NavLinks({ closeMenu, mobile = false, progress, userName }: { closeMenu
         </Link>
       </li>
 
-      <li
-        className="relative"
-        onMouseEnter={() => setDropdownOpen("practising")}
-        onMouseLeave={() => setDropdownOpen(null)}
-      >
-        <button className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
+      <li className="relative">
+        <button 
+          onClick={() => setDropdownOpen(dropdownOpen === "practising" ? null : "practising")}
+          className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
           🎯 Practising
         </button>
         {dropdownOpen === "practising" && <PractiseMenu />}
       </li>
 
-      <li
-        className="relative"
-        onMouseEnter={() => setDropdownOpen("test")}
-        onMouseLeave={() => setDropdownOpen(null)}
-      >
-        <button className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
+      <li className="relative">
+        <button 
+          onClick={() => setDropdownOpen(dropdownOpen === "test" ? null : "test")}
+          className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
           ✅ Test
         </button>
         {dropdownOpen === "test" && <TestMenu />}
@@ -254,17 +267,16 @@ function NavLinks({ closeMenu, mobile = false, progress, userName }: { closeMenu
         </Link>
       </li>
 
-      <li
-        className="relative"
-        onMouseEnter={() => setDropdownOpen("user")}
-        onMouseLeave={() => setDropdownOpen(null)}
-      >
-        <button className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
+      <li className="relative">
+        <button 
+          onClick={() => setDropdownOpen(dropdownOpen === "user" ? null : "user")}
+          className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
           👤 {userName || "User"}
         </button>
         {dropdownOpen === "user" && <UserMenu handleLogout={handleLogout} />}
       </li>
     </ul>
+    </div>
   );
 }
 
