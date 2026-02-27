@@ -10,6 +10,7 @@ import { WordList } from "@/data/wordlists";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [progress, setProgress] = useState<number | undefined>(undefined);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProgress = async () => {
@@ -63,22 +64,36 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Progress Indicator - Hidden on very small screens */}
+            {/* Progress Button - Hidden on very small screens */}
             {progress !== undefined && (
-              <div className="hidden sm:flex items-center gap-2 bg-indigo-600 bg-opacity-50 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-white border-opacity-30 hover:bg-opacity-70 transition-all">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center bg-white rounded-full text-xs sm:text-sm font-bold text-purple-600">
-                  {Math.round(progress * 10) / 10}
-                </div>
-                <div className="hidden sm:block text-xs sm:text-sm text-white font-semibold">
-                  % complete
-                </div>
+              <div className="hidden sm:block relative" 
+                onMouseEnter={() => setDropdownOpen("progress")}
+                onMouseLeave={() => setDropdownOpen(null)}>
+                <button className="flex items-center gap-2 bg-indigo-600 bg-opacity-50 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-white border-opacity-30 hover:bg-opacity-70 transition-all text-xs sm:text-sm">
+                  <div className="w-5 h-5 sm:w-7 sm:h-7 flex items-center justify-center bg-white rounded-full text-xs font-bold text-purple-600">
+                    {Math.round(progress * 10) / 10}
+                  </div>
+                  <span className="hidden sm:inline text-white font-semibold">
+                    % complete
+                  </span>
+                </button>
+                {dropdownOpen === "progress" && (
+                  <div className="absolute top-full mt-1 right-0 bg-gradient-to-br from-indigo-700 to-purple-800 rounded-lg shadow-lg p-2 min-w-max z-10">
+                    <Link
+                      href="/user-details/progress"
+                      className="block px-4 py-2 text-sm text-white bg-indigo-600 bg-opacity-50 hover:bg-opacity-80 rounded-lg transition-all font-medium"
+                    >
+                      📊 View Progress Details
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-3 lg:gap-6">
-            <NavLinks closeMenu={closeMenu} />
+            <NavLinks closeMenu={closeMenu} progress={progress} />
             <div className="w-px h-6 bg-white bg-opacity-20" />
             <QuestionSelection />
           </div>
@@ -116,7 +131,7 @@ export default function Navbar() {
         >
           <div className="bg-gradient-to-b from-indigo-700 via-purple-700 to-purple-800 backdrop-blur-lg rounded-lg border border-white border-opacity-30 overflow-hidden shadow-xl">
             <div className="flex flex-col gap-1 p-2 sm:p-3">
-              <NavLinks closeMenu={closeMenu} mobile={true} />
+              <NavLinks closeMenu={closeMenu} mobile={true} progress={progress} />
               <div className="border-t border-white border-opacity-20 my-2 pt-2">
                 <QuestionSelection />
               </div>
@@ -128,7 +143,7 @@ export default function Navbar() {
   );
 }
 
-function NavLinks({ closeMenu, mobile = false }: { closeMenu: () => void; mobile?: boolean }) {
+function NavLinks({ closeMenu, mobile = false, progress }: { closeMenu: () => void; mobile?: boolean; progress?: number }) {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const router = useRouter();
 
@@ -190,6 +205,29 @@ function NavLinks({ closeMenu, mobile = false }: { closeMenu: () => void; mobile
           📖 Wordlists
         </Link>
 
+        {progress !== undefined && (
+          <>
+            <button
+              onClick={() => toggleDropdown("progress")}
+              className="w-full text-left px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-white bg-indigo-600 bg-opacity-40 rounded-lg hover:bg-opacity-60 transition-all flex justify-between items-center"
+            >
+              <span>📊 {Math.round(progress * 10) / 10}% Progress</span>
+              <span className="text-xs">{dropdownOpen === "progress" ? "−" : "+"}</span>
+            </button>
+            {dropdownOpen === "progress" && (
+              <div className="ml-4 mt-1 bg-indigo-600 bg-opacity-30 rounded-lg p-2">
+                <Link
+                  href="/user-details/progress"
+                  onClick={closeMenu}
+                  className="block px-3 py-2 text-xs sm:text-sm text-white bg-indigo-600 bg-opacity-30 hover:bg-opacity-60 rounded-lg transition-all"
+                >
+                  📈 View Progress Details
+                </Link>
+              </div>
+            )}
+          </>
+        )}
+
         <button
           onClick={() => toggleDropdown("user")}
           className="w-full text-left px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-white bg-indigo-600 bg-opacity-40 rounded-lg hover:bg-opacity-60 transition-all flex justify-between items-center"
@@ -243,6 +281,28 @@ function NavLinks({ closeMenu, mobile = false }: { closeMenu: () => void; mobile
           📖 Wordlists
         </Link>
       </li>
+
+      {progress !== undefined && (
+        <li
+          className="relative"
+          onMouseEnter={() => setDropdownOpen("progress")}
+          onMouseLeave={() => setDropdownOpen(null)}
+        >
+          <button className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
+            📊 {Math.round(progress * 10) / 10}%
+          </button>
+          {dropdownOpen === "progress" && (
+            <div className="absolute top-full mt-1 right-0 bg-gradient-to-br from-indigo-700 to-purple-800 rounded-lg shadow-lg p-2 min-w-max z-10">
+              <Link
+                href="/user-details/progress"
+                className="block px-4 py-2 text-sm text-white bg-indigo-600 bg-opacity-50 hover:bg-opacity-80 rounded-lg transition-all font-medium"
+              >
+                📈 View Progress Details
+              </Link>
+            </div>
+          )}
+        </li>
+      )}
 
       <li
         className="relative"

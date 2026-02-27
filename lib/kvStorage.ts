@@ -13,11 +13,21 @@ export interface UserWordlists {
 let redisClient: any = null;
 let connectionPromise: Promise<any> | null = null;
 
+// In-memory store for development mode
+const inMemoryStore: { [key: string]: any } = {};
+let useInMemory = false;
+
 // Initialize Redis client (connection pooling)
 async function getRedisClient(): Promise<any> {
-  // If connection is in progress, wait for it
+  // If connection is already in progress, wait for it
   if (connectionPromise) {
-    return connectionPromise;
+    try {
+      return await connectionPromise;
+    } catch {
+      // If promise rejected, fall back to in-memory
+      useInMemory = true;
+      return createMockRedisClient();
+    }
   }
   
   // If we have a working client, use it
@@ -28,11 +38,13 @@ async function getRedisClient(): Promise<any> {
 
   const url = process.env.REDIS_URL;
   if (!url) {
-    throw new Error('Missing REDIS_URL in environment variables');
+    console.warn('[Dev] No REDIS_URL configured - using in-memory mode');
+    useInMemory = true;
+    return createMockRedisClient();
   }
 
   try {
-    console.log('[Redis] Creating new connection...');
+    console.log('[Redis] Attempting connection (timeout: 3s)...');
     
     // Create connection promise to prevent race conditions
     connectionPromise = (async () => {
@@ -40,33 +52,62 @@ async function getRedisClient(): Promise<any> {
         url,
         socket: {
           reconnectStrategy: (retries: number) => Math.min(retries * 50, 500),
-          connectTimeout: 10000,
+          connectTimeout: 3000, // 3 seconds - fail fast for development
         },
       } as any);
       
+      let isConnected = false;
+      
       client.on('error', (err: any) => {
-        console.error('[Redis] Client error:', err);
+        console.error('[Redis] Connection error:', err.message);
         redisClient = null;
+        if (!isConnected) {
+          // Never connected - will be handled in main try/catch
+          throw err;
+        }
       });
       
       client.on('connect', () => {
-        console.log('[Redis] Connected');
+        console.log('[Redis] ✅ Connected');
+        isConnected = true;
       });
       
       await client.connect();
-      console.log('[Redis] ✅ Connected successfully');
+      isConnected = true;
       redisClient = client;
       connectionPromise = null;
       return client;
     })();
     
     return await connectionPromise;
-  } catch (error) {
-    console.error('[Redis] Connection error:', error);
+  } catch (error: any) {
+    console.warn('[Dev] Redis unavailable:', error.message, '- switching to in-memory mode');
     connectionPromise = null;
     redisClient = null;
-    throw error;
+    useInMemory = true;
+    return createMockRedisClient();
   }
+}
+
+// Mock Redis client for development (in-memory storage)
+function createMockRedisClient() {
+  return {
+    isOpen: true,
+    get: async (key: string) => {
+      const value = inMemoryStore[key];
+      // Don't stringify - just return the value as-is since we're storing strings
+      return value !== undefined ? value : null;
+    },
+    set: async (key: string, value: string) => {
+      inMemoryStore[key] = value;
+      return 'OK';
+    },
+    del: async (key: string) => {
+      const existed = key in inMemoryStore;
+      delete inMemoryStore[key];
+      return existed ? 1 : 0;
+    },
+  };
 }
 
 /**
@@ -74,6 +115,11 @@ async function getRedisClient(): Promise<any> {
  */
 export async function initializeVocabulary() {
   try {
+    // Skip for in-memory mode, it's handled in getVocabulary
+    if (useInMemory) {
+      return;
+    }
+    
     const client = await getRedisClient();
     const existing = await client.get(VOCABULARY_KEY);
     
@@ -96,6 +142,16 @@ export async function initializeVocabulary() {
  */
 export async function getVocabulary() {
   try {
+    // For in-memory mode, return directly from memory
+    if (useInMemory) {
+      if (!inMemoryStore[VOCABULARY_KEY]) {
+        console.log('[Dev] Initializing vocabulary in memory...');
+        inMemoryStore[VOCABULARY_KEY] = WordList;
+      }
+      return inMemoryStore[VOCABULARY_KEY];
+    }
+    
+    // For Redis mode
     await initializeVocabulary();
     const client = await getRedisClient();
     const data = await client.get(VOCABULARY_KEY);
@@ -147,8 +203,13 @@ export async function getUserWordlists(userId: string): Promise<UserWordlists> {
     const data = await client.get(key);
     
     if (!data) {
-      console.log('[Redis] No wordlists found for user, returning empty');
+      console.log('[Storage] No wordlists found for user, returning empty');
       return { known: [], hard: [], unknown: [] };
+    }
+    
+    // Handle in-memory mode where data might already be parsed
+    if (useInMemory && typeof data !== 'string') {
+      return data;
     }
     
     const parsed = typeof data === 'string' ? JSON.parse(data) : data;
@@ -158,7 +219,7 @@ export async function getUserWordlists(userId: string): Promise<UserWordlists> {
       unknown: parsed.unknown || [],
     };
   } catch (error) {
-    console.error('[Redis] Error getting user wordlists:', error);
+    console.error('[Storage] Error getting user wordlists:', error);
     return { known: [], hard: [], unknown: [] };
   }
 }
@@ -242,9 +303,29 @@ export async function getUser(userId: string) {
     const client = await getRedisClient();
     const key = `user:account:${userId}`;
     const data = await client.get(key);
-    return data ? (typeof data === 'string' ? JSON.parse(data) : data) : null;
+    
+    if (!data) {
+      return null;
+    }
+    
+    if (useInMemory && typeof data !== 'string') {
+      // In-memory mode with already-parsed data
+      return data;
+    }
+    
+    // Parse if it's a JSON string
+    if (typeof data === 'string') {
+      try {
+        return JSON.parse(data);
+      } catch (parseErr) {
+        console.error('[Storage] Failed to parse user data:', { data, error: parseErr });
+        return null;
+      }
+    }
+    
+    return data;
   } catch (error) {
-    console.error('[Redis] Error getting user:', error);
+    console.error('[Storage] Error getting user:', error);
     return null;
   }
 }
@@ -258,9 +339,9 @@ export async function getUserByEmail(email: string) {
     const key = `user:email:${email}`;
     const userId = await client.get(key);
     if (!userId) return null;
-    return getUser(userId);
+    return getUser(userId as string);
   } catch (error) {
-    console.error('[Redis] Error getting user by email:', error);
+    console.error('[Storage] Error getting user by email:', error);
     return null;
   }
 }
