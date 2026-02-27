@@ -103,11 +103,11 @@ export default function DifficultySelector() {
   }, []);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 p-2">
+    <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-2">
       {/* Difficulty Selection */}
-      <div className="w-full sm:w-auto relative">
+      <div className="relative">
         <select
-          className="w-full px-3 sm:px-4 py-2 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs sm:text-sm appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
+          className="px-2.5 sm:px-3 py-1.5 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs sm:text-sm appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
           value={mode}
           onChange={(e) => setMode(e.target.value)}
         >
@@ -128,12 +128,12 @@ export default function DifficultySelector() {
 
       {/* Range Selection for active mode */}
       {mode && (
-        <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-          <span className="w-full sm:w-auto flex items-center gap-1">
-            <span className="text-white text-xs sm:text-sm font-medium whitespace-nowrap">from:</span>
-            <div className="flex-1 sm:flex-none relative">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <span className="flex items-center gap-0.5">
+            <span className="text-purple-600 text-xs sm:text-sm font-medium whitespace-nowrap">from:</span>
+            <div className="relative">
               <select
-                className="w-full px-3 sm:px-4 py-2 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs sm:text-sm text-center appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
+                className="px-1.5 sm:px-2 py-1.5 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
                 value={ranges[mode].from}
                 onChange={(e) => {
                   const newFrom = Number(e.target.value);
@@ -157,11 +157,11 @@ export default function DifficultySelector() {
             </div>
           </span>
 
-          <span className="w-full sm:w-auto flex items-center gap-1">
-            <span className="text-white text-xs sm:text-sm font-medium whitespace-nowrap">to:</span>
-            <div className="flex-1 sm:flex-none relative">
+          <span className="flex items-center gap-0.5">
+            <span className="text-purple-600 text-xs sm:text-sm font-medium whitespace-nowrap">to:</span>
+            <div className="relative">
               <select
-                className="w-full px-3 sm:px-4 py-2 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs sm:text-sm text-center appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
+                className="px-1.5 sm:px-2 py-1.5 border-2 border-indigo-400 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-xs appearance-none focus:ring-2 focus:ring-white focus:ring-opacity-50 hover:border-white hover:border-opacity-50 transition-all font-medium shadow-lg"
                 value={ranges[mode].to}
                 onChange={(e) => {
                   const newTo = Number(e.target.value);

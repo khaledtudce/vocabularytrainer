@@ -9,7 +9,7 @@ interface AddWordModalProps {
 }
 
 export default function AddWordModal({ onClose, onAddWord }: AddWordModalProps) {
-  const { words } = useActiveWords();
+  const { words, refreshCache } = useActiveWords();
 
   const [formData, setFormData] = useState({
     word: '',
@@ -57,6 +57,12 @@ export default function AddWordModal({ onClose, onAddWord }: AddWordModalProps) 
       if (response.ok) {
         const newWord = await response.json();
         onAddWord(newWord);
+        
+        // Refresh cache with new word
+        console.log('[AddWordModal] Word added successfully, refreshing cache...');
+        await refreshCache();
+        console.log('[AddWordModal] Cache refreshed with new word');
+        
         setFormData({
           word: '',
           bangla: '',

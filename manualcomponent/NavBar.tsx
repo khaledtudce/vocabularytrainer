@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import QuestionSelection from "./QuestionSelection";
 import { Menu, X } from "lucide-react";
 import { WordList } from "@/data/wordlists";
 
@@ -26,19 +25,25 @@ export default function Navbar() {
       if (typeof window === "undefined") return;
       
       const userId = localStorage.getItem("userId");
+      console.log('[NavBar] fetchProgress userId:', userId);
       if (!userId) {
+        console.log('[NavBar] No userId in localStorage');
         setProgress(undefined);
         return;
       }
 
       try {
         const response = await fetch(`/api/user/${userId}/wordlists`);
+        console.log('[NavBar] wordlists response status:', response.status);
         const data = await response.json();
+        console.log('[NavBar] wordlists data:', data);
         const knownCount = (data.known || []).length;
         const progressPercent = (knownCount / WordList.length) * 100;
+        console.log('[NavBar] Progress calculated:', progressPercent, 'known:', knownCount, 'total:', WordList.length);
         setProgress(progressPercent);
       } catch (error) {
-        console.error("Failed to fetch progress:", error);
+        console.error("[NavBar] Failed to fetch progress:", error);
+        setProgress(undefined);
       }
     };
 
@@ -89,8 +94,6 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-3 lg:gap-6">
             <NavLinks closeMenu={closeMenu} progress={progress} userName={userName} />
-            <div className="w-px h-6 bg-white bg-opacity-20" />
-            <QuestionSelection />
           </div>
 
           {/* Mobile Progress Link */}
@@ -127,9 +130,6 @@ export default function Navbar() {
           <div className="bg-gradient-to-b from-indigo-700 via-purple-700 to-purple-800 backdrop-blur-lg rounded-lg border border-white border-opacity-30 overflow-hidden shadow-xl">
             <div className="flex flex-col gap-1 p-2 sm:p-3">
               <NavLinks closeMenu={closeMenu} mobile={true} progress={progress} userName={userName} />
-              <div className="border-t border-white border-opacity-20 my-2 pt-2">
-                <QuestionSelection />
-              </div>
             </div>
           </div>
         </div>

@@ -148,7 +148,9 @@ export async function getVocabulary() {
         console.log('[Dev] Initializing vocabulary in memory...');
         inMemoryStore[VOCABULARY_KEY] = WordList;
       }
-      return inMemoryStore[VOCABULARY_KEY];
+      const vocab = inMemoryStore[VOCABULARY_KEY];
+      console.log('[kvStorage] getVocabulary in-memory, type:', typeof vocab, 'is array:', Array.isArray(vocab));
+      return vocab;
     }
     
     // For Redis mode
@@ -156,15 +158,21 @@ export async function getVocabulary() {
     const client = await getRedisClient();
     const data = await client.get(VOCABULARY_KEY);
     
+    console.log('[kvStorage] Redis get returned type:', typeof data);
+    
     if (!data) {
       console.warn('[Redis] No vocabulary found after init');
       return WordList;
     }
     
-    return typeof data === 'string' ? JSON.parse(data) : data;
+    // Parse if it's a string
+    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+    console.log('[kvStorage] getVocabulary returning type:', typeof parsed, 'is array:', Array.isArray(parsed));
+    return parsed;
   } catch (error) {
     console.error('[Redis] Error getting vocabulary:', error);
     // Fallback to local wordlist.js
+    console.log('[kvStorage] Falling back to WordList, type:', typeof WordList, 'is array:', Array.isArray(WordList));
     return WordList;
   }
 }
