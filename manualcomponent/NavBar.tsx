@@ -152,6 +152,11 @@ function NavLinks({ closeMenu, mobile = false, progress, userName }: { closeMenu
       localStorage.removeItem('userName');
       document.cookie = 'userId=; path=/; max-age=0';
       
+      // Emit logout event to notify other components
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("userLoggedOut"));
+      }
+      
       closeMenu();
       router.push('/login');
     } catch (error) {

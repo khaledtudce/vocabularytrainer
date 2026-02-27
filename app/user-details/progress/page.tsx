@@ -55,6 +55,40 @@ export default function ProgressPage() {
   const [stats, setStats] = useState({ learnedToday: 0, learnedThisWeek: 0, learnedThisMonth: 0 });
   const [loading, setLoading] = useState(true);
 
+  // Load user data from cache or fetch from API
+  const loadUserData = async (uid: string, fromCache = false) => {
+    try {
+      let data = null;
+
+      // Try to load from localStorage cache first (unless explicitly from cache)
+      if (!fromCache) {
+        const cached = localStorage.getItem(`userData_${uid}`);
+        if (cached) {
+          data = JSON.parse(cached);
+          console.log('[ProgressPage] Loaded user data from cache');
+          setUserData(data);
+          setStats(calculateStats(data));
+        }
+      }
+
+      // If no cache, or if we need fresh data, fetch from API
+      if (!data) {
+        console.log('[ProgressPage] Fetching user data from API');
+        const res = await fetch(`/api/user/${uid}/data`);
+        if (res.ok) {
+          data = await res.json();
+          // Cache it for next time
+          localStorage.setItem(`userData_${uid}`, JSON.stringify(data));
+          console.log('[ProgressPage] Cached user data to localStorage');
+          setUserData(data);
+          setStats(calculateStats(data));
+        }
+      }
+    } catch (err) {
+      console.error('[ProgressPage] Error loading user data:', err);
+    }
+  };
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const uid = localStorage.getItem("userId");
@@ -64,7 +98,23 @@ export default function ProgressPage() {
       return;
     }
 
-    // Fetch wordlists
+    // Fetch wordlists (try cache first)
+    const cachedWordlists = localStorage.getItem(`wordlists_${uid}`);
+    if (cachedWordlists) {
+      try {
+        const data = JSON.parse(cachedWordlists);
+        setLists({
+          known: mapIdsToWords(data.known || []),
+          unknown: mapIdsToWords(data.unknown || []),
+          hard: mapIdsToWords(data.hard || []),
+        });
+        console.log('[ProgressPage] Loaded wordlists from cache');
+      } catch (e) {
+        console.error('[ProgressPage] Error parsing cached wordlists:', e);
+      }
+    }
+
+    // Fetch fresh wordlists from API
     fetch(`/api/user/${uid}/wordlists`)
       .then((r) => r.json())
       .then((data) => {
@@ -73,19 +123,55 @@ export default function ProgressPage() {
           unknown: mapIdsToWords(data.unknown || []),
           hard: mapIdsToWords(data.hard || []),
         });
+        // Cache the fresh data
+        localStorage.setItem(
+          `wordlists_${uid}`,
+          JSON.stringify({
+            known: data.known || [],
+            unknown: data.unknown || [],
+            hard: data.hard || [],
+          })
+        );
+        console.log('[ProgressPage] Cached wordlists from API');
       })
       .catch(() => {});
 
-    // Fetch user data for progress tracking
-    fetch(`/api/user/${uid}/data`)
-      .then((r) => r.json())
-      .then((data) => {
-        setUserData(data);
-        setStats(calculateStats(data));
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    // Load user data (from cache first, or from API)
+    loadUserData(uid).finally(() => setLoading(false));
   }, []);
+
+  // Listen for cache refresh and logout events
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // When cache is refreshed (e.g., new word added), reload user data
+    const handleCacheRefresh = () => {
+      if (userId) {
+        console.log('[ProgressPage] Cache refreshed, reloading user data');
+        loadUserData(userId, true); // Force fetch from API
+      }
+    };
+
+    // Clear cache on logout
+    const handleLogout = () => {
+      if (userId) {
+        localStorage.removeItem(`userData_${userId}`);
+        localStorage.removeItem(`wordlists_${userId}`);
+        localStorage.removeItem('wordSource');
+        localStorage.removeItem('wordCache.timestamp');
+        localStorage.removeItem('wordCache.count');
+        console.log('[ProgressPage] Cleared all caches on logout');
+      }
+    };
+
+    window.addEventListener("cacheRefreshed", handleCacheRefresh);
+    window.addEventListener("userLoggedOut", handleLogout);
+
+    return () => {
+      window.removeEventListener("cacheRefreshed", handleCacheRefresh);
+      window.removeEventListener("userLoggedOut", handleLogout);
+    };
+  }, [userId]);
 
   // Calculate remaining/unknown words (all words not in known or hard)
   const unknownWords = WordList.filter(
@@ -113,15 +199,24 @@ export default function ProgressPage() {
     // Update via API
     if (userId) {
       try {
+        const newWordListsData = {
+          known: newLists.known.map(w => w.id),
+          hard: newLists.hard.map(w => w.id),
+          unknown: newLists.unknown.map(w => w.id),
+        };
+        
         await fetch(`/api/user/${userId}/wordlists`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            known: newLists.known.map(w => w.id),
-            hard: newLists.hard.map(w => w.id),
-            unknown: newLists.unknown.map(w => w.id),
-          }),
+          body: JSON.stringify(newWordListsData),
         });
+        
+        // Cache the updated wordlists
+        localStorage.setItem(
+          `wordlists_${userId}`,
+          JSON.stringify(newWordListsData)
+        );
+        console.log('[ProgressPage] Cached updated wordlists');
       } catch (error) {
         console.error("Failed to update wordlists:", error);
         // Revert on error
