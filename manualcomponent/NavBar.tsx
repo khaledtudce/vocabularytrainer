@@ -64,30 +64,16 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Progress Button - Hidden on very small screens */}
+            {/* Progress Link - Direct to Progress Page */}
             {progress !== undefined && (
-              <div className="hidden sm:block relative" 
-                onMouseEnter={() => setDropdownOpen("progress")}
-                onMouseLeave={() => setDropdownOpen(null)}>
-                <button className="flex items-center gap-2 bg-indigo-600 bg-opacity-50 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-white border-opacity-30 hover:bg-opacity-70 transition-all text-xs sm:text-sm">
-                  <div className="w-5 h-5 sm:w-7 sm:h-7 flex items-center justify-center bg-white rounded-full text-xs font-bold text-purple-600">
-                    {Math.round(progress * 10) / 10}
-                  </div>
-                  <span className="hidden sm:inline text-white font-semibold">
-                    % complete
-                  </span>
-                </button>
-                {dropdownOpen === "progress" && (
-                  <div className="absolute top-full mt-1 right-0 bg-gradient-to-br from-indigo-700 to-purple-800 rounded-lg shadow-lg p-2 min-w-max z-10">
-                    <Link
-                      href="/user-details/progress"
-                      className="block px-4 py-2 text-sm text-white bg-indigo-600 bg-opacity-50 hover:bg-opacity-80 rounded-lg transition-all font-medium"
-                    >
-                      📊 View Progress Details
-                    </Link>
-                  </div>
-                )}
-              </div>
+              <Link href="/user-details/progress" className="hidden sm:flex items-center gap-2 bg-indigo-600 bg-opacity-50 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-white border-opacity-30 hover:bg-opacity-70 hover:bg-green-500 hover:bg-opacity-30 transition-all text-xs sm:text-sm">
+                <div className="w-5 h-5 sm:w-7 sm:h-7 flex items-center justify-center bg-white rounded-full text-xs font-bold text-purple-600">
+                  {Math.round(progress * 10) / 10}
+                </div>
+                <span className="hidden sm:inline text-white font-semibold">
+                  % complete
+                </span>
+              </Link>
             )}
           </div>
 
@@ -98,13 +84,13 @@ export default function Navbar() {
             <QuestionSelection />
           </div>
 
-          {/* Mobile Progress - Compact Version */}
+          {/* Mobile Progress Link */}
           {progress !== undefined && (
-            <div className="md:hidden">
-              <div className="text-2xs sm:text-xs font-bold text-white bg-indigo-600 bg-opacity-50 rounded-full px-2 sm:px-3 py-1 border border-white border-opacity-20">
+            <Link href="/user-details/progress" className="md:hidden">
+              <div className="text-2xs sm:text-xs font-bold text-white bg-indigo-600 bg-opacity-50 rounded-full px-2 sm:px-3 py-1 border border-white border-opacity-20 hover:bg-opacity-70 transition-all">
                 {Math.round(progress * 10) / 10}% complete
               </div>
-            </div>
+            </Link>
           )}
 
           {/* Mobile Menu Toggle */}
@@ -205,29 +191,6 @@ function NavLinks({ closeMenu, mobile = false, progress }: { closeMenu: () => vo
           📖 Wordlists
         </Link>
 
-        {progress !== undefined && (
-          <>
-            <button
-              onClick={() => toggleDropdown("progress")}
-              className="w-full text-left px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-white bg-indigo-600 bg-opacity-40 rounded-lg hover:bg-opacity-60 transition-all flex justify-between items-center"
-            >
-              <span>📊 {Math.round(progress * 10) / 10}% Progress</span>
-              <span className="text-xs">{dropdownOpen === "progress" ? "−" : "+"}</span>
-            </button>
-            {dropdownOpen === "progress" && (
-              <div className="ml-4 mt-1 bg-indigo-600 bg-opacity-30 rounded-lg p-2">
-                <Link
-                  href="/user-details/progress"
-                  onClick={closeMenu}
-                  className="block px-3 py-2 text-xs sm:text-sm text-white bg-indigo-600 bg-opacity-30 hover:bg-opacity-60 rounded-lg transition-all"
-                >
-                  📈 View Progress Details
-                </Link>
-              </div>
-            )}
-          </>
-        )}
-
         <button
           onClick={() => toggleDropdown("user")}
           className="w-full text-left px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-white bg-indigo-600 bg-opacity-40 rounded-lg hover:bg-opacity-60 transition-all flex justify-between items-center"
@@ -281,28 +244,6 @@ function NavLinks({ closeMenu, mobile = false, progress }: { closeMenu: () => vo
           📖 Wordlists
         </Link>
       </li>
-
-      {progress !== undefined && (
-        <li
-          className="relative"
-          onMouseEnter={() => setDropdownOpen("progress")}
-          onMouseLeave={() => setDropdownOpen(null)}
-        >
-          <button className="px-3 lg:px-4 py-2 text-xs sm:text-sm lg:text-base text-white font-medium rounded-lg transition-all hover:bg-green-500 hover:bg-opacity-30 focus:ring-2 focus:ring-white focus:ring-opacity-50">
-            📊 {Math.round(progress * 10) / 10}%
-          </button>
-          {dropdownOpen === "progress" && (
-            <div className="absolute top-full mt-1 right-0 bg-gradient-to-br from-indigo-700 to-purple-800 rounded-lg shadow-lg p-2 min-w-max z-10">
-              <Link
-                href="/user-details/progress"
-                className="block px-4 py-2 text-sm text-white bg-indigo-600 bg-opacity-50 hover:bg-opacity-80 rounded-lg transition-all font-medium"
-              >
-                📈 View Progress Details
-              </Link>
-            </div>
-          )}
-        </li>
-      )}
 
       <li
         className="relative"
@@ -552,13 +493,6 @@ function UserMenu({ mobile = false, closeMenu, handleLogout }: { mobile?: boolea
         >
           👤 User Details
         </Link>
-        <Link
-          href="/user-details/progress"
-          onClick={closeMenu}
-          className="block px-3 py-2 text-xs sm:text-sm text-white bg-indigo-600 bg-opacity-30 hover:bg-opacity-60 rounded-lg transition-all"
-        >
-          📊 Progress
-        </Link>
         <button
           onClick={() => {
             closeMenu?.();
@@ -580,14 +514,6 @@ function UserMenu({ mobile = false, closeMenu, handleLogout }: { mobile?: boolea
           className="block px-4 py-3 text-sm text-white hover:bg-indigo-600 hover:bg-opacity-60 transition-all"
         >
           👤 User Details
-        </Link>
-      </li>
-      <li className="border-b border-white border-opacity-10">
-        <Link
-          href="/user-details/progress"
-          className="block px-4 py-3 text-sm text-white hover:bg-indigo-600 hover:bg-opacity-60 transition-all"
-        >
-          📊 Progress
         </Link>
       </li>
       <li>
