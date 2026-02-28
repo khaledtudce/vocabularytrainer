@@ -12,6 +12,7 @@ export default function useActiveWords() {
   const [isLoading, setIsLoading] = useState(true);
   const cacheRef = useRef<{ [key: string]: any[] }>({});
   const previousDataRef = useRef<any>(null);
+  const previousModeRef = useRef<Mode | null>(null);
 
   // Load all words from API and cache them
   const loadAndCacheAllWords = async () => {
@@ -110,8 +111,8 @@ export default function useActiveWords() {
       
       const data = await res.json();
       
-      // Only update if data has changed
-      if (previousDataRef.current) {
+      // Only skip update if we're fetching the same mode AND IDs haven't changed
+      if (previousModeRef.current === m && previousDataRef.current) {
         const key = m.toLowerCase();
         const prevIds = previousDataRef.current[key] || [];
         const currIds = data?.[key] ?? [];
@@ -121,6 +122,7 @@ export default function useActiveWords() {
         }
       }
       
+      previousModeRef.current = m;
       previousDataRef.current = data;
       const key = m.toLowerCase();
       const ids: number[] = data?.[key] ?? [];
@@ -129,7 +131,38 @@ export default function useActiveWords() {
       const filteredIds = ids.filter(id => id >= r.from && id <= r.to);
       console.log('[useActiveWords] ✅ Loaded', filteredIds.length, m, 'words in range');
       
-      const wordObjects = filteredIds.map(id => ({ id }));
+      // Fetch actual word objects from cache using the ID range
+      const minId = filteredIds.length > 0 ? Math.min(...filteredIds) : r.from;
+      const maxId = filteredIds.length > 0 ? Math.max(...filteredIds) : r.to;
+      
+      let wordObjects: any[] = [];
+      
+      // First try to get from IndexedDB cache
+      const cachedWords = await getCachedWords(minId, maxId);
+      
+      if (cachedWords && cachedWords.length > 0) {
+        // Filter cached words to only include those in our filtered ID list
+        const idSet = new Set(filteredIds);
+        wordObjects = cachedWords.filter(w => idSet.has(w.id));
+      }
+      
+      // If cache miss or not enough data, fetch from API
+      if (wordObjects.length === 0 && filteredIds.length > 0) {
+        console.log('[useActiveWords] Cache miss for', m, 'mode, fetching from API...');
+        try {
+          const apiRes = await fetch(`/api/vocabulary?from=${minId}&to=${maxId}`);
+          if (apiRes.ok) {
+            const allVocab = await apiRes.json();
+            const idSet = new Set(filteredIds);
+            wordObjects = allVocab.filter((w: any) => idSet.has(w.id));
+          }
+        } catch (err) {
+          console.error('[useActiveWords] Error fetching vocabulary from API:', err);
+        }
+      }
+      
+      console.log('[useActiveWords] ✅ Retrieved', wordObjects.length, 'full word objects for', m, 'mode');
+      
       cacheRef.current[cacheKey] = wordObjects;
       setWords(wordObjects);
     } catch (err) {

@@ -29,6 +29,8 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
   const [examFinished, setExamFinished] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showHintOptions, setShowHintOptions] = useState(false);
+  const [hintOptions, setHintOptions] = useState<string[]>([]);
 
   useEffect(() => {
     setIndex(0);
@@ -49,8 +51,12 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
   const nextWord = async () => {
     if (reason === "exam") await saveCurrentQuestionInfo();
     setInput("");
+    setCompleted(false);
+    setWrongInput("");
     setSubmitted(false);
     setIsCorrect(false);
+    setShowHintOptions(false);
+    setHintOptions([]);
     setIndex((p) => {
       if (p >= (words.length - 1 || 0)) {
         setExamFinished(true);
@@ -67,7 +73,7 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
   }, [examFinished]);
 
   const correctAnswerCount = examFillInBlankQuestionInfos.filter(
-    (item) => item.userAnswer === item.correctAnswer
+    (item) => item.userAnswer.toLowerCase() === item.correctAnswer.toLowerCase()
   ).length;
 
   const saveExamResultsToWordlists = async () => {
@@ -97,7 +103,7 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
       // Process exam results
       examFillInBlankQuestionInfos.forEach((item) => {
         console.log(`[Fill-in-blank] Word #${item.id}: user='${item.userAnswer}' correct='${item.correctAnswer}'`);
-        if (item.userAnswer === item.correctAnswer) {
+        if (item.userAnswer.toLowerCase() === item.correctAnswer.toLowerCase()) {
           // Correct answer: add to known
           known.add(item.id);
           hard.delete(item.id);
@@ -174,10 +180,10 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
     const value = e.target.value;
     if (value.length > germanWord.length) return;
     const correctPart = germanWord.slice(0, value.length);
-    if (value === correctPart) {
+    if (value.toLowerCase() === correctPart.toLowerCase()) {
       setInput(value);
       setWrongInput("");
-      if (value === germanWord) setCompleted(true);
+      if (value.toLowerCase() === germanWord.toLowerCase()) setCompleted(true);
     } else {
       setWrongInput(value);
       setTimeout(() => {
@@ -188,6 +194,36 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
   };
 
   const revealHint = () => {
+    if (input.length < germanWord.length) setInput((prev) => prev + germanWord[input.length]);
+  };
+
+  const generateHintOptions = () => {
+    if (input.length >= germanWord.length) return;
+    
+    const correctLetter = germanWord[input.length];
+    const allLetters = "abcdefghijklmnopqrstuvwxyzäöüß";
+    const wrongLetters = allLetters.split("").filter((l) => l.toLowerCase() !== correctLetter.toLowerCase());
+    
+    // Get 2 random wrong letters
+    const randomWrongLetters = [];
+    for (let i = 0; i < 2 && wrongLetters.length > 0; i++) {
+      const index = Math.floor(Math.random() * wrongLetters.length);
+      randomWrongLetters.push(wrongLetters.splice(index, 1)[0]);
+    }
+    
+    // Combine with correct letter and shuffle
+    const options = [correctLetter, ...randomWrongLetters].sort(() => 0.5 - Math.random());
+    setHintOptions(options);
+    setShowHintOptions(true);
+  };
+
+  const selectHintLetter = (letter: string) => {
+    setInput((prev) => prev + letter);
+    setShowHintOptions(false);
+    setHintOptions([]);
+  };
+
+  const addOneLetter = () => {
     if (input.length < germanWord.length) setInput((prev) => prev + germanWord[input.length]);
   };
 
@@ -271,6 +307,8 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
     setInput("");
     setCompleted(false);
     setWrongInput("");
+    setShowHintOptions(false);
+    setHintOptions([]);
   };
 
   return (
@@ -326,12 +364,12 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
                     className={`w-6 h-6 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center border-2 text-sm sm:text-base md:text-lg font-bold rounded-md transition-colors ${
                       input[i] === undefined
                         ? "border-yellow-400 bg-yellow-50"
-                        : input[i] === letter
+                        : input[i].toLowerCase() === letter.toLowerCase()
                         ? "border-green-500 bg-green-100 text-green-700"
                         : "border-gray-300 bg-gray-100"
                     }`}
                   >
-                    {input[i] || "_"}
+                    {input[i] ? letter : "_"}
                   </div>
                 ))}
               </div>
@@ -372,10 +410,21 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
             <Button
-              onClick={revealHint}
+              onClick={generateHintOptions}
               className="w-full sm:flex-1 bg-blue-600 text-white hover:bg-blue-700 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all active:scale-95"
             >
-              💡 Hint
+              💡 Hint (Choose)
+            </Button>
+            <Button
+              onClick={addOneLetter}
+              disabled={completed}
+              className={`w-full sm:flex-1 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all ${
+                completed
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-orange-600 text-white hover:bg-orange-700 active:scale-95"
+              }`}
+            >
+              ➕ Add Letter
             </Button>
             <Button
               onClick={resetGame}
@@ -384,6 +433,24 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
               🔄 Reset
             </Button>
           </div>
+
+          {/* Hint Options */}
+          {showHintOptions && hintOptions.length > 0 && (
+            <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 space-y-2">
+              <p className="text-sm font-semibold text-blue-700 text-center">Choose the correct letter:</p>
+              <div className="flex gap-2 justify-center">
+                {hintOptions.map((letter, idx) => (
+                  <Button
+                    key={idx}
+                    onClick={() => selectHintLetter(letter)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-lg transition-all active:scale-95"
+                  >
+                    {letter.toUpperCase()}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Navigation */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
@@ -475,6 +542,18 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
             {!submitted ? (
               <>
                 <Button
+                  onClick={generateHintOptions}
+                  className="w-full sm:flex-1 bg-blue-600 text-white hover:bg-blue-700 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg"
+                >
+                  💡 Hint (Choose)
+                </Button>
+                <Button
+                  onClick={addOneLetter}
+                  className="w-full sm:flex-1 bg-orange-600 text-white hover:bg-orange-700 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg"
+                >
+                  ➕ Add Letter
+                </Button>
+                <Button
                   onClick={() => setInput("")}
                   className="w-full sm:flex-1 bg-red-600 text-white hover:bg-red-700 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg"
                 >
@@ -490,6 +569,24 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
               </>
             ) : null}
           </div>
+
+          {/* Hint Options */}
+          {!submitted && showHintOptions && hintOptions.length > 0 && (
+            <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 space-y-2">
+              <p className="text-sm font-semibold text-blue-700 text-center">Choose the correct letter:</p>
+              <div className="flex gap-2 justify-center">
+                {hintOptions.map((letter, idx) => (
+                  <Button
+                    key={idx}
+                    onClick={() => selectHintLetter(letter)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-lg transition-all active:scale-95"
+                  >
+                    {letter.toUpperCase()}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Navigation */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
