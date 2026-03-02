@@ -102,7 +102,11 @@ const FlashCard = ({ page, direction }: PageType) => {
               {getCurrentWord()?.example && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6">
                   <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Example</p>
-                  <p className="text-xs sm:text-sm md:text-base text-gray-700 italic break-words">{getCurrentWord()?.example}</p>
+                  <p className="text-xs sm:text-sm md:text-base text-gray-700 italic break-words">
+                    {typeof getCurrentWord()?.example === 'string' 
+                      ? getCurrentWord().example.split("|")[0] 
+                      : getCurrentWord()?.example}
+                  </p>
                 </div>
               )}
 
