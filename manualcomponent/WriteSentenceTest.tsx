@@ -32,6 +32,7 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
   const [submitted, setSubmitted] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [changingWord, setChangingWord] = useState(false);
+  const [wordResults, setWordResults] = useState<Array<{id: number; isCorrect: boolean}>>([]);
 
   // Pick a random word - only runs on client side
   const getRandomWord = useCallback(() => {
@@ -66,6 +67,72 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
       return () => clearTimeout(timer);
     }
   }, [changingWord, currentWord]);
+
+  // Save word results to Known/Hard/Unknown lists
+  const saveWordResultsToWordlists = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        console.error("[WriteSentenceTest] No userId found");
+        return;
+      }
+
+      if (wordResults.length === 0) {
+        console.log("[WriteSentenceTest] No word results to save");
+        return;
+      }
+
+      // Get current wordlists
+      const response = await fetch(`/api/user/${userId}/wordlists`);
+      if (!response.ok) {
+        console.error("[WriteSentenceTest] Failed to fetch wordlists:", response.status);
+        return;
+      }
+      const currentLists = await response.json();
+      console.log("[WriteSentenceTest] Current wordlists fetched");
+
+      const known = new Set(currentLists.known || []);
+      const hard = new Set(currentLists.hard || []);
+      const unknown = new Set(currentLists.unknown || []);
+
+      // Process word results
+      wordResults.forEach((result) => {
+        console.log(`[WriteSentenceTest] Word #${result.id}: isCorrect=${result.isCorrect}`);
+        if (result.isCorrect) {
+          // Correct answer: add to known
+          known.add(result.id);
+          hard.delete(result.id);
+          unknown.delete(result.id);
+          console.log(`[WriteSentenceTest] ✅ #${result.id} moved to known`);
+        } else {
+          // Wrong/Invalid answer: add to hard
+          hard.add(result.id);
+          known.delete(result.id);
+          unknown.delete(result.id);
+          console.log(`[WriteSentenceTest] ❌ #${result.id} moved to hard`);
+        }
+      });
+
+      // Save updated lists (sorted in ascending order)
+      const payload = {
+        known: (Array.from(known) as number[]).sort((a, b) => a - b),
+        hard: (Array.from(hard) as number[]).sort((a, b) => a - b),
+        unknown: (Array.from(unknown) as number[]).sort((a, b) => a - b),
+      };
+      console.log("[WriteSentenceTest] Saving to API with counts:", {known: payload.known.length, hard: payload.hard.length, unknown: payload.unknown.length});
+      
+      // Update database asynchronously
+      fetch(`/api/user/${userId}/wordlists`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }).catch((err) => console.error("[WriteSentenceTest] Failed to save wordlists:", err));
+    } catch (err) {
+      console.error("[WriteSentenceTest] Error saving word results:", err);
+    }
+  };
 
   const validateSentence = async () => {
     if (!userSentence.trim()) {
@@ -109,6 +176,11 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
       console.log('[WriteSentenceTest] Validation result:', result);
       setValidationResult(result);
       setSubmitted(true);
+      
+      // Track word result: correct if both valid and word is properly used
+      const isCorrect = result.isValid && result.baseOnWord;
+      setWordResults((prev) => [...prev, { id: currentWord.id, isCorrect }]);
+      console.log("[WriteSentenceTest] Word result added:", { id: currentWord.id, isCorrect });
     } catch (err) {
       console.error('[WriteSentenceTest] Error:', err);
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -124,7 +196,13 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
     setError("");
   };
 
-  const changeWord = () => {
+  const changeWord = async () => {
+    // Save current word result before moving to next word
+    if (submitted && validationResult) {
+      await saveWordResultsToWordlists();
+      // Clear the results after saving
+      setWordResults([]);
+    }
     setChangingWord(true);
     getRandomWord();
   };

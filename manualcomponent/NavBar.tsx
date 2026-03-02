@@ -123,8 +123,8 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isOpen ? "max-h-96 mt-3" : "max-h-0"
+          className={`md:hidden overflow-y-auto transition-all duration-300 ease-in-out ${
+            isOpen ? "max-h-[calc(100vh-120px)] mt-3" : "max-h-0"
           }`}
         >
           <div className="bg-gradient-to-b from-indigo-700 via-purple-700 to-purple-800 backdrop-blur-lg rounded-lg border border-white border-opacity-30 overflow-hidden shadow-xl">
