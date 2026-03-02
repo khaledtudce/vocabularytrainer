@@ -289,9 +289,16 @@ const ExamMCQCard = ({ mcqdirection }: ExamMCQCardType) => {
               {/* Question */}
               <div className="text-center">
                 <p className="text-gray-500 text-xs sm:text-sm font-medium mb-3">Translate or choose:</p>
-                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-indigo-700 break-words leading-tight">
-                  {getQuestion()}
-                </p>
+                <div className="flex items-baseline justify-center gap-3 mb-2">
+                  <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-indigo-700 break-words leading-tight">
+                    {getQuestion()}
+                  </p>
+                  {(mcqdirection === "germanToBangla" || mcqdirection === "germanToEnglish") && currentWord?.wordType && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {currentWord.wordType}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Options Grid */}
