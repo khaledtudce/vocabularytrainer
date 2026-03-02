@@ -25,7 +25,7 @@ export default function VocabularyPage() {
   const [addedWords, setAddedWords] = useState<any[]>([]);
   const [pageWindow, setPageWindow] = useState(0); // Track which set of 10 pages to display
   const [selectedWordType, setSelectedWordType] = useState<string>(""); // Filter by word type
-
+  const [selectedGender, setSelectedGender] = useState<string>(""); // Filter by gender (only for Nomen)
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -114,9 +114,12 @@ export default function VocabularyPage() {
       // Check word type filter
       const matchesWordType = !selectedWordType || item.wordType === selectedWordType;
 
-      return matchesSearch && matchesWordType;
+      // Check gender filter (only applies when Nomen is selected)
+      const matchesGender = !selectedGender || selectedWordType !== "Nomen" || item.gender === selectedGender;
+
+      return matchesSearch && matchesWordType && matchesGender;
     });
-  }, [searchTerm, isClient, allVocabulary, addedWords, selectedWordType]);
+  }, [searchTerm, isClient, allVocabulary, addedWords, selectedWordType, selectedGender]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice(
@@ -187,6 +190,7 @@ export default function VocabularyPage() {
                 value={selectedWordType}
                 onChange={(e) => {
                   setSelectedWordType(e.target.value);
+                  setSelectedGender(""); // Reset gender filter when word type changes
                   setCurrentPage(1);
                 }}
                 className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -199,6 +203,56 @@ export default function VocabularyPage() {
                 ))}
               </select>
             </div>
+
+            {/* Filter by Gender (only shown when Nomen is selected) */}
+            {selectedWordType === "Nomen" && (
+              <div className="mt-4">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                  Filter by Gender
+                </label>
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  <button
+                    onClick={() => {
+                      setSelectedGender(selectedGender === "der" ? "" : "der");
+                      setCurrentPage(1);
+                    }}
+                    className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition ${
+                      selectedGender === "der"
+                        ? "bg-orange-100 text-orange-800 border border-orange-300"
+                        : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+                    }`}
+                  >
+                    Maskulin (der)
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedGender(selectedGender === "die" ? "" : "die");
+                      setCurrentPage(1);
+                    }}
+                    className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition ${
+                      selectedGender === "die"
+                        ? "bg-red-100 text-red-800 border border-red-300"
+                        : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+                    }`}
+                  >
+                    Feminin (die)
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedGender(selectedGender === "das" ? "" : "das");
+                      setCurrentPage(1);
+                    }}
+                    className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition ${
+                      selectedGender === "das"
+                        ? "bg-cyan-100 text-cyan-800 border border-cyan-300"
+                        : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+                    }`}
+                  >
+                    Neutrum (das)
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Results Count */}
             <div className="mt-4 text-xs sm:text-sm text-gray-600">
