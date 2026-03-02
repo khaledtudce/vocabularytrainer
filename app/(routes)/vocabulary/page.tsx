@@ -4,6 +4,17 @@ import { useState, useMemo, useEffect } from "react";
 import NavBar from "@/manualcomponent/NavBar";
 import AddWordModal from "@/manualcomponent/AddWordModal";
 
+const WORD_TYPES = [
+  "Nomen",
+  "Adjektiv",
+  "Verb",
+  "Adverb",
+  "Pronomen",
+  "Präposition",
+  "Konjunktion",
+  "Interjektion",
+];
+
 export default function VocabularyPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage] = useState(10);
@@ -13,6 +24,7 @@ export default function VocabularyPage() {
   const [allVocabulary, setAllVocabulary] = useState<any[]>([]);
   const [addedWords, setAddedWords] = useState<any[]>([]);
   const [pageWindow, setPageWindow] = useState(0); // Track which set of 10 pages to display
+  const [selectedWordType, setSelectedWordType] = useState<string>(""); // Filter by word type
 
   useEffect(() => {
     setIsClient(true);
@@ -28,10 +40,19 @@ export default function VocabularyPage() {
       if (cachedVocab) {
         try {
           const vocab = JSON.parse(cachedVocab);
-          setAllVocabulary(vocab);
-          console.log('[Vocabulary] Loaded from cache');
+          // Check if cached vocab has wordType field (new format)
+          const hasWordType = vocab.some((v: any) => v.hasOwnProperty('wordType'));
+          
+          if (hasWordType) {
+            setAllVocabulary(vocab);
+            console.log('[Vocabulary] Loaded from cache (has wordType)');
+          } else {
+            console.log('[Vocabulary] Cache outdated (no wordType), clearing and fetching fresh');
+            localStorage.removeItem('allVocabulary');
+          }
         } catch (e) {
           console.error('[Vocabulary] Error parsing cached vocabulary:', e);
+          localStorage.removeItem('allVocabulary');
         }
       }
 
@@ -82,14 +103,20 @@ export default function VocabularyPage() {
     return source.filter((item) => {
       const searchLower = searchTerm.toLowerCase();
 
-      return (
+      // Check search term match
+      const matchesSearch =
         (item.word || "").toLowerCase().includes(searchLower) ||
         (item.bangla || "").toLowerCase().includes(searchLower) ||
         (item.english || "").toLowerCase().includes(searchLower) ||
-        (item.synonym || "").toLowerCase().includes(searchLower)
-      );
+        (item.synonym || "").toLowerCase().includes(searchLower) ||
+        (item.wordType || "").toLowerCase().includes(searchLower);
+
+      // Check word type filter
+      const matchesWordType = !selectedWordType || item.wordType === selectedWordType;
+
+      return matchesSearch && matchesWordType;
     });
-  }, [searchTerm, isClient, allVocabulary, addedWords]);
+  }, [searchTerm, isClient, allVocabulary, addedWords, selectedWordType]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice(
@@ -141,7 +168,7 @@ export default function VocabularyPage() {
               </label>
               <input
                 type="text"
-                placeholder="Search by German, English, Bangla, or synonym..."
+                placeholder="Search by German, English, Bangla, synonym, or word type..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -149,6 +176,28 @@ export default function VocabularyPage() {
                 }}
                 className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
+            </div>
+
+            {/* Filter by Word Type */}
+            <div className="mt-4">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                Filter by Word Type
+              </label>
+              <select
+                value={selectedWordType}
+                onChange={(e) => {
+                  setSelectedWordType(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="">All Word Types</option>
+                {WORD_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Results Count */}
@@ -175,9 +224,16 @@ export default function VocabularyPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                     {/* Left Column */}
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-indigo-600 mb-2">
-                        {item.word}
-                      </h2>
+                      <div className="flex items-baseline gap-2 mb-2">
+                        <h2 className="text-xl sm:text-2xl font-bold text-indigo-600">
+                          {item.word}
+                        </h2>
+                        {item.wordType && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {item.wordType}
+                          </span>
+                        )}
+                      </div>
                       <div className="mb-3">
                         <p className="text-xs sm:text-sm text-gray-600 font-medium">English:</p>
                         <p className="text-base sm:text-lg text-gray-800">{item.english}</p>

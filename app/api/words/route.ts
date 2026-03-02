@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { word, bangla, english, synonym, example } = body;
+    const { word, bangla, english, synonym, example, wordType } = body;
 
     // Validate required fields
     if (!word || !bangla || !english) {
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
       english,
       synonym: synonym || '',
       example: example || '',
+      wordType: wordType || '',
       picture: '',
       hardlevel: '',
     };
