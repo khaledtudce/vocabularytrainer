@@ -345,6 +345,13 @@ function PractiseMenu({ mobile = false, closeMenu }: { mobile?: boolean; closeMe
         >
           ✓ MCQ: Meaning → German
         </Link>
+        <Link
+          href="/practising/write-sentence"
+          onClick={closeMenu}
+          className="block px-3 py-2 text-xs sm:text-sm text-white bg-indigo-600 bg-opacity-30 hover:bg-opacity-60 rounded-lg transition-all"
+        >
+          ✍️ Write Sentence
+        </Link>
       </div>
     );
   }
@@ -415,6 +422,14 @@ function PractiseMenu({ mobile = false, closeMenu }: { mobile?: boolean; closeMe
           ✓ MCQ: Meaning → German
         </Link>
       </li>
+      <li>
+        <Link
+          href="/practising/write-sentence"
+          className="block px-4 py-3 text-sm text-white hover:bg-indigo-600 hover:bg-opacity-60 transition-all"
+        >
+          ✍️ Write Sentence
+        </Link>
+      </li>
     </ul>
   );
 }
@@ -458,6 +473,13 @@ function TestMenu({ mobile = false, closeMenu }: { mobile?: boolean; closeMenu?:
         >
           ✏️ Fill in the blank
         </Link>
+        <Link
+          href="/test/write-sentence-challenge"
+          onClick={closeMenu}
+          className="block px-3 py-2 text-xs sm:text-sm text-white bg-indigo-600 bg-opacity-30 hover:bg-opacity-60 rounded-lg transition-all"
+        >
+          ✍️ Write Sentence Challenge
+        </Link>
       </div>
     );
   }
@@ -496,12 +518,20 @@ function TestMenu({ mobile = false, closeMenu }: { mobile?: boolean; closeMenu?:
           ✓ MCQ: Meaning → German
         </Link>
       </li>
-      <li>
+      <li className="border-b border-white border-opacity-10">
         <Link
           href="/exam/fill-in-the-blank"
           className="block px-4 py-3 text-sm text-white hover:bg-indigo-600 hover:bg-opacity-60 transition-all"
         >
           ✏️ Fill in the blank
+        </Link>
+      </li>
+      <li>
+        <Link
+          href="/test/write-sentence-challenge"
+          className="block px-4 py-3 text-sm text-white hover:bg-indigo-600 hover:bg-opacity-60 transition-all"
+        >
+          ✍️ Write Sentence Challenge
         </Link>
       </li>
     </ul>
