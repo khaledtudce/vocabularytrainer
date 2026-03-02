@@ -96,19 +96,17 @@ const FlashCard = ({ page, direction }: PageType) => {
                     <p className="text-base sm:text-lg md:text-lg text-gray-800 font-medium break-words">{getCurrentWord()?.synonym}</p>
                   </div>
                 )}
+                {getCurrentWord()?.example && (
+                  <div className="border-t border-gray-200 pt-3 sm:pt-4">
+                    <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Example</p>
+                    <p className="text-xs sm:text-sm md:text-base text-gray-700 italic break-words">
+                      {typeof getCurrentWord()?.example === 'string' 
+                        ? getCurrentWord().example.split("|")[0] 
+                        : getCurrentWord()?.example}
+                    </p>
+                  </div>
+                )}
               </div>
-
-              {/* Example */}
-              {getCurrentWord()?.example && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6">
-                  <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Example</p>
-                  <p className="text-xs sm:text-sm md:text-base text-gray-700 italic break-words">
-                    {typeof getCurrentWord()?.example === 'string' 
-                      ? getCurrentWord().example.split("|")[0] 
-                      : getCurrentWord()?.example}
-                  </p>
-                </div>
-              )}
 
               {/* Picture */}
               {getCurrentWord()?.picture && (
@@ -203,6 +201,16 @@ const FlashCard = ({ page, direction }: PageType) => {
                     <p className="text-xs font-semibold text-gray-600 uppercase mb-1">Synonym</p>
                     <p className="text-base sm:text-lg md:text-xl text-gray-800 break-words">{getCurrentWord()?.synonym}</p>
                   </div>
+                  {getCurrentWord()?.example && (
+                    <div className="border-t border-gray-300 pt-3 sm:pt-4">
+                      <p className="text-xs font-semibold text-gray-600 uppercase mb-1">Example</p>
+                      <p className="text-xs sm:text-sm md:text-base text-gray-700 italic break-words">
+                        {typeof getCurrentWord()?.example === 'string' 
+                          ? getCurrentWord().example.split("|")[0] 
+                          : getCurrentWord()?.example}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -273,6 +281,16 @@ const FlashCard = ({ page, direction }: PageType) => {
                     <p className="text-xs font-semibold text-gray-600 uppercase mb-1">Synonym</p>
                     <p className="text-base sm:text-lg md:text-xl text-gray-800 break-words">{getCurrentWord()?.synonym}</p>
                   </div>
+                  {getCurrentWord()?.example && (
+                    <div className="border-t border-gray-300 pt-3 sm:pt-4">
+                      <p className="text-xs font-semibold text-gray-600 uppercase mb-1">Example</p>
+                      <p className="text-xs sm:text-sm md:text-base text-gray-700 italic break-words">
+                        {typeof getCurrentWord()?.example === 'string' 
+                          ? getCurrentWord().example.split("|")[0] 
+                          : getCurrentWord()?.example}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center px-2">
