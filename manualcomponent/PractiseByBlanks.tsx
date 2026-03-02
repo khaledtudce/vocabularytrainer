@@ -352,10 +352,19 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
             <div className="p-4 sm:p-8 md:p-12 space-y-4 sm:space-y-6">
               {/* Word Type Badge */}
               {words[index]?.wordType && (
-                <div className="flex justify-center">
+                <div className="flex justify-center gap-2 flex-wrap">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     {words[index].wordType}
                   </span>
+                  {words[index]?.wordType === 'Nomen' && words[index]?.gender && (
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                      words[index].gender === 'der' ? 'bg-orange-100 text-orange-800' :
+                      words[index].gender === 'die' ? 'bg-red-100 text-red-800' :
+                      'bg-cyan-100 text-cyan-800'
+                    }`}>
+                      {words[index].gender}
+                    </span>
+                  )}
                 </div>
               )}
 

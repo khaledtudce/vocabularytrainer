@@ -134,14 +134,25 @@ const MCQCard = ({ mcqdirection }: MCQCardType) => {
               {/* Question */}
               <div className="text-center">
                 <p className="text-gray-500 text-xs sm:text-sm font-medium mb-3">Translate or choose:</p>
-                <div className="flex items-baseline justify-center gap-3 mb-2">
+                <div className="flex items-baseline justify-center gap-2 mb-2 flex-wrap">
                   <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-indigo-700 break-words leading-tight">
                     {getQuestion()}
                   </p>
                   {(mcqdirection === "germanToBangla" || mcqdirection === "germanToEnglish") && currentWord?.wordType && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {currentWord.wordType}
-                    </span>
+                    <div className="flex gap-2">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {currentWord.wordType}
+                      </span>
+                      {currentWord.wordType === 'Nomen' && currentWord.gender && (
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          currentWord.gender === 'der' ? 'bg-orange-100 text-orange-800' :
+                          currentWord.gender === 'die' ? 'bg-red-100 text-red-800' :
+                          'bg-cyan-100 text-cyan-800'
+                        }`}>
+                          {currentWord.gender}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

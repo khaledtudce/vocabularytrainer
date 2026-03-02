@@ -231,13 +231,24 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
             Word to Use
           </h2>
-          <div className="flex items-baseline gap-4 mb-3">
+          <div className="flex items-baseline gap-2 mb-3 flex-wrap">
             <p className="text-3xl md:text-4xl font-bold text-indigo-600">{currentWord.word}</p>
-            {currentWord.wordType && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {currentWord.wordType}
-              </span>
-            )}
+            <div className="flex gap-2">
+              {currentWord.wordType && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {currentWord.wordType}
+                </span>
+              )}
+              {currentWord.wordType === 'Nomen' && currentWord.gender && (
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  currentWord.gender === 'der' ? 'bg-orange-100 text-orange-800' :
+                  currentWord.gender === 'die' ? 'bg-red-100 text-red-800' :
+                  'bg-cyan-100 text-cyan-800'
+                }`}>
+                  {currentWord.gender}
+                </span>
+              )}
+            </div>
             {showMeaning && <p className="text-lg text-gray-600">({currentWord.english})</p>}
           </div>
         </div>

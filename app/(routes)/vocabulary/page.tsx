@@ -224,15 +224,26 @@ export default function VocabularyPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                     {/* Left Column */}
                     <div>
-                      <div className="flex items-baseline gap-2 mb-2">
+                      <div className="flex items-baseline gap-2 mb-2 flex-wrap">
                         <h2 className="text-xl sm:text-2xl font-bold text-indigo-600">
                           {item.word}
                         </h2>
-                        {item.wordType && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {item.wordType}
-                          </span>
-                        )}
+                        <div className="flex gap-2 flex-wrap">
+                          {item.wordType && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {item.wordType}
+                            </span>
+                          )}
+                          {item.wordType === 'Nomen' && item.gender && (
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              item.gender === 'der' ? 'bg-orange-100 text-orange-800' :
+                              item.gender === 'die' ? 'bg-red-100 text-red-800' :
+                              'bg-cyan-100 text-cyan-800'
+                            }`}>
+                              {item.gender}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="mb-3">
                         <p className="text-xs sm:text-sm text-gray-600 font-medium">English:</p>

@@ -75,15 +75,26 @@ const FlashCard = ({ page, direction }: PageType) => {
               {/* Word */}
               <div className="text-center">
                 <p className="text-gray-500 text-xs sm:text-sm font-medium mb-2">German Word</p>
-                <div className="flex items-baseline justify-center gap-3 mb-2">
+                <div className="flex items-baseline justify-center gap-2 mb-2 flex-wrap">
                   <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-indigo-700 break-words leading-tight">
                     {getCurrentWord()?.word}
                   </p>
-                  {getCurrentWord()?.wordType && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
-                      {getCurrentWord().wordType}
-                    </span>
-                  )}
+                  <div className="flex gap-2 flex-wrap justify-center">
+                    {getCurrentWord()?.wordType && (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
+                        {getCurrentWord().wordType}
+                      </span>
+                    )}
+                    {getCurrentWord()?.wordType === 'Nomen' && getCurrentWord()?.gender && (
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                        getCurrentWord().gender === 'der' ? 'bg-orange-100 text-orange-800' :
+                        getCurrentWord().gender === 'die' ? 'bg-red-100 text-red-800' :
+                        'bg-cyan-100 text-cyan-800'
+                      }`}>
+                        {getCurrentWord().gender}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
