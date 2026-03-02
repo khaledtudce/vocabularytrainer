@@ -16,6 +16,24 @@ const FlashCard = ({ page, direction }: PageType) => {
   const [index, setIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(true);
 
+  // Debug: Log words data
+  useEffect(() => {
+    if (words.length > 0) {
+      const firstWord = words[0];
+      console.log('[FlashCard] Words loaded:', words.length, 'words');
+      console.log('[FlashCard] First word:', firstWord);
+      console.log('[FlashCard] First word has gender?', Boolean(firstWord.gender));
+      
+      // Find a Nomen with gender for debugging
+      const nomenWithGender = words.find((w: any) => w.wordType === 'Nomen' && w.gender);
+      if (nomenWithGender) {
+        console.log('[FlashCard] Found Nomen with gender:', nomenWithGender);
+      } else {
+        console.log('[FlashCard] No Nomen with gender found in words list');
+      }
+    }
+  }, [words]);
+
   useEffect(() => {
     setIndex(0);
   }, [words]);

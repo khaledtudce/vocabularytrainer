@@ -1,7 +1,8 @@
 // IndexedDB-based caching for vocabulary words
 const DB_NAME = 'VocabularyTrainer';
 const STORE_NAME = 'words';
-const VERSION = 1;
+const VERSION = 2; // Increment version to invalidate old cache
+const CACHE_VERSION = 'v2-with-gender'; // User-facing cache version
 
 let db: IDBDatabase | null = null;
 
@@ -28,7 +29,7 @@ async function initDB(): Promise<IDBDatabase> {
 }
 
 export async function cacheAllWords(words: any[]): Promise<void> {
-  console.log('[wordCache] Caching', words.length, 'words to IndexedDB');
+  console.log('[wordCache] Caching', words.length, 'words to IndexedDB v' + CACHE_VERSION);
   const database = await initDB();
   
   return new Promise((resolve, reject) => {
@@ -46,12 +47,18 @@ export async function cacheAllWords(words: any[]): Promise<void> {
     transaction.onerror = () => reject(transaction.error);
     transaction.oncomplete = () => {
       console.log('[wordCache] ✅ Cached all words successfully');
-      // Store metadata about cache
+      // Store metadata about cache including version
       localStorage.setItem('wordCache.timestamp', Date.now().toString());
       localStorage.setItem('wordCache.count', words.length.toString());
+      localStorage.setItem('wordCache.version', CACHE_VERSION); // Store version
+      
+      // Verify gender field exists in cached data
+      const hasGender = words.some(w => w.wordType === 'Nomen' && w.gender);
+      localStorage.setItem('wordCache.hasGender', hasGender ? 'true' : 'false');
+      
       // Emit event to notify listeners that cache was updated
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('cacheRefreshed', { detail: { count: words.length } }));
+        window.dispatchEvent(new CustomEvent('cacheRefreshed', { detail: { count: words.length, hasGender } }));
       }
       resolve();
     };
@@ -131,6 +138,21 @@ export async function isCacheValid(): Promise<boolean> {
     console.log('[wordCache] Cache is invalid or empty');
     return false;
   }
-  console.log('[wordCache] Cache is valid, contains', metadata.count, 'words');
+  
+  // Check if cache version matches
+  const cachedVersion = localStorage.getItem('wordCache.version');
+  if (cachedVersion !== CACHE_VERSION) {
+    console.log(`[wordCache] Cache version mismatch: cached="${cachedVersion}", expected="${CACHE_VERSION}"`);
+    return false;
+  }
+  
+  // Check if gender field is in cached data
+  const hasGender = localStorage.getItem('wordCache.hasGender');
+  if (hasGender !== 'true') {
+    console.log('[wordCache] Cache does not contain gender field, invalidating');
+    return false;
+  }
+  
+  console.log('[wordCache] Cache is valid, contains', metadata.count, 'words with gender field');
   return true;
 }
