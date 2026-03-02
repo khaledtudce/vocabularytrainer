@@ -75,9 +75,16 @@ const FlashCard = ({ page, direction }: PageType) => {
               {/* Word */}
               <div className="text-center">
                 <p className="text-gray-500 text-xs sm:text-sm font-medium mb-2">German Word</p>
-                <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-indigo-700 break-words leading-tight">
-                  {getCurrentWord()?.word}
-                </p>
+                <div className="flex items-baseline justify-center gap-3 mb-2">
+                  <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-indigo-700 break-words leading-tight">
+                    {getCurrentWord()?.word}
+                  </p>
+                  {getCurrentWord()?.wordType && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
+                      {getCurrentWord().wordType}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Meanings */}

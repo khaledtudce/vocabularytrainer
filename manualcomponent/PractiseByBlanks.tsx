@@ -350,6 +350,15 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
             </div>
 
             <div className="p-4 sm:p-8 md:p-12 space-y-4 sm:space-y-6">
+              {/* Word Type Badge */}
+              {words[index]?.wordType && (
+                <div className="flex justify-center">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {words[index].wordType}
+                  </span>
+                </div>
+              )}
+
               {/* Definitions */}
               <div className="text-center">
                 <p className="text-sm sm:text-base font-semibold text-indigo-600 mb-2">{words[index]?.bangla}</p>
