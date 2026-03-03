@@ -4,13 +4,17 @@ import {
   initializeUserWordlists, 
   storeUser, 
   getUserByEmail, 
-  registerEmailMapping 
+  registerEmailMapping,
+  initializeUsers
 } from '@/lib/kvStorage';
 
 export async function POST(request: Request) {
   try {
     console.log('[Register] ✅ Request received');
     console.log('[Register] REDIS_URL:', process.env.REDIS_URL ? '✓ Set' : '✗ Missing');
+    
+    // Ensure users are initialized from users.json
+    await initializeUsers();
     
     const body = await request.json();
     const { userName, email, password } = body;

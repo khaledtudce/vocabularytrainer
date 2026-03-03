@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getVocabulary } from '@/lib/kvStorage';
+import { getVocabulary, initializeUsers } from '@/lib/kvStorage';
 
 export const revalidate = 0; // Disable caching
 
@@ -9,6 +9,9 @@ export async function GET() {
     
     // Try to connect to Redis by fetching vocabulary
     const vocab = await getVocabulary();
+    
+    // Initialize users on first health check
+    await initializeUsers();
     
     return NextResponse.json({
       status: 'healthy',

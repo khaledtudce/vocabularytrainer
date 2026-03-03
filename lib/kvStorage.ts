@@ -178,6 +178,75 @@ export async function getVocabulary() {
 }
 
 /**
+ * Initialize/seed users in storage if they don't exist
+ */
+export async function initializeUsers() {
+  try {
+    console.log('[Storage] Initializing users from data/users.json...');
+    
+    // Dynamically import users.json
+    let usersList: any[] = [];
+    
+    try {
+      const users = await import('@/data/users.json');
+      const imported = users.default || users;
+      
+      // Ensure it's an array
+      if (Array.isArray(imported)) {
+        usersList = imported;
+      } else if (imported && typeof imported === 'object') {
+        // If it's an object with a data property
+        usersList = imported.data || [];
+      }
+    } catch (importErr) {
+      console.warn('[Storage] Could not import users.json:', importErr);
+      return; // Non-fatal - users might not be available
+    }
+    
+    if (!Array.isArray(usersList) || usersList.length === 0) {
+      console.warn('[Storage] No users found in users.json');
+      return;
+    }
+    
+    console.log(`[Storage] Found ${usersList.length} users in users.json`);
+    
+    const client = await getRedisClient();
+    let loadedCount = 0;
+    
+    for (const user of usersList) {
+      if (!user || !user.id || !user.email) {
+        console.warn('[Storage] Skipping invalid user:', user);
+        continue;
+      }
+      
+      // Check if user already exists
+      const existingKey = `user:account:${user.id}`;
+      const existing = await client.get(existingKey);
+      
+      if (existing) {
+        console.log(`[Storage] User ${user.id} already loaded`);
+        continue;
+      }
+      
+      // Store user account data
+      await client.set(existingKey, JSON.stringify(user));
+      
+      // Create email-to-userId mapping
+      const emailKey = `user:email:${user.email}`;
+      await client.set(emailKey, user.id);
+      
+      loadedCount++;
+      console.log(`[Storage] ✓ Loaded user: ${user.email} (${user.id})`);
+    }
+    
+    console.log(`[Storage] ✅ User initialization complete: ${loadedCount} users loaded`);
+  } catch (error) {
+    console.error('[Storage] Error initializing users:', error);
+    // Non-fatal error - users might be registered later
+  }
+}
+
+/**
  * Add a new word to vocabulary
  */
 export async function addWordToVocabulary(wordData: any) {

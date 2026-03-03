@@ -32,7 +32,9 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
   const [submitted, setSubmitted] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [changingWord, setChangingWord] = useState(false);
-  const [wordResults, setWordResults] = useState<Array<{id: number; isCorrect: boolean}>>([]);
+  const [wordResults, setWordResults] = useState<{ id: number; isCorrect: boolean }[]>([]);
+  const [bengaliTranslation, setBengaliTranslation] = useState("");
+  const [translationLoading, setTranslationLoading] = useState(false);
 
   // Pick a random word - only runs on client side
   const getRandomWord = useCallback(() => {
@@ -43,6 +45,7 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
       setValidationResult(null);
       setSubmitted(false);
       setError("");
+      setBengaliTranslation("");
     }
   }, [words]);
 
@@ -181,6 +184,9 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
       const isCorrect = result.isValid && result.baseOnWord;
       setWordResults((prev) => [...prev, { id: currentWord.id, isCorrect }]);
       console.log("[WriteSentenceTest] Word result added:", { id: currentWord.id, isCorrect });
+
+      // Translate corrected sentence to Bengali
+      translateSentenceToBengali(result.correctedSentence);
     } catch (err) {
       console.error('[WriteSentenceTest] Error:', err);
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -189,11 +195,43 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
     }
   };
 
+  const translateSentenceToBengali = async (sentence: string) => {
+    try {
+      setTranslationLoading(true);
+      console.log('[WriteSentenceTest] Translating sentence to Bengali...');
+      
+      const response = await fetch("/api/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: sentence,
+          targetLanguage: "bn",
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('[WriteSentenceTest] Translation API error:', response.status);
+        return;
+      }
+
+      const data = await response.json();
+      setBengaliTranslation(data.translation || "");
+      console.log('[WriteSentenceTest] Translation successful');
+    } catch (err) {
+      console.error('[WriteSentenceTest] Translation error:', err);
+    } finally {
+      setTranslationLoading(false);
+    }
+  };
+
   const retryWithSameWord = () => {
     setUserSentence("");
     setValidationResult(null);
     setSubmitted(false);
     setError("");
+    setBengaliTranslation("");
   };
 
   const changeWord = async () => {
@@ -338,6 +376,25 @@ const WriteSentenceTest = ({ showMeaning = true }: WriteSentenceTestProps) => {
             }`}>
               {validationResult.correctedSentence}
             </p>
+          </div>
+
+          {/* Bengali Translation */}
+          <div suppressHydrationWarning className="rounded-lg shadow-md p-6 border-2 border-blue-200 bg-blue-50">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">🇧🇩 Bengali Translation</h3>
+            {translationLoading ? (
+              <p className="text-lg p-4 rounded-lg bg-white border-l-4 border-blue-500 text-gray-600">
+                <span className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></span>
+                Translating...
+              </p>
+            ) : bengaliTranslation ? (
+              <p className="text-lg p-4 rounded-lg bg-white border-l-4 border-blue-500 text-gray-800">
+                {bengaliTranslation}
+              </p>
+            ) : (
+              <p className="text-lg p-4 rounded-lg bg-white border-l-4 border-blue-500 text-gray-500">
+                Translation will appear here...
+              </p>
+            )}
           </div>
 
           {/* Grammar Errors */}

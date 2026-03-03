@@ -3,13 +3,17 @@ import {
   getUserByEmail, 
   getUserWordlists, 
   updateUserWordlists,
-  getVocabulary 
+  getVocabulary,
+  initializeUsers
 } from '@/lib/kvStorage';
 
 export async function POST(request: Request) {
   try {
     console.log('[Login] ✅ Request received');
     console.log('[Login] REDIS_URL:', process.env.REDIS_URL ? '✓ Set' : '✗ Missing');
+    
+    // Ensure users are initialized from users.json
+    await initializeUsers();
     
     const body = await request.json();
     const { email, password } = body;

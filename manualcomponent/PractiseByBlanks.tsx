@@ -414,7 +414,7 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
                   value={input}
                   onChange={handleInputChange}
                   disabled={completed}
-                  className={`w-32 sm:w-48 px-3 sm:px-4 py-2 sm:py-2.5 border-2 rounded-lg focus:outline-none focus:ring-2 transition-colors text-sm sm:text-base ${
+                  className={`w-full sm:w-96 max-w-2xl px-3 sm:px-4 py-2 sm:py-2.5 border-2 rounded-lg focus:outline-none focus:ring-2 transition-colors text-sm sm:text-base ${
                     wrongInput
                       ? "border-red-500 focus:ring-red-300"
                       : "border-indigo-300 focus:ring-indigo-300"
@@ -535,7 +535,7 @@ export default function PractiseByBlanks({ reason }: PractiseByBlanksType) {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={submitted}
-                  className="w-32 sm:w-48 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 text-sm sm:text-base"
+                  className="w-full sm:w-96 max-w-2xl px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 text-sm sm:text-base"
                   placeholder="Type here..."
                 />
               </div>
