@@ -12,6 +12,11 @@ export default function UserDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
   const [vocabStats, setVocabStats] = useState({ known: 0, hard: 0, unknown: 0 });
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editUserName, setEditUserName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [editError, setEditError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -129,6 +134,65 @@ export default function UserDetailsPage() {
     };
   }, [isClient, router]);
 
+  const handleEditClick = () => {
+    setEditUserName(userName);
+    setEditEmail(email);
+    setEditError('');
+    setIsEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setEditError('');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editUserName.trim() || !editEmail.trim()) {
+      setEditError('Username and email are required');
+      return;
+    }
+
+    if (!editEmail.includes('@')) {
+      setEditError('Please enter a valid email address');
+      return;
+    }
+
+    setIsSaving(true);
+    setEditError('');
+
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await fetch(`/api/user/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userName: editUserName.trim(),
+          email: editEmail.trim(),
+        }),
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUserName(updatedUser.userName);
+        setEmail(updatedUser.email);
+        localStorage.setItem('userName', updatedUser.userName);
+        localStorage.removeItem(`userDetails_${userId}`);
+        setIsEditMode(false);
+        console.log('[UserDetails] User updated successfully');
+      } else {
+        const error = await response.json();
+        setEditError(error.error || 'Failed to update user');
+      }
+    } catch (error) {
+      console.error('[UserDetails] Error updating user:', error);
+      setEditError('Error saving changes. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (!isClient || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -155,14 +219,22 @@ export default function UserDetailsPage() {
         {/* Profile Card */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 sm:mb-8">
           <div className="bg-gradient-to-r from-indigo-500 to-purple-500 px-4 sm:px-6 py-4 sm:py-6">
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-100 to-purple-100">
-                {userName.charAt(0).toUpperCase()}
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4 sm:gap-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-100 to-purple-100">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{userName}</h2>
+                  <p className="text-indigo-100 text-sm sm:text-base">{email}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{userName}</h2>
-                <p className="text-indigo-100 text-sm sm:text-base">{email}</p>
-              </div>
+              <button
+                onClick={handleEditClick}
+                className="bg-white hover:bg-indigo-50 text-indigo-600 px-3 sm:px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-colors"
+              >
+                ✏️ Edit
+              </button>
             </div>
           </div>
 
@@ -245,6 +317,75 @@ export default function UserDetailsPage() {
             Your learning progress is automatically tracked as you complete practice sessions and exams. Visit the Progress page to see detailed statistics and your vocabulary distribution.
           </p>
         </div>
+
+        {/* Edit Modal */}
+        {isEditMode && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-md">
+              {/* Modal Header */}
+              <div className="bg-gradient-to-r from-indigo-500 to-purple-500 px-4 sm:px-6 py-4">
+                <h3 className="text-lg sm:text-xl font-bold text-white">Edit Profile</h3>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-4 sm:p-6 space-y-4">
+                {editError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {editError}
+                  </div>
+                )}
+
+                {/* Username Field */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    value={editUserName}
+                    onChange={(e) => setEditUserName(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Enter your username"
+                    disabled={isSaving}
+                  />
+                </div>
+
+                {/* Email Field */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Enter your email address"
+                    disabled={isSaving}
+                  />
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex gap-3 px-4 sm:px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl sm:rounded-b-2xl">
+                <button
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  className="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={isSaving}
+                  className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
