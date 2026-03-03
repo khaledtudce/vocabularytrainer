@@ -189,14 +189,14 @@ export async function initializeUsers() {
     
     try {
       const users = await import('@/data/users.json');
-      const imported = users.default || users;
+      const imported: any = users.default || users;
       
       // Ensure it's an array
       if (Array.isArray(imported)) {
         usersList = imported;
-      } else if (imported && typeof imported === 'object') {
+      } else if (imported && typeof imported === 'object' && imported.data) {
         // If it's an object with a data property
-        usersList = imported.data || [];
+        usersList = Array.isArray(imported.data) ? imported.data : [];
       }
     } catch (importErr) {
       console.warn('[Storage] Could not import users.json:', importErr);
