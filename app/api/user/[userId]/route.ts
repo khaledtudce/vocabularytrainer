@@ -86,7 +86,7 @@ export async function PUT(request: Request, context: { params: any }) {
       updatedAt: new Date().toISOString(),
     };
 
-    await storeUser(userId, updatedUser);
+    await storeUser(updatedUser);
     console.log(`[API] User ${userId} updated successfully`);
 
     // Return updated user details without password
